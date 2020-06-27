@@ -2871,6 +2871,7 @@ local function GetPlanet(planetUtilities, planetID)
 							delay = 6*30*60,
 							orbitalDrop = true,
 							difficultyAtLeast = 3,
+              warningText = planetUtilities.messages.enemyOrbitalDrop,
 						},
 						{
 							name = "striderbantha",
@@ -2881,6 +2882,7 @@ local function GetPlanet(planetUtilities, planetID)
 							delay = 13*30*60,
 							orbitalDrop = true,
 							difficultyAtLeast = 2,
+              warningText = planetUtilities.messages.enemyOrbitalDrop,
 						},
 						{
 							name = "striderbantha",
@@ -2890,6 +2892,7 @@ local function GetPlanet(planetUtilities, planetID)
 							spawnRadius = 50,
 							delay = 19*30*60,
 							orbitalDrop = true,
+              warningText = planetUtilities.messages.enemyOrbitalDrop,
 						},
 						{
 							name = "striderbantha",

@@ -1706,6 +1706,7 @@ local function GetPlanet(planetUtilities, planetID)
 							commands = {
 								{cmdID = planetUtilities.COMMAND.FIGHT, pos = {3620, 1000}},
 							},
+              warningText = planetUtilities.messages.enemyOrbitalDrop,
 						},
  						{
 							name = "vehassault",
@@ -1864,6 +1865,7 @@ local function GetPlanet(planetUtilities, planetID)
 							commands = {
 								{cmdID = planetUtilities.COMMAND.FIGHT, pos = {3620, 1000}},
 							},
+              warningText = planetUtilities.messages.enemyOrbitalDrop,
 						},
  						{
 							name = "vehassault",
@@ -1918,6 +1920,7 @@ local function GetPlanet(planetUtilities, planetID)
 							commands = {
 								{cmdID = planetUtilities.COMMAND.FIGHT, pos = {3620, 1000}},
 							},
+              warningText = planetUtilities.messages.enemyOrbitalDrop,
 						},
  						{
 							name = "veharty",
@@ -2048,6 +2051,7 @@ local function GetPlanet(planetUtilities, planetID)
 							commands = {
 								{cmdID = planetUtilities.COMMAND.FIGHT, pos = {3620, 1000}},
 							},
+              warningText = planetUtilities.messages.enemyOrbitalDrop,
 						},
 					},
 					startUnits = {

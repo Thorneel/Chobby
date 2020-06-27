@@ -391,6 +391,7 @@ local function GetPlanet(planetUtilities, planetID)
 							spawnRadius = 50,
 							delay = 8*30*60,
 							orbitalDrop = true,
+              warningText = planetUtilities.messages.enemyOrbitalDrop,
 						},
 						{
 							name = "tankriot",
@@ -450,6 +451,7 @@ local function GetPlanet(planetUtilities, planetID)
 							spawnRadius = 50,
 							delay = 11*30*60,
 							orbitalDrop = true,
+              warningText = planetUtilities.messages.enemyOrbitalDrop,
 						},
 						{
 							name = "tankassault",

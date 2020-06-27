@@ -74,6 +74,7 @@ local function GetPlanet(planetUtilities, planetID)
 						spawnRadius = 10,
 						delay = 30*30*60,
 						orbitalDrop = true,
+              warningText = planetUtilities.messages.enemyOrbitalDrop,
 					},
 					{
 						name = "striderbantha",

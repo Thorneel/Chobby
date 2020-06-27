@@ -1595,6 +1595,7 @@ local function GetPlanet(planetUtilities, planetID)
 							spawnRadius = 150,
 							delay = 2*30*60,
 							orbitalDrop = true,
+              warningText = planetUtilities.messages.enemyOrbitalDrop,
 						},
 						{
 							name = "shieldskirm",
@@ -1694,6 +1695,7 @@ local function GetPlanet(planetUtilities, planetID)
 							spawnRadius = 150,
 							delay = 4.5*30*60,
 							orbitalDrop = true,
+              warningText = planetUtilities.messages.enemyOrbitalDrop,
 						},
 						{
 							name = "spiderskirm",
@@ -1778,6 +1780,7 @@ local function GetPlanet(planetUtilities, planetID)
 							spawnRadius = 150,
 							delay = 8*30*60,
 							orbitalDrop = true,
+              warningText = planetUtilities.messages.enemyOrbitalDrop,
 						},
 						{
 							name = "hoverarty",

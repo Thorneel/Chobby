@@ -218,6 +218,7 @@ local function GetPlanet(planetUtilities, planetID)
 							spawnRadius = 50,
 							delay = 3*30*60,
 							orbitalDrop = true,
+              warningText = planetUtilities.messages.enemyOrbitalDrop,
 						},
 						{
 							name = "amphfloater",
@@ -245,6 +246,7 @@ local function GetPlanet(planetUtilities, planetID)
 							spawnRadius = 50,
 							delay = 6*30*60,
 							orbitalDrop = true,
+              warningText = planetUtilities.messages.enemyOrbitalDrop,
 						},
 						{
 							name = "amphaa",

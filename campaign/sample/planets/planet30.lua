@@ -1070,6 +1070,7 @@ local function GetPlanet(planetUtilities, planetID)
 							spawnRadius = 50,
 							delay = 3.5*30*60,
 							orbitalDrop = true,
+              warningText = planetUtilities.messages.enemyOrbitalDrop,
 						},
 						{
 							name = "jumpsumo",
@@ -1081,6 +1082,7 @@ local function GetPlanet(planetUtilities, planetID)
 							spawnRadius = 50,
 							delay = 6.5*30*60,
 							orbitalDrop = true,
+              warningText = planetUtilities.messages.enemyOrbitalDrop,
 						},
 						{
 							name = "jumpsumo",
@@ -1092,6 +1094,7 @@ local function GetPlanet(planetUtilities, planetID)
 							spawnRadius = 50,
 							delay = 9.5*30*60,
 							orbitalDrop = true,
+              warningText = planetUtilities.messages.enemyOrbitalDrop,
 						},
 						{
 							name = "amphassault",
@@ -1102,6 +1105,7 @@ local function GetPlanet(planetUtilities, planetID)
 							spawnRadius = 50,
 							delay = 6.5*30*60,
 							orbitalDrop = true,
+              warningText = planetUtilities.messages.enemyOrbitalDrop,
 						},
 						{
 							name = "amphassault",
@@ -1121,6 +1125,7 @@ local function GetPlanet(planetUtilities, planetID)
 							spawnRadius = 50,
 							delay = 12.5*30*60,
 							orbitalDrop = true,
+              warningText = planetUtilities.messages.enemyOrbitalDrop,
 						},
 						{
 							name = "amphassault",
@@ -1141,6 +1146,7 @@ local function GetPlanet(planetUtilities, planetID)
 							spawnRadius = 50,
 							delay = 9.5*30*60,
 							orbitalDrop = true,
+              warningText = planetUtilities.messages.enemyOrbitalDrop,
 						},
 						{
 							name = "gunshipkrow",
@@ -1151,6 +1157,7 @@ local function GetPlanet(planetUtilities, planetID)
 							spawnRadius = 50,
 							delay = 13.5*30*60,
 							orbitalDrop = true,
+              warningText = planetUtilities.messages.enemyOrbitalDrop,
 						},
 						{
 							name = "gunshipkrow",

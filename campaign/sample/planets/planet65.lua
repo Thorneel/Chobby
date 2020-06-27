@@ -2614,6 +2614,7 @@ local function GetPlanet(planetUtilities, planetID)
 							spawnRadius = 150,
 							delay = 6*30*60,
 							orbitalDrop = true,
+              warningText = planetUtilities.messages.enemyOrbitalDrop,
 						},
 						{
 							name = "striderfunnelweb",
@@ -2642,6 +2643,7 @@ local function GetPlanet(planetUtilities, planetID)
 							spawnRadius = 150,
 							delay = 12*30*60,
 							orbitalDrop = true,
+              warningText = planetUtilities.messages.enemyOrbitalDrop,
 						},
 						{
 							name = "striderdante",

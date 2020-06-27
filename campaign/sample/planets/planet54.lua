@@ -348,6 +348,7 @@ local function GetPlanet(planetUtilities, planetID)
 							spawnRadius = 50,
 							delay = 1.5*30*60,
 							orbitalDrop = true,
+              warningText = planetUtilities.messages.enemyOrbitalDrop,
 						},
 						{
 							name = "shipassault",
@@ -378,6 +379,7 @@ local function GetPlanet(planetUtilities, planetID)
 							delay = 3*30*60,
 							orbitalDrop = true,
 							difficultyAtLeast = 3,
+              warningText = planetUtilities.messages.enemyOrbitalDrop,
 						},
 						{
 							name = "tankheavyassault",
@@ -388,6 +390,7 @@ local function GetPlanet(planetUtilities, planetID)
 							spawnRadius = 50,
 							delay = 6*30*60,
 							orbitalDrop = true,
+              warningText = planetUtilities.messages.enemyOrbitalDrop,
 						},
 						{
 							name = "amphassault",
@@ -397,6 +400,7 @@ local function GetPlanet(planetUtilities, planetID)
 							spawnRadius = 50,
 							delay = 8*30*60,
 							orbitalDrop = true,
+              warningText = planetUtilities.messages.enemyOrbitalDrop,
 						},
 					},
 					startUnits = {

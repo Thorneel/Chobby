@@ -1,6 +1,10 @@
 
 local planetUtilities = {}
 
+planetUtilities.messages = {
+  enemyOrbitalDrop = "warning: orbital drop detected",
+}
+
 planetUtilities.planetImages = {
 	LUA_DIRNAME .. "images/planets/arid01.png",
 	LUA_DIRNAME .. "images/planets/barren01.png",

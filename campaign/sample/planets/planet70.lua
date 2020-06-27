@@ -1445,6 +1445,7 @@ local function GetPlanet(planetUtilities, planetID)
 							orbitalDrop = true,
 							difficultyAtLeast = 1,
 							difficultyAtMost = 1,
+              warningText = planetUtilities.messages.enemyOrbitalDrop,
 						},
 						{
 							name = "gunshipkrow",
@@ -1456,6 +1457,7 @@ local function GetPlanet(planetUtilities, planetID)
 							orbitalDrop = true,
 							difficultyAtLeast = 2,
 							difficultyAtMost = 2,
+              warningText = planetUtilities.messages.enemyOrbitalDrop,
 						},
 						{
 							name = "gunshipkrow",
@@ -1467,6 +1469,7 @@ local function GetPlanet(planetUtilities, planetID)
 							orbitalDrop = true,
 							difficultyAtLeast = 3,
 							difficultyAtMost = 3,
+              warningText = planetUtilities.messages.enemyOrbitalDrop,
 						},
 						{
 							name = "gunshipkrow",
@@ -1478,6 +1481,7 @@ local function GetPlanet(planetUtilities, planetID)
 							orbitalDrop = true,
 							difficultyAtLeast = 4,
 							difficultyAtMost = 4,
+              warningText = planetUtilities.messages.enemyOrbitalDrop,
 						},
 						{
 							name = "gunshipkrow",
@@ -1489,6 +1493,7 @@ local function GetPlanet(planetUtilities, planetID)
 							orbitalDrop = true,
 							difficultyAtLeast = 4,
 							difficultyAtMost = 4,
+              warningText = planetUtilities.messages.enemyOrbitalDrop,
 						},
 						{
 							name = "gunshipkrow",
@@ -1499,6 +1504,7 @@ local function GetPlanet(planetUtilities, planetID)
 							delay = 18*30*60,
 							orbitalDrop = true,
 							difficultyAtLeast = 2,
+              warningText = planetUtilities.messages.enemyOrbitalDrop,
 						},
 					},
 					startUnits = {

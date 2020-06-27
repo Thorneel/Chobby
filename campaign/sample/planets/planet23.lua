@@ -536,6 +536,7 @@ local function GetPlanet(planetUtilities, planetID)
 							spawnRadius = 100,
 							delay = 3*30*60,
 							orbitalDrop = true,
+              warningText = planetUtilities.messages.enemyOrbitalDrop,
 						},
 						{
 							name = "spiderassault",
@@ -573,6 +574,7 @@ local function GetPlanet(planetUtilities, planetID)
 							spawnRadius = 100,
 							delay = 6*30*60,
 							orbitalDrop = true,
+              warningText = planetUtilities.messages.enemyOrbitalDrop,
 						},
 						{
 							name = "vehassault",
@@ -686,6 +688,7 @@ local function GetPlanet(planetUtilities, planetID)
 							spawnRadius = 100,
 							delay = 9*30*60,
 							orbitalDrop = true,
+              warningText = planetUtilities.messages.enemyOrbitalDrop,
 						},
 						{
 							name = "jumpassault",
@@ -725,6 +728,7 @@ local function GetPlanet(planetUtilities, planetID)
 							spawnRadius = 100,
 							delay = 12*30*60,
 							orbitalDrop = true,
+              warningText = planetUtilities.messages.enemyOrbitalDrop,
 						},
 						{
 							name = "shieldshield",
