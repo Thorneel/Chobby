@@ -919,7 +919,20 @@ local function GetPlanet(planetUtilities, planetID)
 					description = "Complete all bonus objectives (in one battle).",
 					experience = planetUtilities.BONUS_EXP,
 				},
-			}
+			},
+      messagesOverTime = {
+        [       6     *30    ] = "warning: large-scale nanite activity detected",
+        [       8     *30    ] = "warning: nanite infiltration detected",
+        [       8     *30 +10] = "activating anti-nanite countermeasures",
+        [       8     *30 +15] = "nanite inflitration neutralised",
+        [       9     *30    ] = "warning: nanite coordination network detected",
+        [       9     *30 +15] = "warning: nanite strain identified as zombie nanoplague",
+        [      10     *30    ] = "warning: nanite activation signal detected",
+        [      10     *30 +10] = "warning: zombie automata activity detected",
+        [      10     *30 +20] = "warning: zombie automata powering up",
+        [      10     *30 +25] = "warning: zombie distributed network active",
+        [      10     *30 +30] = "warning: zombie nanoplague resurrection field active",
+      },
 		},
 		completionReward = {
 			experience = planetUtilities.MAIN_EXP,

@@ -5,6 +5,58 @@ planetUtilities.messages = {
   enemyOrbitalDrop = "warning: orbital drop detected",
 }
 
+planetUtilities.messageGenerators = {
+  
+  VictoryAfterTime = function(name, timeInSeconds, additionalMessages)
+      
+      local timeInFrames = timeInSeconds * 30
+      local timeInMinutes = math.floor(timeInSeconds/60)
+      
+      local messageTable = {
+        [2*30   ] = "connecting to " .. name .. "...",
+        [2*30+10] = "connected",
+        [2*30+12] = "querying database",
+        [2*30+14] = "warning: corrupted packets, some data may be unrecoverable",
+        [2*30+16] = "retrieving relevant data",
+        [2*30+18] = "opening high-bandwidth data socket",
+        [2*30+20] = "starting download...",
+        [3*30   ] = "estimated time before download is complete: " .. timeInMinutes .. " minutes",
+        
+        [timeInFrames-(60*30)] = "1 minutes remaining...",
+        [timeInFrames-(30*30)] = "30 seconds remaining...",
+        [timeInFrames-(15*30)] = "15 seconds remaining...",
+        [timeInFrames-(10*30)] = "10 seconds remaining...",
+        [timeInFrames-( 9*30)] = "preparing emergency extraction",
+        [timeInFrames-( 5*30)] = "5 seconds remaining...",
+        [timeInFrames-( 3*30)] = "dropship in approach",
+        [timeInFrames-    30 ] = "1 second remaining...",
+        [timeInFrames-    20 ] = "data transfer complete",
+        [timeInFrames-    10 ] = "terminating process",
+        [timeInFrames-     6 ] = "closing high-bandwidth data socket",
+        [timeInFrames-     4 ] = "disconnecting from " .. name .. "...",
+        [timeInFrames-     2 ] = "disconnected",
+        [timeInFrames-     1 ] = "download succesful",
+      }
+      
+      local timeLeftInMinutes = 5
+      while(timeLeftInMinutes < timeInMinutes) do
+        
+        local frame = timeInFrames - (timeLeftInMinutes*60*30)
+        messageTable[frame] = timeLeftInMinutes .. " minutes remaining..."
+        timeLeftInMinutes = timeLeftInMinutes + 5
+        
+      end
+      
+      if additionalMessages and type(additionalMessages) == "table" then
+        for k,v in pairs(additionalMessages) do messageTable[k] = v end
+      end
+      
+      return messageTable
+    end,
+  
+  
+}
+
 planetUtilities.planetImages = {
 	LUA_DIRNAME .. "images/planets/arid01.png",
 	LUA_DIRNAME .. "images/planets/barren01.png",

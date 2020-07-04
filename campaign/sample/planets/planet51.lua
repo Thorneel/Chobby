@@ -2236,7 +2236,8 @@ local function GetPlanet(planetUtilities, planetID)
 					description = "Destroy all enemy Metal Extractors before 25:00",
 					experience = planetUtilities.BONUS_EXP,
 				},
-			}
+			},
+      messagesOverTime = planetUtilities.messageGenerators.VictoryAfterTime("Tech Lab", 30*60),
 		},
 		completionReward = {
 			experience = planetUtilities.MAIN_EXP,

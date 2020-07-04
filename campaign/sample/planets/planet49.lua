@@ -4717,6 +4717,26 @@ local function GetPlanet(planetUtilities, planetID)
 					experience = planetUtilities.BONUS_EXP,
 				},
 			},
+      messagesOverTime = {
+        [   18*60     *30    ] = "enemy transmission intercepted",
+        [   18*60     *30 +10] = "scanning for vulnerabilities...",
+        [  (18*60+ 4) *30    ] = "no vulnerability found",
+        [  (18*60+ 4) *30 +10] = "starting encryption analysis...",
+        
+        [  (20*60+40) *30    ] = "encryption analysis finished",
+        [  (20*60+40) *30 + 2] = "result: weak key use detected",
+        [  (20*60+40) *30 +10] = "starting codebreaking...",
+        
+        [  (29*60+50) *30    ] = "codebreaking successful",
+        [  (29*60+50) *30 + 2] = "decoding enemy transmission",
+        [  (29*60+55) *30    ] = "enemy transmission decoded",
+        [  (29*60+55) *30 + 2] = "analysing content...",
+        [  (29*60+59) *30    ] = "connecting to enemy communication network...",
+        [  (29*60+59) *30 +10] = "connected",
+        [  (29*60+59) *30 +12] = "sending shutdown order",
+        [  (29*60+59) *30 +26] = "order acknowledged",
+        [  (29*60+59) *30 +28] = "enemy forces shutting down",
+      },
 		},
 		completionReward = {
 			experience = planetUtilities.MAIN_EXP,
