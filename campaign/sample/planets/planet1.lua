@@ -141,6 +141,7 @@ local function GetPlanet(planetUtilities, planetID)
 					bitDependant = true,
 					commanderParameters = {
 						facplop = false,
+            messageWhenDestroyed = planetUtilities.messages.enemyNodeDestroyed,
 					},
 					allyTeam = 1,
 					unlocks = {
@@ -157,7 +158,7 @@ local function GetPlanet(planetUtilities, planetID)
 						decorations = {
 						  "skin_support_dark",
 						},
-						modules = {}
+						modules = {},
 					},
 					startUnits = {
 						{
@@ -219,7 +220,8 @@ local function GetPlanet(planetUtilities, planetID)
 							mapMarker = {
 								text = "Destroy",
 								color = "red"
-							}
+							},
+              messageWhenDestroyed = planetUtilities.messages.enemyProdDestroyed,
 						},
 					
 					}

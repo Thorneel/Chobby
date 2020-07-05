@@ -375,6 +375,7 @@ local function GetPlanet(planetUtilities, planetID)
 							z = 11080,
 							facing = 2,
 							bonusObjectiveID = 3,
+              messageWhenDestroyed = "ha"
 						},
 						{
 							name = "staticcon",
@@ -609,6 +610,7 @@ local function GetPlanet(planetUtilities, planetID)
 								text = "Singularity Reactors",
 								color = "red"
 							},
+              messageWhenDestroyed = "boom",
 						},
 						{
 							name = "energysingu",

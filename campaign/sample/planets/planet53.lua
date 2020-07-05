@@ -1848,6 +1848,7 @@ local function GetPlanet(planetUtilities, planetID)
 								text = "Warp Jammer",
 								color = "red_small"
 							},
+              messageWhenDestroyed = planetUtilities.messages.enemyWarpJammerDestroyed,
 						},
 						{
 							name = "pw_warpjammer",
@@ -1858,6 +1859,7 @@ local function GetPlanet(planetUtilities, planetID)
 								text = "Warp Jammer",
 								color = "red_small"
 							},
+              messageWhenDestroyed = planetUtilities.messages.enemyWarpJammerDestroyed,
 						},
 						{
 							name = "staticantinuke",
@@ -2074,6 +2076,7 @@ local function GetPlanet(planetUtilities, planetID)
 							x = 7424,
 							z = 3624,
 							facing = 3,
+              messageWhenDestroyed = planetUtilities.messages.enemyProdDestroyed,
 						},
  						{
 							name = "energysolar",
@@ -2168,6 +2171,7 @@ local function GetPlanet(planetUtilities, planetID)
 							x = 7232,
 							z = 912,
 							facing = 3,
+              messageWhenDestroyed = planetUtilities.messages.enemyProdDestroyed,
 						},
  						{
 							name = "staticcon",
@@ -2180,6 +2184,7 @@ local function GetPlanet(planetUtilities, planetID)
 							x = 7456,
 							z = 1680,
 							facing = 3,
+              messageWhenDestroyed = planetUtilities.messages.enemyProdDestroyed,
 						},
  						{
 							name = "staticcon",
@@ -2198,6 +2203,7 @@ local function GetPlanet(planetUtilities, planetID)
 							x = 7464,
 							z = 5016,
 							facing = 3,
+              messageWhenDestroyed = planetUtilities.messages.enemyProdDestroyed,
 						},
  						{
 							name = "staticcon",
@@ -2220,6 +2226,7 @@ local function GetPlanet(planetUtilities, planetID)
 							x = 7544,
 							z = 2848,
 							facing = 3,
+              messageWhenDestroyed = planetUtilities.messages.enemyProdDestroyed,
 						},
  						{
 							name = "turretlaser",

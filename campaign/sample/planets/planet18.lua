@@ -593,6 +593,7 @@ local function GetPlanet(planetUtilities, planetID)
 								text = "Destroy",
 								color = "red_small"
 							},
+              messageWhenDestroyed = planetUtilities.messages.enemyEnergyDestroyed,
 						},
 						{
 							name = "energypylon",
@@ -2270,6 +2271,7 @@ local function GetPlanet(planetUtilities, planetID)
 								text = "Destroy",
 								color = "red_small"
 							},
+              messageWhenDestroyed = planetUtilities.messages.enemyEnergyDestroyed,
 						},
 						{
 							name = "turretemp",

@@ -580,6 +580,7 @@ local function GetPlanet(planetUtilities, planetID)
 								text = "Gunship Plant",
 								color = "red"
 							},
+              messageWhenDestroyed = planetUtilities.messages.enemyProdDestroyed,
 						},
 						{
 							name = "factorygunship",
@@ -591,6 +592,7 @@ local function GetPlanet(planetUtilities, planetID)
 								text = "Gunship Plant",
 								color = "red"
 							},
+              messageWhenDestroyed = planetUtilities.messages.enemyProdDestroyed,
 						},
 						{
 							name = "staticcon",
@@ -793,18 +795,21 @@ local function GetPlanet(planetUtilities, planetID)
 							x = 4760,
 							z = 4792,
 							facing = 0,
+              messageWhenDestroyed = planetUtilities.messages.enemyDefenseDestroyed,
 						},
 						{
 							name = "turretheavy",
 							x = 3688,
 							z = 6472,
 							facing = 0,
+              messageWhenDestroyed = planetUtilities.messages.enemyDefenseDestroyed,
 						},
 						{
 							name = "turretheavy",
 							x = 6344,
 							z = 3480,
 							facing = 0,
+              messageWhenDestroyed = planetUtilities.messages.enemyDefenseDestroyed,
 						},
 						{
 							name = "turretheavylaser",

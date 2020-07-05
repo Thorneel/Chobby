@@ -3,6 +3,19 @@ local planetUtilities = {}
 
 planetUtilities.messages = {
   enemyOrbitalDrop = "warning: orbital drop detected",
+  
+  enemyNodeDestroyed = "enemy control node destroyed",
+  enemyProdDestroyed = "enemy production system destroyed",
+  enemyEnergyDestroyed = "heavy enemy energy generator destroyed",
+  enemyResourceGenDestroyed = "vital enemy resource generator destroyed",
+  enemyDepotDestroyed = "enemy resource depot destroyed",
+  enemyDefenseDestroyed = "heavy enemy defense system destroyed",
+  enemyNukeDestroyed = "enemy strategic nuclear silo destroyed",
+  enemyAntiNukeDestroyed = "enemy anti-nuclear defense destroyed",
+  enemyArtyDestroyed = "enemy long-range artillery cannon destroyed",
+  enemyStriderDestroyed = "enemy strider destroyed",
+  enemySuperweaponDestroyed = "enemy superweapon destroyed",
+  enemyWarpJammerDestroyed = "enemy warp jammer destroyed",
 }
 
 planetUtilities.messageGenerators = {

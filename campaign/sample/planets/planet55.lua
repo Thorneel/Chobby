@@ -2026,6 +2026,7 @@ local function GetPlanet(planetUtilities, planetID)
 							spawnRadius = 50,
 							delay = 8*30*60,
 							orbitalDrop = true,
+              messageWhenDestroyed = planetUtilities.messages.enemyStriderDestroyed,
 						},
 						{
 							name = "striderfunnelweb",
@@ -2036,6 +2037,7 @@ local function GetPlanet(planetUtilities, planetID)
 							delay = 8*30*60,
 							orbitalDrop = true,
 							difficultyAtLeast = 2,
+              messageWhenDestroyed = planetUtilities.messages.enemyStriderDestroyed,
 						},
 						{
 							name = "striderfunnelweb",
@@ -2046,6 +2048,7 @@ local function GetPlanet(planetUtilities, planetID)
 							delay = 8*30*60,
 							orbitalDrop = true,
 							difficultyAtLeast = 3,
+              messageWhenDestroyed = planetUtilities.messages.enemyStriderDestroyed,
 						},
 						{
 							name = "striderfunnelweb",
@@ -2056,6 +2059,7 @@ local function GetPlanet(planetUtilities, planetID)
 							delay = 8*30*60,
 							orbitalDrop = true,
 							difficultyAtLeast = 4,
+              messageWhenDestroyed = planetUtilities.messages.enemyStriderDestroyed,
 						},
 						{
 							name = "striderfunnelweb",
@@ -2065,6 +2069,7 @@ local function GetPlanet(planetUtilities, planetID)
 							spawnRadius = 50,
 							delay = 12*30*60,
 							orbitalDrop = true,
+              messageWhenDestroyed = planetUtilities.messages.enemyStriderDestroyed,
 						},
 						{
 							name = "striderfunnelweb",
@@ -2075,6 +2080,7 @@ local function GetPlanet(planetUtilities, planetID)
 							delay = 12*30*60,
 							orbitalDrop = true,
 							difficultyAtLeast = 2,
+              messageWhenDestroyed = planetUtilities.messages.enemyStriderDestroyed,
 						},
 					},
 					startUnits = {
@@ -2087,12 +2093,14 @@ local function GetPlanet(planetUtilities, planetID)
 								text = "Antinuke",
 								color = "red_small"
 							},
+              messageWhenDestroyed = planetUtilities.messages.enemyAntiNukeDestroyed,
 						},
 						{
 							name = "staticheavyarty",
 							x = 5008,
 							z = 2976,
 							facing = 0,
+              messageWhenDestroyed = planetUtilities.messages.enemyArtyDestroyed,
 						},
  						{
 							name = "staticheavyarty",
@@ -2100,6 +2108,7 @@ local function GetPlanet(planetUtilities, planetID)
 							z = 3104,
 							facing = 0,
 							difficultyAtLeast = 4,
+              messageWhenDestroyed = planetUtilities.messages.enemyArtyDestroyed,
 						},
 						{
 							name = "staticheavyarty",
@@ -2108,7 +2117,8 @@ local function GetPlanet(planetUtilities, planetID)
 							facing = 0,
 							difficultyAtMost = 3,
 							difficultyAtLeast = 3,
-							buildProgress = 0.5
+							buildProgress = 0.5,
+              messageWhenDestroyed = planetUtilities.messages.enemyArtyDestroyed,
 						},
 						{
 							name = "staticheavyarty",
@@ -2116,19 +2126,22 @@ local function GetPlanet(planetUtilities, planetID)
 							z = 3104,
 							facing = 0,
 							difficultyAtMost = 2,
-							buildProgress = 0.1
+							buildProgress = 0.1,
+              messageWhenDestroyed = planetUtilities.messages.enemyArtyDestroyed,
 						},
 						{
 							name = "striderfunnelweb",
 							x = 5000,
 							z = 700,
 							facing = 0,
+              messageWhenDestroyed = planetUtilities.messages.enemyStriderDestroyed,
 						},
 						{
 							name = "striderfunnelweb",
 							x = 5200,
 							z = 700,
 							facing = 0,
+              messageWhenDestroyed = planetUtilities.messages.enemyStriderDestroyed,
 						},
 						{
 							name = "striderfunnelweb",
@@ -2136,6 +2149,7 @@ local function GetPlanet(planetUtilities, planetID)
 							z = 700,
 							facing = 0,
 							difficultyAtLeast = 4,
+              messageWhenDestroyed = planetUtilities.messages.enemyStriderDestroyed,
 						},
 						{
 							name = "pw_metal",
@@ -2545,6 +2559,7 @@ local function GetPlanet(planetUtilities, planetID)
 							x = 5584,
 							z = 2288,
 							facing = 0,
+              messageWhenDestroyed = planetUtilities.messages.enemyProdDestroyed,
 						},
  						{
 							name = "energywind",
@@ -3451,6 +3466,7 @@ local function GetPlanet(planetUtilities, planetID)
 							x = 1648,
 							z = 448,
 							facing = 0,
+              messageWhenDestroyed = planetUtilities.messages.enemyProdDestroyed,
 						},
  						{
 							name = "staticmex",

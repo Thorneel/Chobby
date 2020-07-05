@@ -1391,6 +1391,7 @@ local function GetPlanet(planetUtilities, planetID)
 					humanName = "Sommelis",
 					commanderParameters = {
 						facplop = false,
+            messageWhenDestroyed = planetUtilities.messages.enemyNodeDestroyed,
 					},
 					allyTeam = 1,
 					unlocks = {
@@ -1512,6 +1513,7 @@ local function GetPlanet(planetUtilities, planetID)
 								text = "Cerberus",
 								color = "red_small"
 							},
+              messageWhenDestroyed = planetUtilities.messages.enemyArtyDestroyed,
 						},
 						{
 							name = "staticheavyradar",

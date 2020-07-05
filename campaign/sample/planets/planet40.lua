@@ -1603,6 +1603,7 @@ local function GetPlanet(planetUtilities, planetID)
 								text = "Nuclear Silo",
 								color = "red",
 							},
+              messageWhenDestroyed = planetUtilities.messages.enemyNukeDestroyed,
 						},
 						{
 							name = "staticantinuke",

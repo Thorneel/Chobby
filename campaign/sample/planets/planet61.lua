@@ -1279,6 +1279,7 @@ local function GetPlanet(planetUtilities, planetID)
 								text = "Antinuke",
 								color = "red_small"
 							},
+              messageWhenDestroyed = planetUtilities.messages.enemyAntiNukeDestroyed,
 						},
 						{
 							name = "staticarty",
@@ -1334,12 +1335,14 @@ local function GetPlanet(planetUtilities, planetID)
 							x = 7100,
 							z = 2320,
 							facing = 0,
+              messageWhenDestroyed = planetUtilities.messages.enemyDefenseDestroyed,
 						},
 						{
 							name = "turretsunlance",
 							x = 7360,
 							z = 2580,
 							facing = 0,
+              messageWhenDestroyed = planetUtilities.messages.enemyDefenseDestroyed,
 						},
 						{
 							name = "turretriot",
@@ -3890,6 +3893,7 @@ local function GetPlanet(planetUtilities, planetID)
 								text = "Antinuke",
 								color = "red_small"
 							},
+              messageWhenDestroyed = planetUtilities.messages.enemyAntiNukeDestroyed,
 						},
 					},
 				},
@@ -4512,12 +4516,14 @@ local function GetPlanet(planetUtilities, planetID)
 							x = 7296,
 							z = 6192,
 							facing = 0,
+              messageWhenDestroyed = planetUtilities.messages.enemyDefenseDestroyed,
 						},
 						{
 							name = "turretsunlance",
 							x = 7520,
 							z = 5936,
 							facing = 0,
+              messageWhenDestroyed = planetUtilities.messages.enemyDefenseDestroyed,
 						},
 					}
 				},
