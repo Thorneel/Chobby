@@ -315,13 +315,16 @@ local function GetPlanet(planetUtilities, planetID)
 				},
 			},
       messagesOverTime = {
-        [       2     *30    ] = "scanning for local enemy activity...",
-        [       3     *30    ] = "local activity detected: 1 Commander, 1 Factory",
-        [       3     *30 + 2] = "enemy forces are estimated to have no factory building capacity",
-        [       3     *30 + 4] = "suggestion: engage [error: corrupted data block]",
-        [       3     *30 + 6] = "attempting recovery... [error: corrupted data block]",
-        [       3     *30 + 8] = "restarting suggestion module... [error: corrupted data block]",
-      }
+        displayAfterVictory = false,
+        messages = {
+          [       2     *30    ] = "scanning for local enemy activity...",
+          [       3     *30    ] = "local activity detected: 1 Commander, 1 Factory",
+          [       3     *30 + 2] = "enemy forces are estimated to have no factory building capacity",
+          [       3     *30 + 4] = "suggestion: engage [error: corrupted data block]",
+          [       3     *30 + 6] = "attempting recovery... [error: corrupted data block]",
+          [       3     *30 + 8] = "restarting suggestion module... [error: corrupted data block]",
+        },
+      },
 		},
 		completionReward = {
 			experience = planetUtilities.MAIN_EXP,

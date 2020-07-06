@@ -2237,7 +2237,10 @@ local function GetPlanet(planetUtilities, planetID)
 					experience = planetUtilities.BONUS_EXP,
 				},
 			},
-      messagesOverTime = planetUtilities.messageGenerators.VictoryAfterTime("Tech Lab", 30*60),
+      messagesOverTime = {
+        displayAfterVictory = true,
+        messages = planetUtilities.messageGenerators.VictoryAfterTime("Tech Lab", 30*60),
+      },
 		},
 		completionReward = {
 			experience = planetUtilities.MAIN_EXP,
