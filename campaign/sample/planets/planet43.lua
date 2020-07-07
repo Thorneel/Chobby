@@ -935,6 +935,21 @@ local function GetPlanet(planetUtilities, planetID)
           [      10     *30 +25] = "warning: zombie distributed network active",
           [      10     *30 +30] = "warning: zombie nanoplague resurrection field active",
         },
+        
+        victoryMessages = {
+          [ 0*30+ 1] = "attempting direct connection...",
+          [ 0*30+ 2] = "direct connection established",
+          [ 0*30+ 5] = "starting quick diagnostic...",
+          [ 0*30+10] = "problem detected: out-of-parameters nanites",
+          [ 0*30+11] = "problem detected: unauthorized nanite communication network",
+          [ 0*30+12] = "problem detected: out-of-parameters automata",
+          [ 0*30+15] = "engaging emergency failsafe",
+          [ 0*30+16] = "general shutdown order sent",
+          [ 1*30   ] = "shutdown confirmed",
+          [ 5*30   ] = "all systems nominal",
+          [ 5*30+ 2] = "complete diagnostic recommended",
+          [ 5*30+10] = "starting complete diagnostic, this may take a while...",
+        },
       },
 		},
 		completionReward = {
