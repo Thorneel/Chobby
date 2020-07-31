@@ -527,7 +527,7 @@ Oh right, I was a student at an Imperial Academy of War. Funny thing, to have fo
 	},
 	location_sirlanna = { -- planet23
 		name = "Sirlanna Fortress",
-		image = "campaign/sample/graphics/unitpics/turretgauss.png",
+		image = "campaign/sample/graphics/unitpics/pw_garrison.png",
 		category = "4. Locations",
 		text = [[This star system had once been the lynchpin of half the Union's Anarchai Arm front, a mighty fortress ready to take on any invasion - or stage their own. But a new, greater foe struck the vulnerable Dynasty Arm border instead. Pushing right towards the Union's core worlds, they cut Sirlanna off, blockading it from neighbouring systems.
  
