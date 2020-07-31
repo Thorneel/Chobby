@@ -950,6 +950,8 @@ local function GetPlanet(planetUtilities, planetID)
           [ 5*30+ 2] = "complete diagnostic recommended",
           [ 5*30+10] = "starting complete diagnostic, this may take a while...",
         },
+        
+        defeatMessages = planetUtilities.messageLists.defeat,
       },
 		},
 		completionReward = {

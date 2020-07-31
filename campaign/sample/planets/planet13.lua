@@ -425,6 +425,25 @@ local function GetPlanet(planetUtilities, planetID)
 					experience = planetUtilities.BONUS_EXP,
 				},
 			},
+      messagesOverTime = {
+        victoryMessages = planetUtilities.messageGenerators.ConcatMessages(
+          planetUtilities.messageLists.orderShutdownFromLocation,
+          {
+            --[ 0*30+16] = "general shutdown order sent",
+            [ 0*30+17] = "accessing interception network",
+            [ 0*30+20] = "connected to inteception network command system",
+            [ 0*30+21] = "scanning starship movement logs...",
+            --[ 1*30   ] = "shutdown confirmed",
+            [ 1*30+10] = "interstellar pursuit force identified",
+            [ 1*30+11] = "preparing shutdown order for pursuit force",
+            [ 1*30+11] = "activating interstellar communication array...",
+            [ 2*30   ] = "interstellar communication array online",
+            [ 2*30+ 1] = "transmitting shutdown order...",
+            [ 4*30   ] = "message received: shutdown order acknowledged",
+            [ 5*30   ] = "message received: shutdown confirmed",
+          }
+        ),
+      },
 		},
 		completionReward = {
 			experience = planetUtilities.MAIN_EXP,

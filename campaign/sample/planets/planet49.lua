@@ -4675,6 +4675,7 @@ local function GetPlanet(planetUtilities, planetID)
 						"factoryspider",
 					},
 					loseAfterSeconds = 30*60,
+          skipVictoryMessageIfLostToTime = true,
 					allyTeamLossObjectiveID = 1,
 				},
 			},

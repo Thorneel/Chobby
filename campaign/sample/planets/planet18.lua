@@ -3410,7 +3410,10 @@ local function GetPlanet(planetUtilities, planetID)
 					description = "Complete all bonus objectives (in one battle).",
 					experience = planetUtilities.BONUS_EXP,
 				},
-			}
+			},
+      messagesOverTime = {
+        victoryMessages = planetUtilities.messageLists.orderShutdownFromLocation,
+      },
 		},
 		completionReward = {
 			experience = planetUtilities.MAIN_EXP,

@@ -34,7 +34,7 @@ planetData = {
 		primaryType = "G8V",
 		milRating = 1,
 		feedbackLink = "http://zero-k.info/Forum/Thread/24489",
-		text = [[Your first battle will be straightforward. You have been provided with a starting base. Construct an army of Glaives and Reavers and overwhelm your enemy.]]
+		text = [[Your first battle will be straightforward. You have been provided with a starting base. Construct an army of Glaives and Reavers and overwhelm your enemy.]],
 		-- extendedText is optional and used as the text for the ingame briefing.
 		extendedText = [[Something else]],
 	},
@@ -71,7 +71,7 @@ planetData = {
 			[1] = {
 				zombies = 0,
 			},
-		}
+		},
 		
 		-- Add arbitrary map markers
 		mapMarkers = {
@@ -159,15 +159,15 @@ planetData = {
 			-- Extra abilities that are availbile to the player
 			extraAbilities = {
 				"terraform",
-			}
+			},
 			
 			-- The whitelist is a list of units that are not disabled for the mission.
 			-- The blacklist is a list of units that are disabled for the mission.
 			-- These tables are maps, leave them nil to not use them.
-			unitWhitelist = nil
+			unitWhitelist = nil,
 			unitBlacklist = {
 				turretlaser = true,
-			}
+			},
 			
 			-- Win by moving particular unit types to one or more locations.
 			typeVictoryAtLocation = {
@@ -179,7 +179,7 @@ planetData = {
 						objectiveID = 5,
 						-- Map markers added in map marker table.
 					},
-				}
+				},
 			},
 			
 			-- Units that spawn at the start of the game.
@@ -197,7 +197,7 @@ planetData = {
 					stunTime = 2,
 					
 					-- Starting shield power as a factor of total shield capacity. Leave as nil for the default.
-					shieldFactor = 0.8
+					shieldFactor = 0.8,
 					
 					-- Set terraform height to make a Skydust
 					terraformHeight = 30,
@@ -263,7 +263,7 @@ planetData = {
 						{2477, 2432},
 						{2286, 2570},
 						{2077, 2102},
-					}
+					},
 					
 					-- selfPatrol makes units patrol on the spot. Use for Caretakers
 					selfPatrol = false,
@@ -357,7 +357,7 @@ planetData = {
 				difficultyAtMost = nil,
 				difficultyAtLeast = nil,
 			},
-		}
+		},
 		
 		-- Configuration for all the AI teams in the game. These are mostly the same as player config.
 		aiConfig = {
@@ -427,6 +427,7 @@ planetData = {
 						z = 220,
 						facing = 2,
 						noControl = true,
+            messageWhenDestroyed = ""
 					},
 					{
 						name = "factorycloak",
@@ -437,6 +438,14 @@ planetData = {
 				},
 				-- midgameUnits is identical to playerConfig
 				midgameUnits = {
+          name = "spiderassault",
+          x = 3660,
+          z = 2040,
+          facing = 0,
+          spawnRadius = 100,
+          delay = 3*30*60,
+          orbitalDrop = true,
+          warningText = "", -- message when this unit is spawned
 				},
 			},
 			{
@@ -511,12 +520,12 @@ planetData = {
 				-- AllyTeam 0 had better be the players allyTeam.
 				-- The players allyTeam only supports the parameters loseAfterSeconds and timeLossObjectiveID
 				
-				-- Lose after this many seconds
-				loseAfterSeconds = 60,
+				-- All allyTeams can have loseAfterSeconds.
+				loseAfterSeconds = false,
 				
 				-- ObjectiveID is purely for the objectives UI. Sets the objective to mark as complete.
 				timeLossObjectiveID = 1,
-			}
+			},
 			[1] = {
 				-- If ignoreUnitLossDefeat is true then the defeault defeat condition, lose all units, is disabled.
 				ignoreUnitLossDefeat = false,
@@ -537,8 +546,11 @@ planetData = {
 					"factorycloak",
 				},
 				
-				-- All allyTeams can have loseAfterSeconds.
-				loseAfterSeconds = false,
+				-- Lose after this many seconds
+				loseAfterSeconds = 60,
+        
+        -- If this allyTeam looses to time, do not display the victory messages
+        skipVictoryMessageIfLostToTime = true,
 				
 				-- ObjectiveID is purely for the objectives UI. Sets the objective to mark as complete.
 				allyTeamLossObjectiveID = 5,
@@ -646,6 +658,14 @@ planetData = {
 				imageOverlay = planetUtilities.ICON_OVERLAY.GUARD,
 				description = "Keep your Reaver alive.",
 				experience = 10,
+        messagesOnSuccess = {
+          [ 0*30+10] = "message to be displayed this many frames after bonus objective success",
+          -- ...
+        },
+        messagesOnFailure = {
+          [ 0*30+10] = "message to be displayed this many frames after bonus objective has been failed",
+          -- ...
+        },
 			},
 			[2] = {
 				victoryByTime = 480,
@@ -660,7 +680,37 @@ planetData = {
 				experience = planetUtilities.BONUS_EXP,
 			},
 			-- See planet definitions for many more examples.
-		}
+		},
+    
+    -- non-unit-specific messages to be displayed during the mission
+    messagesOverTime = {
+      
+      -- whether messages will still be displayed past victory
+      -- messages are never displayed after defeat
+      displayAfterVictory = false,
+      
+      -- messages to be displayed after a fixed number of game frames past the mission start
+      messages = {
+        -- display after 15 minutes, 20 seconds, and 10 frames (there are 30 frames per second)
+        [(((15*60)+20)*30)+10] = "message to be displayed at this game frame",
+        [(((15*60)+20)*30)+25] = "message to be displayed at this other game frame",
+        -- ...
+      },
+      
+      -- messages to display after a victory
+      -- note: if someone lost to time, victory messages are not displayed, use general time messages instead
+      -- this allows for different messages for time and military victories
+      victoryMessages = {
+        [ 0*30+10] = "message to be displayed this many frames after victory",
+        -- ...
+      },
+      
+      -- messages to display after a defeat
+      defeatMessages = {
+        [ 0*30+10] = "message to be displayed this many frames after defeat",
+        -- ...
+      },
+    },
 	},
 	
 	-- Configuration for the rewards gained upon winning the battle. Does not include bonus objectives.

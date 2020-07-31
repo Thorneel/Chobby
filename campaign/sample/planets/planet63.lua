@@ -3089,6 +3089,7 @@ local function GetPlanet(planetUtilities, planetID)
 				[1] = {
 					ignoreUnitLossDefeat = false,
 					loseAfterSeconds = 30*60,
+          skipVictoryMessageIfLostToTime = true,
 					allyTeamLossObjectiveID = 1,
 				},
 			},

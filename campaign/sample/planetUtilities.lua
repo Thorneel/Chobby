@@ -16,58 +16,111 @@ planetUtilities.messages = {
   enemyStriderDestroyed = "enemy strider destroyed",
   enemySuperweaponDestroyed = "enemy superweapon destroyed",
   enemyWarpJammerDestroyed = "enemy warp jammer destroyed",
+  
+  
+}
+
+local orderShutdownMessageList = {
+  [ 0*30+11] = "accessing enemy command network",
+  [ 0*30+15] = "connected to command network",
+  [ 0*30+16] = "general shutdown order sent",
+  [ 1*30   ] = "shutdown confirmed",
+}
+
+local function ConcatMessages(...)
+  
+  local arg = {...}
+  local messageTable = {}
+  for i = 1, #arg do
+    for k,v in pairs(arg[i]) do messageTable[k] = v end
+  end
+  return messageTable
+  
+end
+
+planetUtilities.messageLists = {
+  
+  orderShutdownFromLocation = ConcatMessages(
+    {
+      [ 0*30+ 1] = "attempting direct connection...",
+      [ 0*30+ 2] = "direct connection established",
+      [ 0*30+ 3] = "attempting to take over system...",
+      [ 0*30+10] = "system successfully commandeered",
+    },
+    orderShutdownMessageList
+  ),
+  
+  orderShutdownAfterDestruction = ConcatMessages(
+    {
+      [ 0*30+ 1] = "all main enemy systems destroyed",
+      [ 0*30+ 2] = "scanning for enemy communications...",
+      [ 0*30+ 5] = "enemy communications intercepted",
+      [ 0*30+ 6] = "analyzing enemy communications...",
+      [ 0*30+10] = "network vulnerability identified",
+    },
+    orderShutdownMessageList
+  ),
+  
+  callDropship = {
+    [ 0*30+ 1] = "main objectives accomplished",
+    [ 0*30+ 2] = "engaging emergency exfiltration protocol",
+    [ 0*30+ 3] = "dropship in final approach",
+  },
+  
+  defeat = {
+    [ 0*30+ 1] = "ALERT: SYSTEMS CRITICAL",
+    [ 0*30+ 2] = "ALERT: COMMANDER INTEGRITY COMPROMISED",
+    [ 0*30+ 3] = "ALERT: EMERGENCY RIPCORD EVAC OFFLINE",
+    [ 0*30+ 4] = "ALERT: REACTOR BR4ZH%X#S&###",
+  },
 }
 
 planetUtilities.messageGenerators = {
   
-  VictoryAfterTime = function(name, timeInSeconds, additionalMessages)
-      
-      local timeInFrames = timeInSeconds * 30
-      local timeInMinutes = math.floor(timeInSeconds/60)
-      
-      local messageTable = {
-        [2*30   ] = "connecting to " .. name .. "...",
-        [2*30+10] = "connected",
-        [2*30+12] = "querying database",
-        [2*30+14] = "warning: corrupted packets, some data may be unrecoverable",
-        [2*30+16] = "retrieving relevant data",
-        [2*30+18] = "opening high-bandwidth data socket",
-        [2*30+20] = "starting download...",
-        [3*30   ] = "estimated time before download is complete: " .. timeInMinutes .. " minutes",
-        
-        [timeInFrames-(60*30)] = "1 minutes remaining...",
-        [timeInFrames-(30*30)] = "30 seconds remaining...",
-        [timeInFrames-(15*30)] = "15 seconds remaining...",
-        [timeInFrames-(10*30)] = "10 seconds remaining...",
-        [timeInFrames-( 9*30)] = "preparing emergency extraction",
-        [timeInFrames-( 5*30)] = "5 seconds remaining...",
-        [timeInFrames-( 3*30)] = "dropship in approach",
-        [timeInFrames-    30 ] = "1 second remaining...",
-        [timeInFrames-    20 ] = "data transfer complete",
-        [timeInFrames-    10 ] = "terminating process",
-        [timeInFrames-     6 ] = "closing high-bandwidth data socket",
-        [timeInFrames-     4 ] = "disconnecting from " .. name .. "...",
-        [timeInFrames-     2 ] = "disconnected",
-        [timeInFrames-     1 ] = "download succesful",
-      }
-      
-      local timeLeftInMinutes = 5
-      while(timeLeftInMinutes < timeInMinutes) do
-        
-        local frame = timeInFrames - (timeLeftInMinutes*60*30)
-        messageTable[frame] = timeLeftInMinutes .. " minutes remaining..."
-        timeLeftInMinutes = timeLeftInMinutes + 5
-        
-      end
-      
-      if additionalMessages and type(additionalMessages) == "table" then
-        for k,v in pairs(additionalMessages) do messageTable[k] = v end
-      end
-      
-      return messageTable
-    end,
+  ConcatMessages = ConcatMessages,
   
-  
+  VictoryAfterTime = function(name, timeInSeconds)
+    
+    local timeInFrames = timeInSeconds * 30
+    local timeInMinutes = math.floor(timeInSeconds/60)
+    
+    local messageTable = {
+      [2*30   ] = "connecting to " .. name .. "...",
+      [2*30+10] = "connected",
+      [2*30+12] = "querying database",
+      [2*30+14] = "warning: corrupted packets, some data may be unrecoverable",
+      [2*30+16] = "retrieving relevant data",
+      [2*30+18] = "opening high-bandwidth data socket",
+      [2*30+20] = "starting download...",
+      [3*30   ] = "estimated time before download is complete: " .. timeInMinutes .. " minutes",
+      
+      [timeInFrames-(60*30)] = "1 minutes remaining...",
+      [timeInFrames-(30*30)] = "30 seconds remaining...",
+      [timeInFrames-(15*30)] = "15 seconds remaining...",
+      [timeInFrames-(10*30)] = "10 seconds remaining...",
+      [timeInFrames-( 9*30)] = "preparing emergency extraction",
+      [timeInFrames-( 5*30)] = "5 seconds remaining...",
+      [timeInFrames-( 3*30)] = "dropship in approach",
+      [timeInFrames-    30 ] = "1 second remaining...",
+      [timeInFrames-    20 ] = "data transfer complete",
+      [timeInFrames-    10 ] = "terminating process",
+      [timeInFrames-     6 ] = "closing high-bandwidth data socket",
+      [timeInFrames-     4 ] = "disconnecting from " .. name .. "...",
+      [timeInFrames-     2 ] = "disconnected",
+      [timeInFrames-     1 ] = "download succesful",
+    }
+    
+    local timeLeftInMinutes = 5
+    while(timeLeftInMinutes < timeInMinutes) do
+      local frame = timeInFrames - (timeLeftInMinutes*60*30)
+      messageTable[frame] = timeLeftInMinutes .. " minutes remaining..."
+      timeLeftInMinutes = timeLeftInMinutes + 5
+    end
+    
+    for k,v in pairs(planetUtilities.messageLists.callDropship) do messageTable[timeInFrames+k] = v end
+    
+    return messageTable
+  end,
 }
 
 planetUtilities.planetImages = {

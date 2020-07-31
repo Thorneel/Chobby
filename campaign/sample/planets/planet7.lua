@@ -1828,7 +1828,7 @@ local function GetPlanet(planetUtilities, planetID)
           [ (29*60+20)*30    ] = "why",
           [ (36*60+36)*30    ] = "wrong way",
           [ (42*60+28)*30    ] = "this is futile",
-          [ (47*60+ 1)*30    ] = "no",
+          [ (47*60+ 1)*30    ] = "no, really",
           [ (51*60+ 8)*30    ] = "why insist",
           [ (55*60+17)*30    ] = "really",
           [ (60*60+ 5)*30    ] = "go away",
@@ -1836,6 +1836,10 @@ local function GetPlanet(planetUtilities, planetID)
           [ (79*60+39)*30    ] = "still there?",
           [ (86*60+43)*30    ] = "come on",
           [ (99*60+59)*30    ] = "give up",
+        },
+        
+        victoryMessages = {
+          [ 0*30+ 1] = "so...",
         },
       },
 		},
