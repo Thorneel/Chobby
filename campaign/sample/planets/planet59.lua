@@ -2913,6 +2913,20 @@ local function GetPlanet(planetUtilities, planetID)
           [ ((19*60)+59)*30 +29] = "3VHGBZZ23CRER1HT - warning: defense system 972ETLEP49H8 operational",
           [   19*60     *30    ] = "ALERT: DEFENSE SYSTEM 972ETLEP49H8 ACTIVE",
         },
+        
+        victoryMessages = {
+          [ 0*30+ 1] = "attempting direct connection...",
+          [ 0*30+ 2] = "direct connection established",
+          [ 0*30+ 5] = "sending credentials...",
+          [ 0*30+10] = "3VHGBZZ23CRER1HT - credentials validated",
+          [ 0*30+11] = "3VHGBZZ23CRER1HT - identity confirmed",
+          [ 0*30+12] = "3VHGBZZ23CRER1HT - no threat detected, deactivating self-defense systems",
+          [ 0*30+15] = "3VHGBZZ23CRER1HT - 972ETLEP49H8: extinguishing projector",
+          [ 0*30+16] = "3VHGBZZ23CRER1HT - defense shutdown order sent",
+          [ 1*30   ] = "3VHGBZZ23CRER1HT - defense shutdown confirmed",
+          [ 2*30   ] = "3VHGBZZ23CRER1HT - powering down",
+          [ 2*30+ 2] = "3VHGBZZ23CRER1HT - Élan vital",
+        },
       },
 		},
 		completionReward = {
