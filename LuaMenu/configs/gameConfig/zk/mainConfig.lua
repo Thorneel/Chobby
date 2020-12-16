@@ -12,9 +12,11 @@ local rankFunction, largeRankFunction = VFS.Include(LUA_DIRNAME .. "configs/game
 local backgroundConfig                = VFS.Include(LUA_DIRNAME .. "configs/gameConfig/" .. shortname .. "/skinning/skinConfig.lua")
 local gameUnitInformation             = VFS.Include(LUA_DIRNAME .. "configs/gameConfig/" .. shortname .. "/gameUnitInformation.lua")
 local badges                          = VFS.Include(LUA_DIRNAME .. "configs/gameConfig/" .. shortname .. "/badges.lua")
+local awards                          = VFS.Include(LUA_DIRNAME .. "configs/gameConfig/" .. shortname .. "/awards.lua")
 local GetRankAndImage                 = VFS.Include(LUA_DIRNAME .. "configs/gameConfig/" .. shortname .. "/profilePage.lua")
+local modBlacklist                    = VFS.Include(LUA_DIRNAME .. "configs/gameConfig/" .. shortname .. "/modBlacklist.lua")
 
-local link_reportPlayer, link_userPage, link_homePage, link_replays, link_maps, link_particularMapPage = VFS.Include(LUA_DIRNAME .. "configs/gameConfig/" .. shortname .. "/linkFunctions.lua")
+local link_reportPlayer, link_userPage, link_homePage, link_replays, link_maps, link_particularMapPage, link_matchmakerMapBans = VFS.Include(LUA_DIRNAME .. "configs/gameConfig/" .. shortname .. "/linkFunctions.lua")
 
 local settingsConfig, settingsNames, settingsDefault, SettingsPresetFunc = VFS.Include(LUA_DIRNAME .. "configs/gameConfig/" .. shortname .. "/settingsMenu.lua")
 
@@ -58,11 +60,6 @@ local minimapThumbnailPath = LUA_DIRNAME .. "configs/gameConfig/" .. shortname .
 -- Getters
 ---------------------------------------------------------------------------------
 
-local awardDir = LUA_DIRNAME .. "configs/gameConfig/" .. shortname .. "/awards/trophy_"
-local function GetAward(name)
-	return awardDir .. name .. ".png"
-end
-
 local externalFuncAndData = {
 	dirName                 = "zk",
 	name                    = "Zero-K",
@@ -97,13 +94,14 @@ local externalFuncAndData = {
 	gameUnitInformation     = gameUnitInformation,
 	badges                  = badges,
 	GetRankAndImage         = GetRankAndImage,
-	GetAward                = GetAward,
+	awards                  = awards,
 	link_reportPlayer       = link_reportPlayer,
 	link_userPage           = link_userPage,
 	link_homePage           = link_homePage,
 	link_replays            = link_replays,
 	link_maps               = link_maps,
 	link_particularMapPage  = link_particularMapPage,
+	link_matchmakerMapBans  = link_matchmakerMapBans,
 	ignoreServerVersion     = false,
 	runTutorial             = true,
 	openTrack               = 'sounds/lobbyMusic/The Secret of Ayers Rock.ogg',
@@ -116,6 +114,7 @@ local externalFuncAndData = {
 	-- I assume ZK doesn't want to show this as it was removed
 	hideGameExistanceDisplay = true,
 	disableColorChoosing = true,
+	modBlacklist = modBlacklist,
 }
 
 function externalFuncAndData.CheckAvailability()

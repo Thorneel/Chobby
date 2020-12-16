@@ -115,6 +115,10 @@ function Lobby:SelectMap(mapName)
 	self:SayBattle("!map " .. mapName)
 end
 
+function Lobby:SelectGame(gameName)
+	return self
+end
+
 function Lobby:SetBattleType(typeName)
 	self:SayBattle("!type " .. typeName)
 end
@@ -204,6 +208,10 @@ function Lobby:Unignore(userName)
 	return self
 end
 
+function Lobby:ReportUser(userName, text)
+	return self
+end
+
 ------------------------
 -- Battle commands
 ------------------------
@@ -252,7 +260,7 @@ function Lobby:SayBattleEx(message)
 	return self
 end
 
-function Lobby:ConnectToBattle(useSpringRestart, battleIp, battlePort, clientPort, scriptPassword, myName, gameName, mapName, engineName, battleType)
+function Lobby:ConnectToBattle(useSpringRestart, battleIp, battlePort, clientPort, scriptPassword, myName, gameName, mapName, engineName, battleType, isSpectator)
 	if gameName and not VFS.HasArchive(gameName) then
 		WG.Chobby.InformationPopup("Cannont start game: missing game file '" .. gameName .. "'.")
 		return
@@ -278,7 +286,7 @@ function Lobby:ConnectToBattle(useSpringRestart, battleIp, battlePort, clientPor
 		return
 	end
 
-	self:_CallListeners("OnBattleAboutToStart", battleType)
+	self:_CallListeners("OnBattleAboutToStart", battleType, isSpectator)
 
 	Spring.Echo("Game starts!")
 	if useSpringRestart then
@@ -543,7 +551,7 @@ function Lobby:_OnRemoveUser(userName)
 	-- preserve isFriend/hasFriendRequest
 	local isFriend, hasFriendRequest = userInfo.isFriend, userInfo.hasFriendRequest
 	local persistentUserInfo = self:_GetPersistentUserInfo(userName)
-	self.users[userName] =persistentUserInfo
+	self.users[userName] = persistentUserInfo
 
 	if isFriend or hasFriendRequest then
 		userInfo = self:TryGetUser(userName)
@@ -690,6 +698,7 @@ function Lobby:_OnBattleOpened(battleID, battle)
 		port = battle.port,
 
 		maxPlayers = battle.maxPlayers,
+		maxEvenPlayers = battle.maxEvenPlayers,
 		passworded = battle.passworded,
 
 		engineName = battle.engineName,
@@ -708,6 +717,7 @@ function Lobby:_OnBattleOpened(battleID, battle)
 		disallowCustomTeams = battle.disallowCustomTeams,
 		disallowBots = battle.disallowBots,
 		isMatchMaker = battle.isMatchMaker,
+		timeQueueEnabled = battle.TimeQueueEnabled,
 	}
 	self.battleCount = self.battleCount + 1
 
@@ -721,10 +731,20 @@ function Lobby:_OnBattleClosed(battleID)
 end
 
 function Lobby:_OnJoinBattle(battleID, hashCode)
+	if not self.battles[battleID] then
+		Spring.Log(LOG_SECTION, "warning", "_OnJoinBattle nonexistent battle.")
+		return
+	end
 	self.myBattleID = battleID
 	self.modoptions = {}
 
 	self:_CallListeners("OnJoinBattle", battleID, hashCode)
+	if self.openBattleModOptions then
+		if self.battles[battleID].founder == self:GetMyUserName() then
+			self:SetModOptions(self.openBattleModOptions)
+		end
+		self.openBattleModOptions = nil
+	end
 end
 
 function Lobby:_OnJoinedBattle(battleID, userName, scriptPassword)
@@ -802,6 +822,7 @@ function Lobby:_OnUpdateBattleInfo(battleID, battleInfo)
 	end
 
 	battle.maxPlayers = battleInfo.maxPlayers or battle.maxPlayers
+	battle.maxEvenPlayers = battleInfo.maxEvenPlayers or battle.maxEvenPlayers
 	if battleInfo.passworded ~= nil then
 		battle.passworded = battleInfo.passworded
 	end
@@ -826,6 +847,9 @@ function Lobby:_OnUpdateBattleInfo(battleID, battleInfo)
 	end
 	if battleInfo.isMatchMaker ~= nil then
 		battle.isMatchMaker = battleInfo.isMatchMaker
+	end
+	if battleInfo.timeQueueEnabled ~= nil then
+		battle.timeQueueEnabled = battleInfo.timeQueueEnabled
 	end
 
 	self:_CallListeners("OnUpdateBattleInfo", battleID, battleInfo)
@@ -856,6 +880,8 @@ function Lobby:_OnUpdateUserBattleStatus(userName, status)
 	userData.aiVersion  = status.aiVersion or userData.aiVersion
 	userData.owner      = status.owner or userData.owner
 	userData.teamColor  = status.teamColor or userData.teamColor
+	userData.joinTime   = status.joinTime or userData.JoinTime
+	userData.queueOrder = status.queueOrder or userData.queueOrder
 
 	status.allyNumber   = userData.allyNumber
 	status.teamNumber   = userData.teamNumber
@@ -864,7 +890,9 @@ function Lobby:_OnUpdateUserBattleStatus(userName, status)
 	status.aiLib        = userData.aiLib
 	status.aiVersion    = userData.aiVersion
 	status.owner        = userData.owner
-	status.teamColor	= userData.teamColor
+	status.teamColor    = userData.teamColor
+	status.joinTime     = userData.joinTime
+	status.queueOrder   = userData.queueOrder
 	self:_CallListeners("OnUpdateUserBattleStatus", userName, status)
 
 	if changedSpectator or changedAllyTeam then
@@ -900,8 +928,8 @@ function Lobby:_OnSaidBattleEx(userName, message, sayTime)
 	self:_CallListeners("OnSaidBattleEx", userName, message, sayTime)
 end
 
-function Lobby:_OnVoteUpdate(voteMessage, pollType, notify, mapPoll, candidates, votesNeeded, pollUrl)
-	self:_CallListeners("OnVoteUpdate", voteMessage, pollType, notify, mapPoll, candidates, votesNeeded, pollUrl)
+function Lobby:_OnVoteUpdate(voteMessage, pollType, notify, mapPoll, candidates, votesNeeded, pollUrl, mapName)
+	self:_CallListeners("OnVoteUpdate", voteMessage, pollType, notify, mapPoll, candidates, votesNeeded, pollUrl, mapName)
 end
 
 function Lobby:_OnVoteEnd(message, success)

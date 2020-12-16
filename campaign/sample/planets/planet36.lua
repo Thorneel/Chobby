@@ -592,7 +592,6 @@ local function GetPlanet(planetUtilities, planetID)
 			},
 			codexEntries = {
 				"faction_empire",
-				"quadrant_dynasty_arm",
 				"location_baosezu",
 			},
 		},

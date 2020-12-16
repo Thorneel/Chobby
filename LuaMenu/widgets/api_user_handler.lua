@@ -195,7 +195,7 @@ local function GetUserComboBoxOptions(userName, isInBattle, userControl, showTea
 			comboOptions[#comboOptions + 1] = "User Page"
 		end
 
-		if userInfo.accountID and Configuration.gameConfig.link_reportPlayer ~= nil then
+		if Configuration.gameConfig.link_reportPlayer ~= nil then
 			comboOptions[#comboOptions + 1] = "Report"
 		end
 
@@ -624,10 +624,7 @@ local function GetUserControls(userName, opts)
 							end
 						})
 					elseif selectedName == "Report" and Configuration.gameConfig.link_reportPlayer ~= nil then
-						local userInfo = userControls.lobby:GetUser(userName) or {}
-						if userInfo.accountID then
-							WG.BrowserHandler.OpenUrl(Configuration.gameConfig.link_reportPlayer(userInfo.accountID))
-						end
+						WG.ReportPanel.OpenReportWindow(userName)
 					elseif selectedName == "Unignore" then
 						userControls.lobby:Unignore(userName)
 					elseif selectedName == "Ignore" then
@@ -640,6 +637,33 @@ local function GetUserControls(userName, opts)
 
 	if comboBoxOnly then
 		return userControls
+	end
+
+	if large then
+		offset = offset + 1
+		local imgFile, status, fontColor = GetUserStatus(userName, isInBattle, userControls)
+		userControls.imStatusLarge = Image:New {
+			name = "imStatusLarge",
+			x = offset,
+			y = offsetY + 1,
+			width = 20,
+			height = 20,
+			parent = userControls.mainControl,
+			keepAspect = true,
+			file = imgFile,
+		}
+		offset = offset + 26
+		userControls.lblStatusLarge = Label:New {
+			name = "lblStatusLarge",
+			x = offset,
+			y = offsetY,
+			height = 22,
+			valign = 'center',
+			parent = userControls.mainControl,
+			caption = i18n(status .. "_status"),
+			font = Configuration:GetFont(1),
+		}
+		offset = offset + 58
 	end
 
 	if isInBattle and not suppressSync then
@@ -756,38 +780,14 @@ local function GetUserControls(userName, opts)
 	if not hideStatus then
 		userControls.statusImages = {}
 		UpdateUserControlStatus(userName, userControls)
-		if large then
-			offsetY = offsetY + 35
-			offset = 5
-			local imgFile, status, fontColor = GetUserStatus(userName, isInBattle, userControls)
-			userControls.imStatusLarge = Image:New {
-				name = "imStatusLarge",
-				x = offset,
-				y = offsetY,
-				width = 25,
-				height = 25,
-				parent = userControls.mainControl,
-				keepAspect = true,
-				file = imgFile,
-			}
-			offset = offset + 35
-			userControls.lblStatusLarge = Label:New {
-				name = "lblStatusLarge",
-				x = offset,
-				y = offsetY,
-				height = 25,
-				valign = 'center',
-				parent = userControls.mainControl,
-				caption = i18n(status .. "_status"),
-				font = Configuration:GetFont(1),
-			}
-			userControls.lblStatusLarge.font.color = fontColor
-			userControls.lblStatusLarge:Invalidate()
-			userControls.tbName.font.color = fontColor
-			userControls.tbName:Invalidate()
-		end
 	end
 
+	if large then
+		userControls.lblStatusLarge.font.color = fontColor
+		userControls.lblStatusLarge:Invalidate()
+		userControls.tbName.font.color = fontColor
+		userControls.tbName:Invalidate()
+	end
 
 	if autoResize then
 		userControls.mainControl.OnResize = userControls.mainControl.OnResize or {}
@@ -827,7 +827,7 @@ local function _GetUserDropdownMenu(userName, isInBattle)
 	userControls.mainControl:BringToFront()
 
 	local x,y = Spring.GetMouseState()
-	local screenWidth, screenHeight = Spring.GetWindowGeometry()
+	local screenWidth, screenHeight = Spring.GetViewGeometry()
 	userControls.mainControl:SetPos(math.max(0, x - 60), screenHeight - y - userControls.mainControl.height + 5, 120)
 
 	local function delayFunc()
@@ -945,9 +945,9 @@ function userHandler.GetFriendUser(userName)
 		large            = true,
 		hideStatusAway   = true,
 		hideStatusIngame = true,
-		offset           = 5,
-		offsetY          = 6,
-		height           = 80,
+		offset           = 4,
+		offsetY          = 3,
+		height           = 28,
 		maxNameLength    = WG.Chobby.Configuration.friendMaxNameLength,
 		steamInvite      = true,
 	})
@@ -957,7 +957,7 @@ function userHandler.GetFriendRequestUser(userName)
 	return _GetUser(friendRequestUsers, userName, {
 		large          = true,
 		hideStatus     = true,
-		offsetY        = 20,
+		offsetY        = 3,
 		maxNameLength  = WG.Chobby.Configuration.friendMaxNameLength,
 	})
 end

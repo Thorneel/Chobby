@@ -90,6 +90,15 @@ local function DownloadSortFunc(a, b)
 	return a.priority > b.priority or (a.priority == b.priority and a.id < b.id)
 end
 
+local function StartDownload(id, name, fileType)
+	if USE_WRAPPER_DOWNLOAD and WG.WrapperLoopback and WG.WrapperLoopback.DownloadFile then
+		WG.WrapperLoopback.DownloadFile(name, typeMap[fileType])
+		CallListeners("DownloadStarted", id, name, fileType)
+	else
+		VFS.DownloadArchive(name, fileType)
+	end
+end
+
 local function DownloadQueueUpdate()
 	requestUpdate = false
 
@@ -101,12 +110,7 @@ local function DownloadQueueUpdate()
 
 	local front = downloadQueue[1]
 	if not front.active then
-		if USE_WRAPPER_DOWNLOAD and WG.WrapperLoopback and WG.WrapperLoopback.DownloadFile then
-			WG.WrapperLoopback.DownloadFile(front.name, typeMap[front.fileType])
-			CallListeners("DownloadStarted", front.id, front.name, front.fileType)
-		else
-			VFS.DownloadArchive(front.name, front.fileType)
-		end
+		StartDownload(front.id, front.name, front.fileType)
 		front.active = true
 	end
 
@@ -116,7 +120,7 @@ end
 local function GetDownloadIndex(downloadList, name, fileType)
 	for i = 1, #downloadList do
 		local data = downloadList[i]
-		if data.name == name and data.fileType == fileType then
+		if data.name == name and (data.fileType == fileType or fileType == "map") then
 			return i
 		end
 	end
@@ -151,11 +155,29 @@ local function AssociatedSpringDownloadID(springDownloadID, name, fileType)
 	downloadQueue[index].springDownloadID = springDownloadID
 end
 
+local function RetryDownload(name, fileType)
+	local index = GetDownloadIndex(downloadQueue, name, fileType)
+	if not (index and downloadQueue[index]) then
+		return false
+	end
+	local download = downloadQueue[index]
+	download.attempts = (download.attempts or 0) + 1 
+	if download.attempts >= (WG.Chobby.Configuration.downloadRetryCount or 0) then
+		return false
+	end
+
+	StartDownload(download.id, download.name, download.fileType)
+	download.active = true
+	return true
+end
+
 local function RemoveDownload(name, fileType, putInRemoveList, removalType)
 	local index = GetDownloadIndex(downloadQueue, name, fileType)
 	if not index then
 		return false
 	end
+
+	fileType = downloadQueue[index].fileType or fileType
 
 	if removalType == "success" then
 		CallListeners("DownloadFinished", downloadQueue[index].id, name, fileType)
@@ -286,7 +308,17 @@ function wrapperFunctions.DownloadFinished(name, fileType, success, aborted)
 		if not VFS.HasArchive(name) then
 			VFS.ScanAllDirs() -- Find downloaded file (if it exists).
 		end
-		RemoveDownload(name, fileType, true, (aborted and "cancel") or (success and "success") or "fail")
+		local possiblyRetry = not success and not aborted
+		if not (possiblyRetry and RetryDownload(name, fileType)) then
+			if possiblyRetry and fileType == "game" then
+				WG.WrapperLoopback.DownloadFile(name, typeMap["map"])
+			else
+				if (not aborted) and (not success) and VFS.HasArchive(name) then
+					success = true
+				end
+				RemoveDownload(name, fileType, true, (aborted and "cancel") or (success and "success") or "fail")
+			end
+		end
 	end
 
 	--Chotify:Post({

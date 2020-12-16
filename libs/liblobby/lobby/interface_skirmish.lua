@@ -373,6 +373,20 @@ function InterfaceSkirmish:SelectMap(mapName)
 	})
 end
 
+function InterfaceSkirmish:SelectGame(gameName, force, isRapid)
+	if isRapid and VFS.GetNameFromRapidTag then
+		gameName = VFS.GetNameFromRapidTag(gameName)
+	end
+	self:_OnUpdateBattleInfo(self:GetMyBattleID(), {
+		gameName = gameName,
+	})
+	return self
+end
+
+function InterfaceSkirmish:SetBattleType()
+	return self
+end
+
 -- Skirmish only
 function InterfaceSkirmish:SetBattleState(myUserName, gameName, mapName, title)
 	local myBattleID = 1

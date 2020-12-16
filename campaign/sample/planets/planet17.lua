@@ -1518,7 +1518,6 @@ local function GetPlanet(planetUtilities, planetID)
 			},
 			codexEntries = {
 				"faction_empire",
-				"quadrant_celestial_arm",
 				"quadrant_inner_bulge",
 			},
 		},
