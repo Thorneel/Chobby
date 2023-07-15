@@ -833,7 +833,7 @@ local function GetPlanet(planetUtilities, planetID)
 								text = "Garrison",
 								color = "red_small",
 							},
-              messageWhenDestroyed = planetUtilities.messages.enemyNodeDestroyed,
+							messageWhenDestroyed = planetUtilities.messages.enemyNodeDestroyed,
 						},
 						{
 							name = "pw_garrison",
@@ -845,7 +845,7 @@ local function GetPlanet(planetUtilities, planetID)
 								text = "Garrison",
 								color = "red_small",
 							},
-              messageWhenDestroyed = planetUtilities.messages.enemyNodeDestroyed,
+							messageWhenDestroyed = planetUtilities.messages.enemyNodeDestroyed,
 						},
 						{
 							name = "pw_garrison",
@@ -856,7 +856,7 @@ local function GetPlanet(planetUtilities, planetID)
 								text = "Garrison",
 								color = "red_small",
 							},
-              messageWhenDestroyed = planetUtilities.messages.enemyNodeDestroyed,
+							messageWhenDestroyed = planetUtilities.messages.enemyNodeDestroyed,
 						},
 						{
 							name = "pw_garrison",
@@ -868,7 +868,7 @@ local function GetPlanet(planetUtilities, planetID)
 								text = "Garrison",
 								color = "red_small",
 							},
-              messageWhenDestroyed = planetUtilities.messages.enemyNodeDestroyed,
+							messageWhenDestroyed = planetUtilities.messages.enemyNodeDestroyed,
 						},
 						{
 							name = "pw_garrison",
@@ -880,7 +880,7 @@ local function GetPlanet(planetUtilities, planetID)
 								text = "Garrison",
 								color = "red_small",
 							},
-              messageWhenDestroyed = planetUtilities.messages.enemyNodeDestroyed,
+							messageWhenDestroyed = planetUtilities.messages.enemyNodeDestroyed,
 						},
 						-- difficulty dependent stuff
 						{

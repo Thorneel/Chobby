@@ -728,7 +728,7 @@ local function GetPlanet(planetUtilities, planetID)
 								-- text = "Fusion Reactor",
 								-- color = "red_small"
 							-- },
-              -- messageWhenDestroyed = planetUtilities.messages.enemyEnergyDestroyed,
+							-- messageWhenDestroyed = planetUtilities.messages.enemyEnergyDestroyed,
 						},
 						{
 							name = "turrettorp",
@@ -821,7 +821,7 @@ local function GetPlanet(planetUtilities, planetID)
 							x = 3248,
 							z = 4640,
 							facing = 2,
-              messageWhenDestroyed = planetUtilities.messages.enemyProdDestroyed,
+							messageWhenDestroyed = planetUtilities.messages.enemyProdDestroyed,
 						},
  						{
 							name = "turretmissile",
@@ -852,14 +852,14 @@ local function GetPlanet(planetUtilities, planetID)
 							x = 1544,
 							z = 4520,
 							facing = 2,
-              messageWhenDestroyed = planetUtilities.messages.enemyProdDestroyed,
+							messageWhenDestroyed = planetUtilities.messages.enemyProdDestroyed,
 						},
  						{
 							name = "factorygunship",
 							x = 2792,
 							z = 5032,
 							facing = 2,
-              messageWhenDestroyed = planetUtilities.messages.enemyProdDestroyed,
+							messageWhenDestroyed = planetUtilities.messages.enemyProdDestroyed,
 						},
  						{
 							name = "staticcon",

@@ -167,7 +167,7 @@ local function GetPlanet(planetUtilities, planetID)
 					bitDependant = true,
 					commanderParameters = {
 						facplop = false,
-            messageWhenDestroyed = planetUtilities.messages.enemyNodeDestroyed,
+						messageWhenDestroyed = planetUtilities.messages.enemyNodeDestroyed,
 					},
 					allyTeam = 1,
 					unlocks = {
@@ -182,7 +182,7 @@ local function GetPlanet(planetUtilities, planetID)
 						name = "Most Loyal Opposition",
 						chassis = "engineer",
 						decorations = {
-						  "skin_support_dark",
+							"skin_support_dark",
 						},
 						modules = {},
 					},
@@ -250,7 +250,7 @@ local function GetPlanet(planetUtilities, planetID)
 								text = "Destroy",
 								color = "red"
 							},
-              messageWhenDestroyed = planetUtilities.messages.enemyProdDestroyed,
+							messageWhenDestroyed = planetUtilities.messages.enemyProdDestroyed,
 						},
 					
 					}
@@ -420,7 +420,7 @@ local function GetPlanet(planetUtilities, planetID)
 			bonusObjectiveConfig = {
 				-- Indexed by bonusObjectiveID
 				[1] = { -- Have 3 mex
-                    satisfyOnce = true,
+					satisfyOnce = true,
 					comparisionType = planetUtilities.COMPARE.AT_LEAST,
 					targetNumber = 3,
 					unitTypes = {
@@ -432,7 +432,7 @@ local function GetPlanet(planetUtilities, planetID)
 					experience = planetUtilities.BONUS_EXP,
 				},
 				[2] = { -- Have 3 solar
-                    satisfyOnce = true,
+					satisfyOnce = true,
 					comparisionType = planetUtilities.COMPARE.AT_LEAST,
 					targetNumber = 3,
 					unitTypes = {
@@ -456,7 +456,7 @@ local function GetPlanet(planetUtilities, planetID)
 					description = "Build a Radar Tower",
 					experience = planetUtilities.BONUS_EXP,
 				},
-                [4] = { -- Build 10 Glaives
+				[4] = { -- Build 10 Glaives
 					satisfyOnce = true,
 					countRemovedUnits = true, -- count units that previously died.
 					comparisionType = planetUtilities.COMPARE.AT_LEAST,

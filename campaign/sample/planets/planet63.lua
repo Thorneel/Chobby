@@ -3085,7 +3085,7 @@ local function GetPlanet(planetUtilities, planetID)
 				[1] = {
 					ignoreUnitLossDefeat = false,
 					loseAfterSeconds = 30*60,
-          skipVictoryMessageIfLostToTime = true,
+					skipVictoryMessageIfLostToTime = true,
 					allyTeamLossObjectiveID = 1,
 				},
 			},
@@ -3137,10 +3137,10 @@ local function GetPlanet(planetUtilities, planetID)
 					experience = planetUtilities.BONUS_EXP,
 				},
 			},
-      messagesOverTime = {
-        displayAfterVictory = true,
-        messages = planetUtilities.messageGenerators.VictoryAfterTime("Tech Lab", 30*60),
-      },
+			messagesOverTime = {
+				displayAfterVictory = true,
+				messages = planetUtilities.messageGenerators.VictoryAfterTime("Tech Lab", 30*60),
+			},
 		},
 		completionReward = {
 			experience = planetUtilities.MAIN_EXP,

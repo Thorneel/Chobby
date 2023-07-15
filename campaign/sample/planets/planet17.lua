@@ -713,7 +713,7 @@ local function GetPlanet(planetUtilities, planetID)
 								color = "red"
 							},
 							difficultyAtMost = 2,
-              messageWhenDestroyed = planetUtilities.messages.enemyProdDestroyed,
+							messageWhenDestroyed = planetUtilities.messages.enemyProdDestroyed,
 						},
 						{
 							name = "striderdante",
@@ -751,7 +751,7 @@ local function GetPlanet(planetUtilities, planetID)
 								color = "red"
 							},
 							difficultyAtLeast = 3,
-              messageWhenDestroyed = planetUtilities.messages.enemyProdDestroyed,
+							messageWhenDestroyed = planetUtilities.messages.enemyProdDestroyed,
 						},
 						{
 							name = "energypylon",
@@ -1119,7 +1119,7 @@ local function GetPlanet(planetUtilities, planetID)
 								text = "Metal Storage Depot",
 								color = "red_small"
 							},
-              messageWhenDestroyed = planetUtilities.messages.enemyDepotDestroyed,
+							messageWhenDestroyed = planetUtilities.messages.enemyDepotDestroyed,
 						},
 						{
 							name = "pw_mstorage2",
@@ -1131,7 +1131,7 @@ local function GetPlanet(planetUtilities, planetID)
 								text = "Metal Storage Depot",
 								color = "red_small"
 							},
-              messageWhenDestroyed = planetUtilities.messages.enemyDepotDestroyed,
+							messageWhenDestroyed = planetUtilities.messages.enemyDepotDestroyed,
 						},
 						{
 							name = "staticstorage",

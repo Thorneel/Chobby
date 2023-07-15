@@ -303,7 +303,7 @@ local function GetPlanet(planetUtilities, planetID)
 					commanderParameters = {
 						facplop = false,
 						bonusObjectiveID = 1,
-            messageWhenDestroyed = planetUtilities.messages.enemyNodeDestroyed,
+						messageWhenDestroyed = planetUtilities.messages.enemyNodeDestroyed,
 					},
 					allyTeam = 1,
 					unlocks = {
@@ -414,7 +414,7 @@ local function GetPlanet(planetUtilities, planetID)
 								text = "Adv. Geo",
 								color = "red_small"
 							},
-              messageWhenDestroyed = planetUtilities.messages.enemyEnergyDestroyed,
+							messageWhenDestroyed = planetUtilities.messages.enemyEnergyDestroyed,
 						},
  						{
 							name = "energyheavygeo",
@@ -425,7 +425,7 @@ local function GetPlanet(planetUtilities, planetID)
 								text = "Adv. Geo",
 								color = "red_small"
 							},
-              messageWhenDestroyed = planetUtilities.messages.enemyEnergyDestroyed,
+							messageWhenDestroyed = planetUtilities.messages.enemyEnergyDestroyed,
 						},
  						{
 							name = "energyheavygeo",
@@ -436,7 +436,7 @@ local function GetPlanet(planetUtilities, planetID)
 								text = "Adv. Geo",
 								color = "red_small"
 							},
-              messageWhenDestroyed = planetUtilities.messages.enemyEnergyDestroyed,
+							messageWhenDestroyed = planetUtilities.messages.enemyEnergyDestroyed,
 						},
 						{
 							name = "tankassault",
@@ -826,7 +826,7 @@ local function GetPlanet(planetUtilities, planetID)
 								{cmdID = planetUtilities.COMMAND.PATROL, pos = {4720, 5104}},
 								{cmdID = planetUtilities.COMMAND.PATROL, pos = {4695, 5079}, options = {"shift"}},
 							},
-              messageWhenDestroyed = planetUtilities.messages.enemyProdDestroyed,
+							messageWhenDestroyed = planetUtilities.messages.enemyProdDestroyed,
 						},
 						{
 							name = "energypylon",

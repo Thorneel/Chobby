@@ -1031,9 +1031,9 @@ local function GetPlanet(planetUtilities, planetID)
 				[1] = {
 					ignoreUnitLossDefeat = false,
 					loseAfterSeconds = 900,
-          skipVictoryMessageIfLostToTime = true,
+					skipVictoryMessageIfLostToTime = true,
 					allyTeamLossObjectiveID = 1,
-          doNotExplodeOnLoss = true,
+					doNotExplodeOnLoss = true,
 				},
 			},
 			objectiveConfig = {

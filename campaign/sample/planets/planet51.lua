@@ -2184,7 +2184,7 @@ local function GetPlanet(planetUtilities, planetID)
 						"staticmex",
 					},
 					loseAfterSeconds = 30*60,
-          skipVictoryMessageIfLostToTime = true,
+					skipVictoryMessageIfLostToTime = true,
 					allyTeamLossObjectiveID = 1,
 				},
 			},

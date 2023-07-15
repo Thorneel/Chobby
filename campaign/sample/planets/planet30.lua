@@ -1181,7 +1181,7 @@ local function GetPlanet(planetUtilities, planetID)
 								text = "Sunlance",
 								color = "red_small"
 							},
-              messageWhenDestroyed = planetUtilities.messages.enemyDefenseDestroyed,
+							messageWhenDestroyed = planetUtilities.messages.enemyDefenseDestroyed,
 						},
 						{
 							name = "turretsunlance",
@@ -1193,7 +1193,7 @@ local function GetPlanet(planetUtilities, planetID)
 								text = "Sunlance",
 								color = "red_small"
 							},
-              messageWhenDestroyed = planetUtilities.messages.enemyDefenseDestroyed,
+							messageWhenDestroyed = planetUtilities.messages.enemyDefenseDestroyed,
 						},
 						{
 							name = "turretsunlance",
@@ -1205,7 +1205,7 @@ local function GetPlanet(planetUtilities, planetID)
 								text = "Sunlance",
 								color = "red_small"
 							},
-              messageWhenDestroyed = planetUtilities.messages.enemyDefenseDestroyed,
+							messageWhenDestroyed = planetUtilities.messages.enemyDefenseDestroyed,
 						},
 						{
 							name = "turretsunlance",
@@ -1217,7 +1217,7 @@ local function GetPlanet(planetUtilities, planetID)
 								text = "Sunlance",
 								color = "red_small"
 							},
-              messageWhenDestroyed = planetUtilities.messages.enemyDefenseDestroyed,
+							messageWhenDestroyed = planetUtilities.messages.enemyDefenseDestroyed,
 						},
 						{
 							name = "amphassault",
