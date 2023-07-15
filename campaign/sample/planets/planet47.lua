@@ -2349,6 +2349,13 @@ local function GetPlanet(planetUtilities, planetID)
 							difficultyAtLeast = 4,
 						},
 						{
+							name = "energypylon",
+							x = 3820,
+							z = 6990,
+							facing = 3,
+							difficultyAtLeast = 4,
+						},
+						{
 							name = "staticcon",
 							x = 3975,
 							z = 7000,
@@ -2392,6 +2399,12 @@ local function GetPlanet(planetUtilities, planetID)
 							x = 800,
 							z = 6688,
 							facing = 2,
+						},
+						{
+							name = "energypylon",
+							x = 444,
+							z = 6728,
+							facing = 3,
 						},
 						{
 							name = "turretriot",
@@ -2514,7 +2527,7 @@ local function GetPlanet(planetUtilities, planetID)
 					vitalUnitTypes = {
 						"striderhub",
 						--"striderscorpion",
-						"stridercatapult",
+						"striderarty",
 					},
 					loseAfterSeconds = false,
 					allyTeamLossObjectiveID = 1,

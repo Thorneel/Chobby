@@ -7,6 +7,13 @@ function InterfaceSkirmish:init()
 	self.useTeamColor = true
 end
 
+function InterfaceSkirmish:FixScript(str)
+	while str ~= string.gsub(str, "\]\]", "\]") do
+		 str = string.gsub(str, "\]\]", "\]")
+	end
+	return str
+end
+
 function InterfaceSkirmish:WriteTable(key, value)
 	local str = '\t['..key..']\n\t{\n'
 	for k, v in pairs(value) do
@@ -20,8 +27,12 @@ function InterfaceSkirmish:WriteTable(key, value)
 end
 
 function InterfaceSkirmish:MakeScriptTXT(script)
+	if VFS.FileExists("_debug_override_script.txt") then
+		Spring.Echo("======== Using _debug_override_script.txt ========")
+		return self:FixScript(VFS.LoadFile("_debug_override_script.txt"))
+	end
+	
 	local str = '[Game]\n{\n\n'
-
 	-- First write Tables
 	for key, value in pairs(script) do
 		if type(value) == 'table' then
@@ -36,7 +47,7 @@ function InterfaceSkirmish:MakeScriptTXT(script)
 		end
 	end
 	str = str..'}'
-	return str
+	return self:FixScript(str)
 end
 
 function InterfaceSkirmish:_StartScript(gameName, mapName, playerName, friendList, friendsReplaceAI, hostPort)
@@ -265,7 +276,10 @@ function InterfaceSkirmish:_StartScript(gameName, mapName, playerName, friendLis
 		end
 	end
 
-	Spring.Reload(scriptTxt)
+	local function DelayedStart()
+		Spring.Reload(scriptTxt)
+	end
+	WG.Delay(DelayedStart, 0.5)
 end
 
 function InterfaceSkirmish:StartReplay(replayFilename, myName, hostPort)
@@ -280,7 +294,11 @@ function InterfaceSkirmish:StartReplay(replayFilename, myName, hostPort)
 	IsHost=1;
 }
 ]]
-
+	
+	if not (string.find(replayFilename, "demos/") or string.find(replayFilename, "demos\\")) then
+		replayFilename = "demos/" .. replayFilename
+	end
+	
 	scriptTxt = scriptTxt:gsub("__FILE__", replayFilename)
                          :gsub("__IP__", "127.0.0.1")
                          :gsub("__MY_PLAYER_NAME__", myName or "(spec)")
@@ -293,7 +311,10 @@ function InterfaceSkirmish:StartReplay(replayFilename, myName, hostPort)
 	--scriptFile:write(scriptTxt)
 	--scriptFile:close()
 
-	Spring.Reload(scriptTxt)
+	local function DelayedStart()
+		Spring.Reload(scriptTxt)
+	end
+	WG.Delay(DelayedStart, 0.5)
 	return false
 end
 
@@ -330,22 +351,31 @@ function InterfaceSkirmish:StartGameFromLuaScript(gameType, scriptTable, friendL
 	--scriptFile:write(scriptTxt)
 	--scriptFile:close()
 
-	Spring.Reload(scriptTxt)
+	local function DelayedStart()
+		Spring.Reload(scriptTxt)
+	end
+	WG.Delay(DelayedStart, 0.5)
 end
 
 function InterfaceSkirmish:StartGameFromString(scriptString, gameType)
 	self:_CallListeners("OnBattleAboutToStart", gameType)
-	Spring.Reload(scriptString)
+	local function DelayedStart()
+		Spring.Reload(scriptString)
+	end
+	WG.Delay(DelayedStart, 0.5)
 	return false
 end
 
 function InterfaceSkirmish:StartGameFromFile(scriptFileName, gameType)
 	self:_CallListeners("OnBattleAboutToStart", gameType)
-	if self.useSpringRestart then
-		Spring.Restart(scriptFileName, "")
-	else
-		Spring.Start(scriptFileName, "")
+	local function DelayedStart()
+		if self.useSpringRestart then
+			Spring.Restart(scriptFileName, "")
+		else
+			Spring.Start(scriptFileName, "")
+		end
 	end
+	WG.Delay(DelayedStart, 0.5)
 	return false
 end
 
@@ -363,7 +393,10 @@ function InterfaceSkirmish:StartBattle(gameType, myName, friendList, friendsRepl
 
 	self:_CallListeners("OnBattleAboutToStart", gameType, battle.gameName, battle.mapName)
 	self:_OnSaidBattleEx("Battle", "about to start", battle.gameName, battle.mapName, myName)
-	self:_StartScript(battle.gameName, battle.mapName, myName, friendList, friendsReplaceAI, hostPort)
+	local function DelayedStart()
+		self:_StartScript(battle.gameName, battle.mapName, myName, friendList, friendsReplaceAI, hostPort)
+	end
+	WG.Delay(DelayedStart, 0.5)
 	return self
 end
 
@@ -407,6 +440,7 @@ function InterfaceSkirmish:SetBattleState(myUserName, gameName, mapName, title)
 		mapName = mapName,
 		title = title,
 	})
+	self:_OnUpdateUserBattleStatus(myUserName, {allyNumber = 0})
 	self:_OnJoinBattle(myBattleID, myUserName)
 	self:_OnJoinedBattle(myBattleID, myUserName)
 	local modoptions = {}
@@ -446,6 +480,9 @@ end
 
 function InterfaceSkirmish:SetBattleStatus(status)
 	self:super("SetBattleStatus", status)
+	if status.isSpectator == false and not status.allyTeam then
+		status.allyNumber = 0
+	end
 	self:_OnUpdateUserBattleStatus(self:GetMyUserName(), status)
 	return self
 end

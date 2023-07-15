@@ -1,36 +1,30 @@
 local DEV_NAME = ""
-local STABLE_NAME = " (old)"
+local STABLE_NAME = " Old"
 
-local stableSubnameMap = {
-	{"CircuitAIBeginner", "AI: Beginner" .. STABLE_NAME},
-	{"CircuitAINovice", "AI: Novice" .. STABLE_NAME},
-	{"CircuitAIEasy", "AI: Easy" .. STABLE_NAME},
-	{"CircuitAINormal", "AI: Normal" .. STABLE_NAME},
-	{"CircuitAIHard", "AI: Hard" .. STABLE_NAME},
-	{"CircuitAIBrutal", "AI: Brutal" .. STABLE_NAME},
-	{"CAI", "AI: Legacy"},
+local AiPrefixFunc = VFS.Include(LUA_DIRNAME .. "configs/gameConfig/zk/aiPrefixFunc.lua")
+
+local subnameMap = {
+	{"CircuitAIBeginner", "AI: Beginner"},
+	{"CircuitAINovice", "AI: Novice"},
+	{"CircuitAIEasy", "AI: Easy"},
+	{"CircuitAINormal", "AI: Normal"},
+	{"CircuitAIHard", "AI: Hard"},
+	{"CircuitAIBrutal", "AI: Brutal"},
+	{"CircuitTest", "AI: Bleeding edge test"},
 }
 
-local devSubnameMap = {
-	{"DevCircuitAIBeginner", "AI: Beginner" .. DEV_NAME},
-	{"DevCircuitAINovice", "AI: Novice" .. DEV_NAME},
-	{"DevCircuitAIEasy", "AI: Easy" .. DEV_NAME},
-	{"DevCircuitAINormal", "AI: Normal" .. DEV_NAME},
-	{"DevCircuitAIHard", "AI: Hard" .. DEV_NAME},
-	{"DevCircuitAIBrutal", "AI: Brutal" .. DEV_NAME},
-	{"DevCircuitEconomist", "AI: Economist Personality" .. DEV_NAME},
-	{"DevCircuitTest", "AI: Bleeding edge test" .. DEV_NAME},
-	{"CAI", "AI: Legacy"},
-}
+for i = 1, #subnameMap do
+	subnameMap[i][1] = AiPrefixFunc() .. subnameMap[i][1]
+end
+subnameMap[#subnameMap + 1] = {"CAI", "AI: Legacy"}
 
-local function GetAiSimpleName(name)
+local function GetAiSimpleName(name, engineName)
 	if name == "Null AI" then
 		return "Inactive AI"
 	end
 	if string.find(name, "Chicken") then
 		return name
 	end
-	local subnameMap = (WG.Chobby.Configuration:GetIsDevEngine() and devSubnameMap) or stableSubnameMap
 	for i = 1, #subnameMap do
 		if string.find(name, subnameMap[i][1]) then
 			return subnameMap[i][2]
@@ -46,7 +40,6 @@ local simpleAiOrder = {
 	["AI: Normal" .. DEV_NAME] = -3,
 	["AI: Hard" .. DEV_NAME] = -2,
 	["AI: Brutal" .. DEV_NAME] = -1,
-	["AI: Economist Personality" .. DEV_NAME] = -0.9,
 	["AI: Bleeding edge test" .. DEV_NAME] = -0.1,
 	["AI: Beginner" .. STABLE_NAME] = 0,
 	["AI: Novice" .. STABLE_NAME] = 1,
@@ -54,6 +47,7 @@ local simpleAiOrder = {
 	["AI: Normal" .. STABLE_NAME] = 3,
 	["AI: Hard" .. STABLE_NAME] = 4,
 	["AI: Brutal" .. STABLE_NAME] = 5,
+	["AI: Bleeding edge test" .. STABLE_NAME] = 5.5,
 	["Inactive AI"] = 6,
 	["Chicken: Beginner"] = 6.5,
 	["Chicken: Very Easy"] = 7,
@@ -72,7 +66,6 @@ local aiTooltip = {
 	["AI: Normal" .. DEV_NAME] = "Recommended for veteran strategy gamers.",
 	["AI: Hard" .. DEV_NAME] = "Recommended for veteran strategy gamers who aren't afraid of losing.",
 	["AI: Brutal" .. DEV_NAME] = "Recommended for veterans of Zero-K.",
-	["AI: Economist Personality" .. DEV_NAME] = "Brutal AI with a bias for escalating and economy.",
 	["AI: Bleeding edge test" .. DEV_NAME] = "Latest test version.",
 	["AI: Beginner" .. STABLE_NAME] = "Recommended for players with no strategy game experience.",
 	["AI: Novice" .. STABLE_NAME] = "Recommended for players with some strategy game experience, or experience with related genres (such as MOBA).",
@@ -80,6 +73,7 @@ local aiTooltip = {
 	["AI: Normal" .. STABLE_NAME] = "Recommended for veteran strategy gamers.",
 	["AI: Hard" .. STABLE_NAME] = "Recommended for veteran strategy gamers who aren't afraid of losing.",
 	["AI: Brutal" .. STABLE_NAME] = "Recommended for veterans of Zero-K.",
+	["AI: Bleeding edge test" .. STABLE_NAME] = "Latest test version.",
 	["AI: Legacy"] = "Older unsupported AI, still potentially challenging.",
 	["Inactive AI"] = "This AI does absolutely nothing after spawning.",
 	["Chicken: Beginner"] = "Defeat waves of aliens.",

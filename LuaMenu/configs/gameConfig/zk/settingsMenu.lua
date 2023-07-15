@@ -76,7 +76,12 @@ end
 
 local function GetUiScaleParameters()
 	local realWidth, realHeight = Spring.Orig.GetViewSizes()
-	local defaultUiScale = math.floor(math.max(1, realHeight/950))*100
+	local defaultUiScale = 100
+	if realHeight > 1900 then
+		defaultUiScale = 200
+	elseif realHeight > 1220 or realWidth > 2500 then
+		defaultUiScale = 125
+	end
 	local maxUiScale = math.max(2, realWidth/1000)*100
 	local minUiScale = math.min(0.5, realWidth/4000)*100
 	return defaultUiScale, maxUiScale, minUiScale
@@ -91,7 +96,7 @@ local settingsConfig = {
 			{
 				name = "Compat.",
 				settings = {
-					WaterType = "Basic",
+					WaterType_2 = "Basic",
 					WaterQuality = "Low",
 					DeferredRendering = "Off",
 					UnitReflections = "Off",
@@ -120,7 +125,7 @@ local settingsConfig = {
 			{
 				name = "Lowest",
 				settings = {
-					WaterType = "Reflective",
+					WaterType_2 = "Bumpmapped",
 					WaterQuality = "Low",
 					DeferredRendering = "Off",
 					UnitReflections = "Low",
@@ -149,7 +154,7 @@ local settingsConfig = {
 			{
 				name = "Low",
 				settings = {
-					WaterType = "Bumpmapped",
+					WaterType_2 = "Bumpmapped",
 					WaterQuality = "Low",
 					DeferredRendering = "Off",
 					UnitReflections = "Low",
@@ -178,7 +183,7 @@ local settingsConfig = {
 			{
 				name = "Medium",
 				settings = {
-					WaterType = "Bumpmapped",
+					WaterType_2 = "Bumpmapped",
 					WaterQuality = "Medium",
 					DeferredRendering = "On",
 					UnitReflections = "Medium",
@@ -207,7 +212,7 @@ local settingsConfig = {
 			{
 				name = "High",
 				settings = {
-					WaterType = "Bumpmapped",
+					WaterType_2 = "Bumpmapped",
 					WaterQuality = "High",
 					DeferredRendering = "On",
 					UnitReflections = "Medium",
@@ -236,7 +241,7 @@ local settingsConfig = {
 			{
 				name = "Ultra",
 				settings = {
-					WaterType = "Bumpmapped",
+					WaterType_2 = "Bumpmapped",
 					WaterQuality = "Ultra",
 					DeferredRendering = "On",
 					UnitReflections = "Ultra",
@@ -276,7 +281,13 @@ local settingsConfig = {
 				humanName = "Menu Display Mode",
 				lobbyDisplayModeToggle = true,
 			},
-
+			{
+				name = "ActiveGraphicsLabel",
+				humanName = "Graphics Driver Selected: ",
+				isLabelSetting = true,
+				desc = Platform.gpuVendor,
+				size = 2,
+			},
 			{
 				name = "AtiIntelCompatibility_2",
 				humanName = "ATI/Intel Compatibility",
@@ -880,7 +891,7 @@ local settingsConfig = {
 			},
 
 			{
-				name = "WaterType",
+				name = "WaterType_2",
 				humanName = "Water Type",
 				options = {
 					{
@@ -981,6 +992,7 @@ local settingsConfig = {
 					InterfaceScale = defaultUiScale,
 					MouseZoomSpeed = 25,
 					InvertZoom = "Off",
+					HardwareCursor = "On",
 					TextToSpeech = "On",
 					EdgeScroll = "On",
 					CommandAlpha = 60,
@@ -1062,6 +1074,24 @@ local settingsConfig = {
 								ScrollWheelSpeed = currentZoom * -1,
 							}
 						end
+					},
+				},
+			},
+			{
+				name = "HardwareCursor",
+				humanName = "Hardware Cursor",
+				options = {
+					{
+						name = "On",
+						apply = {
+							HardwareCursor = 1,
+						}
+					},
+					{
+						name = "Off",
+						apply = {
+							HardwareCursor = 0,
+						}
 					},
 				},
 			},
@@ -1228,39 +1258,93 @@ local settingsConfig = {
 				humanName = "GC Rate",
 				options = {
 					{
-						name = "Very Fast",
+						name = "Highest performance",
 						apply = {
-							LuaGarbageCollectionMemLoadMult = 2,
+							LuaGarbageCollectionMemLoadMult = 1,
 						}
 					},
 					{
-						name = "Fast",
+						name = "Higher performance",
 						apply = {
-							LuaGarbageCollectionMemLoadMult = 3,
+							LuaGarbageCollectionMemLoadMult = 1.7,
+						}
+					},
+					{
+						name = "More performance",
+						apply = {
+							LuaGarbageCollectionMemLoadMult = 2.4,
 						}
 					},
 					{
 						name = "Recommended",
 						apply = {
+							LuaGarbageCollectionMemLoadMult = 3.2,
+						}
+					},
+					{
+						name = "More Stability",
+						apply = {
 							LuaGarbageCollectionMemLoadMult = 4,
 						}
 					},
 					{
-						name = "Slow",
+						name = "Higher Stability",
 						apply = {
-							LuaGarbageCollectionMemLoadMult = 7,
+							LuaGarbageCollectionMemLoadMult = 6,
 						}
 					},
 					{
-						name = "Slower",
+						name = "Highest Stability",
 						apply = {
-							LuaGarbageCollectionMemLoadMult = 15,
+							LuaGarbageCollectionMemLoadMult = 10,
+						}
+					},
+				},
+			},
+			{
+				name = "GcTimeMult",
+				humanName = "GC Time Mult",
+				options = {
+					{
+						name = "Highest performance",
+						apply = {
+							LuaGarbageCollectionRunTimeMult = 1,
 						}
 					},
 					{
-						name = "Slowest",
+						name = "Higher Performance",
 						apply = {
-							LuaGarbageCollectionMemLoadMult = 100,
+							LuaGarbageCollectionRunTimeMult = 1.4,
+						}
+					},
+					{
+						name = "More Performance",
+						apply = {
+							LuaGarbageCollectionRunTimeMult = 1.7,
+						}
+					},
+					{
+						name = "Recommended",
+						apply = {
+							LuaGarbageCollectionRunTimeMult = 2,
+						}
+					},
+					{
+						name = "More Stability",
+						apply = {
+							LuaGarbageCollectionRunTimeMult = 3,
+						}
+					},
+					{
+						name = "Higher Stability",
+						apply = {
+							LuaGarbageCollectionRunTimeMult = 4,
+						}
+					},
+					{
+						name = "Highest Stability",
+						apply = {
+							LuaGarbageCollectionRunTimeMult = 5,
 						}
 					},
 				},
@@ -1270,7 +1354,7 @@ local settingsConfig = {
 }
 
 local settingsDefault = {
-	WaterType = "Bumpmapped",
+	WaterType_2 = "Bumpmapped",
 	WaterQuality = "Medium",
 	DeferredRendering = "On",
 	UnitReflections = "Medium",
@@ -1298,6 +1382,7 @@ local settingsDefault = {
 	InterfaceScale = defaultUiScale,
 	MouseZoomSpeed = 25,
 	InvertZoom = "Off",
+	HardwareCursor = "On",
 	TextToSpeech = "On",
 	EdgeScroll = "On",
 	CommandAlpha = 60,
@@ -1307,6 +1392,7 @@ local settingsDefault = {
 	NetworkSettings = "Balanced",
 	SmoothBuffer = "Off",
 	GcRate = "Recommended",
+	GcTimeMult = "Recommended",
 }
 
 local settingsNames = {}

@@ -22,7 +22,6 @@ local settingsConfig, settingsNames, settingsDefault, SettingsPresetFunc = VFS.I
 
 local headingLarge    = LUA_DIRNAME .. "configs/gameConfig/" .. shortname .. "/skinning/headingLarge.png"
 local headingSmall    = LUA_DIRNAME .. "configs/gameConfig/" .. shortname .. "/skinning/headingSmall.png"
-local backgroundImage = LUA_DIRNAME .. "configs/gameConfig/" .. shortname .. "/skinning/background.jpg"
 local taskbarIcon     = LUA_DIRNAME .. "configs/gameConfig/" .. shortname .. "/taskbarLogo.png"
 
 
@@ -44,7 +43,7 @@ local subheadings = {
 }
 
 local background = {
-	image           = backgroundImage,
+	image           = backgroundConfig.backgroundImage,
 	backgroundFocus = backgroundConfig.backgroundFocus,
 }
 
@@ -70,6 +69,7 @@ local externalFuncAndData = {
 	GetAiSimpleName         = aiSimpleNames.GetAiSimpleName,
 	simpleAiOrder           = aiSimpleNames.simpleAiOrder,
 	aiTooltip               = aiSimpleNames.aiTooltip,
+	aiPrefixFunc            = aiSimpleNames.aiPrefixFunc,
 	oldAiVersions           = oldAiVersions,
 	settingsConfig          = settingsConfig,
 	settingsNames           = settingsNames,
@@ -104,12 +104,13 @@ local externalFuncAndData = {
 	link_matchmakerMapBans  = link_matchmakerMapBans,
 	ignoreServerVersion     = false,
 	runTutorial             = true,
-	openTrack               = 'sounds/lobbyMusic/The Secret of Ayers Rock.ogg',
+	openTrack               = 'sounds/lobbyMusic/dreamsofcipher_wip.ogg',
 	randomTrackList         = {
 		"sounds/lobbyMusic/A Magnificent Journey (Alternative Version).ogg",
 		"sounds/lobbyMusic/Dream Infinity.ogg",
 		"sounds/lobbyMusic/Interstellar.ogg",
 		"sounds/lobbyMusic/Tomorrow Landscape.ogg",
+		"sounds/lobbyMusic/The Secret of Ayers Rock.ogg",
 	},
 	-- I assume ZK doesn't want to show this as it was removed
 	hideGameExistanceDisplay = true,

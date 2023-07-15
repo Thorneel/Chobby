@@ -75,7 +75,7 @@ local function InitializeDifficultyWindow(parent)
 		height = 30,
 		valign = "top",
 		align = "left",
-		font = Configuration:GetFont(2),
+		objectOverrideFont = Configuration:GetFont(2),
 		caption = "Difficulty",
 		parent = parent,
 	}
@@ -86,7 +86,7 @@ local function InitializeDifficultyWindow(parent)
 		height = 30,
 		items = {"Easy", "Normal", "Hard", "Brutal"},
 		selected = 2,
-		font = Configuration:GetFont(2),
+		objectOverrideFont = Configuration:GetFont(2),
 		itemFontSize = Configuration:GetFont(2).size,
 		selected = WG.CampaignData.GetDifficultySetting(),
 		OnSelect = {
@@ -117,14 +117,12 @@ end
 -- Stats Window
 
 local function MakeStatLabel(parent, offset, name)
-	local fontSize = WG.Chobby.Configuration:GetFont(2).size
-
 	TextBox:New {
 		x = 20,
 		y = offset + TEXT_OFFSET,
 		width = 200,
 		height = 30,
-		fontsize = fontSize,
+		objectOverrideFont = WG.Chobby.Configuration:GetFont(2),
 		text = name,
 		parent = parent,
 	}
@@ -133,7 +131,7 @@ local function MakeStatLabel(parent, offset, name)
 		y = offset + TEXT_OFFSET,
 		width = 200,
 		height = 30,
-		fontsize = fontSize,
+		objectOverrideFont = WG.Chobby.Configuration:GetFont(2),
 		text = "",
 		parent = parent,
 	}
@@ -158,7 +156,7 @@ local function InitializeStatsWindow(parent)
 
 	local function UpdateStats()
 		local gamedata = WG.CampaignData.GetGamedataInATroublingWay()
-		leastDifficulty:SetText(DIFFICULTY_NAME_MAP[gamedata.leastDifficulty or 5])
+		leastDifficulty:SetText(DIFFICULTY_NAME_MAP[(gamedata.leastDifficulty or 4) + 1])
 		totalTime:SetText(Spring.Utilities.FormatTime((gamedata.totalPlayFrames or 0)/30, true))
 		totalVictoryTime:SetText(Spring.Utilities.FormatTime((gamedata.totalVictoryPlayFrames or 0)/30, true))
 		planets:SetText(tostring(#(gamedata.planetsCaptured.list or {})))
@@ -195,7 +193,7 @@ local function MakeTab(name, children)
 	return {
 		name = name,
 		caption = name,
-		font = WG.Chobby.Configuration:GetFont(3),
+		objectOverrideFont = WG.Chobby.Configuration:GetFont(3),
 		children = {contentsPanel}
 	}
 end
@@ -229,7 +227,7 @@ local function MakeStandardTab(name, ChildrenFunction)
 	return {
 		name = name,
 		caption = name,
-		font = WG.Chobby.Configuration:GetFont(3),
+		objectOverrideFont = WG.Chobby.Configuration:GetFont(3),
 		children = {contentsPanel}
 	}
 end
@@ -243,11 +241,11 @@ local function InitializeControls(window)
 
 	local btnClose = Button:New {
 		right = 11,
-		y = 7,
+		y = WG.TOP_BUTTON_Y,
 		width = 80,
-		height = 45,
+		height = WG.BUTTON_HEIGHT,
 		caption = i18n("close"),
-		font = WG.Chobby.Configuration:GetFont(3),
+		objectOverrideFont = WG.Chobby.Configuration:GetButtonFont(3),
 		classname = "negative_button",
 		OnClick = {
 			function()

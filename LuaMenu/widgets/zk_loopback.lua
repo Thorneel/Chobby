@@ -124,6 +124,22 @@ local function GetSpringBattleInfoDone(args)
 
 end
 
+local function GetResourceInfoDone(args)
+--[[
+   [ChobbyMessage]
+    public class GetResourceInfoDone
+    {
+        public string InternalName;
+        public string ArchiveName;
+        public string Data;
+    }
+]]--
+	if WG.ModoptionsPanel then
+		WG.ModoptionsPanel.WrapperModoptionResponse(args.ArchiveName, args.Data)
+	end
+end
+
+
 
 -- reports that download has ended/was aborted
 local function DownloadFileDone(args)
@@ -209,6 +225,10 @@ local function SteamConnectSpring(args)
 	]]--
 end
 
+local function SteamP2PDirectConnectRequest(args)
+	SteamConnectSpring(args)
+end
+
 local function DownloadImageDone(args)
 	--[[
     public class DownloadImageDone
@@ -265,10 +285,12 @@ commands["SteamFriendJoinedMe"] = SteamFriendJoinedMe
 commands["SteamHostGameSuccess"] = SteamHostGameSuccess
 commands["SteamHostGameFailed"] = SteamHostGameFailed
 commands["SteamConnectSpring"] = SteamConnectSpring
+commands["SteamP2PDirectConnectRequest"] =  SteamP2PDirectConnectRequest
 commands["DownloadImageDone"] = DownloadImageDone
 commands["DownloadFileProgress"] = DownloadFileProgress
 commands["ReadReplayInfoDone"] = ReadReplayInfoDone
 commands["GetSpringBattleInfoDone"] = GetSpringBattleInfoDone
+commands["GetResourceInfoDone"] = GetResourceInfoDone
 
 commands["DiscordOnReady"] = DiscordOnReady
 commands["DiscordOnSpectate"] = DiscordOnSpectate
@@ -291,6 +313,10 @@ end
 
 function WrapperLoopback.GetSpringBattleInfo(gameId)
 	SendCommand("GetSpringBattleInfo", {GameID = gameID})
+end
+
+function WrapperLoopback.GetResourceInfo(internalName, archiveName)
+	SendCommand("GetResourceInfo", {InternalName = internalName, ArchiveName = archiveName})
 end
 
 function WrapperLoopback.SendBugReport(title, description)

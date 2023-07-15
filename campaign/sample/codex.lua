@@ -192,7 +192,7 @@ Chicken biology is suspiciously close to Earth-native biology, but with signific
  
 In light of their distribution thoughout the galaxy, it is generally accepted that chicken have means to either transport or seed colonies over interstellar distances. Whether by slower-than-light dormant forms, sophisticated counter-detection systems, or even planetary warp travel working by unknown physical principles, no concrete element has been found.
  
-Chicken have existed for at least as long as the early days of the human galactic age and are capabible of survival in almost any planetary environment. Despite this, and their demonstrated interstellar capabilities, they have never settled on more than a handful of worlds, even including those ignored by humans as unsuitable for colonization or exploitation. Why they have not overrun the galaxy has been said to be the key to understanding what they really are.]]
+Chicken have existed for at least as long as the early days of the human galactic age and are capable of survival in almost any planetary environment. Despite this, and their demonstrated interstellar capabilities, they have never settled on more than a handful of worlds, even including those ignored by humans as unsuitable for colonization or exploitation. Why they have not overrun the galaxy has been said to be the key to understanding what they really are.]]
 	},
 	threat_chickens_intelligence = { -- planet63
 		name = "Chicken Intelligence",
@@ -558,7 +558,7 @@ So,
 Thanks to those lone static defenses, I could breach the perimeter.
 For something so well-guarded, though, I can't find what they were actually guarding. There is nothing there!
 Getting in was the easiest part, it would seem.
-Those weren't the only thing down thee though. The
+Those weren't the only thing down there though. The
 Interlopers weren't part of the defense.
 By
 The time I wrapped this all up, it was pretty clear they were actually hostile to the defenses. The
@@ -698,9 +698,9 @@ Supposedly just a standard Empire R&D site, it had actually been infiltrated by 
 		category = "5. Anomalies",
 		text = [[Finally, an Empire R&D site with a detailed record of the event. According to their research, the event appears to have started at the extreme end of the Anarchai Arm. Some early hypotheses proposed extragalactic origin, but additional data confirmed a spread pattern constistent with emmination from a specific region of the galaxy, not propagated from a distant source.
  
-It propagated through the arm in a matter of days, but slowed considerably by the time it reached the Inner Disc. Its progression then became asymmetric, progressing through the Celestial Arm in an estimated two weeks - though precise timing was unavailible due to the ongoing conflict with the Union followed by a loss of communication as its progress split the Empire. The wavefronts themselves appeared to disrupt hyperspace in a way that made interstellar communication, let alone travel, impossible through their wake.
+It propagated through the arm in a matter of days, but slowed considerably by the time it reached the Inner Bulge. Its progression then became asymmetric, progressing through the Celestial Arm in an estimated two weeks - though precise timing was unavailible due to the ongoing conflict with the Union followed by a loss of communication as its progress split the Empire. The wavefronts themselves appeared to disrupt hyperspace in a way that made interstellar communication, let alone travel, impossible through their wake.
  
-Both the Inner Disc and Dynastic Quadrant went dark over in a matter of months. By that time, the Empire had ordered a total evacuation towards the Mandate Arm, hoping that at least some worlds would be spared as the advance slowed down. However, later calculations showed that Cipher, the furthest world that they could reach, would be overtaken five to fifteen years later.
+Both the Inner Bulge and Dynastic Quadrant went dark over in a matter of months. By that time, the Empire had ordered a total evacuation towards the Mandate Arm, hoping that at least some worlds would be spared as the advance slowed down. However, later calculations showed that Cipher, the furthest world that they could reach, would be overtaken five to fifteen years later.
  
 They found no way of resist or bypass it, nor even of slowing it down. The automated systems continued taking data after it hit Lalata, but the remaining people never found a way to recover it across the event's wake.]]
 	},

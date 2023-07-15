@@ -17,6 +17,8 @@ end
 --------------------------------------------------------------------------------
 -- Local Variables
 
+local PARTIAL_ADD_NUMBER = 50
+
 local replayListWindow
 
 --------------------------------------------------------------------------------
@@ -31,7 +33,7 @@ local function CreateReplayEntry(replayPath, engineName, gameName, mapName)
 		return
 	end
 
-	fileName = string.gsub(string.gsub(string.gsub(fileName, " BAR", ""), " maintenance", ""), " develop", "")
+	fileName = string.gsub(string.gsub(string.gsub(string.gsub(fileName, " BAR105", ""), " BAR", ""), " maintenance", ""), " develop", "")
 	fileName = string.gsub(fileName, "%.sdfz", "")
 
 	local replayTime = string.sub(fileName, 0, 15)
@@ -53,7 +55,7 @@ local function CreateReplayEntry(replayPath, engineName, gameName, mapName)
 		width = 65,
 		caption = i18n("start"),
 		classname = "action_button",
-		font = WG.Chobby.Configuration:GetFont(2),
+		objectOverrideFont = Configuration:GetButtonFont(2),
 		OnClick = {
 			function()
 				if not replayPath then
@@ -66,37 +68,37 @@ local function CreateReplayEntry(replayPath, engineName, gameName, mapName)
 		parent = replayPanel,
 	}
 
-	local replayDate = TextBox:New {
+	local replayDate = Label:New {
 		name = "replayDate",
 		x = 85,
-		y = 12,
+		y = 15,
 		right = 0,
-		height = 20,
+		height = 16,
 		valign = 'center',
-		fontsize = Configuration:GetFont(2).size,
-		text = replayTime,
+		objectOverrideFont = Configuration:GetFont(2),
+		caption = replayTime,
 		parent = replayPanel,
 	}
-	local replayMap = TextBox:New {
+	local replayMap = Label:New {
 		name = "replayMap",
 		x = 305,
-		y = 12,
+		y = 15,
 		right = 0,
-		height = 20,
+		height = 16,
 		valign = 'center',
-		fontsize = Configuration:GetFont(2).size,
-		text = mapName,
+		objectOverrideFont = Configuration:GetFont(2),
+		caption = mapName,
 		parent = replayPanel,
 	}
-	local replayVersion = TextBox:New {
+	local replayVersion = Label:New {
 		name = "replayVersion",
 		x = 535,
-		y = 12,
+		y = 15,
 		width = 400,
-		height = 20,
+		height = 16,
 		valign = 'center',
-		fontsize = Configuration:GetFont(2).size,
-		text = gameName,
+		objectOverrideFont = Configuration:GetFont(2),
+		caption = gameName,
 		parent = replayPanel,
 	}
 	--local replayEngine = TextBox:New {
@@ -106,7 +108,7 @@ local function CreateReplayEntry(replayPath, engineName, gameName, mapName)
 	--	width = 400,
 	--	height = 20,
 	--	valign = 'center',
-	--	fontsize = Configuration:GetFont(2).size,
+	--	objectOverrideFont = Configuration:GetFont(2),
 	--	text = engineName,
 	--	parent = replayPanel,
 	--}
@@ -127,7 +129,7 @@ local function InitializeControls(parentControl)
 		width = 180,
 		height = 30,
 		parent = parentControl,
-		font = Configuration:GetFont(3),
+		objectOverrideFont = Configuration:GetFont(3),
 		caption = "Replays",
 	}
 
@@ -148,7 +150,7 @@ local function InitializeControls(parentControl)
 		align = "center",
 		valign = "center",
 		parent = loadingPanel,
-		font = Configuration:GetFont(3),
+		objectOverrideFont = Configuration:GetFont(3),
 		caption = "Loading",
 	}
 
@@ -192,7 +194,7 @@ local function InitializeControls(parentControl)
 			loadingPanel:SetVisibility(true)
 			loadingPanel:BringToFront()
 			local items = {}
-			for i = 1, 20 do
+			for i = 1, PARTIAL_ADD_NUMBER do
 				if index < 1 then
 					if moreButton then
 						moreButton:SetVisibility(false)
@@ -219,11 +221,11 @@ local function InitializeControls(parentControl)
 
 	Button:New {
 		x = 100,
-		y = 7,
+		y = WG.TOP_BUTTON_Y,
 		width = 110,
-		height = 45,
+		height = WG.BUTTON_HEIGHT,
 		caption = i18n("refresh"),
-		font = Configuration:GetFont(3),
+		objectOverrideFont = Configuration:GetButtonFont(3),
 		classname = "option_button",
 		parent = parentControl,
 		OnClick = {
@@ -235,11 +237,11 @@ local function InitializeControls(parentControl)
 
 	moreButton = Button:New {
 		x = 340,
-		y = 7,
+		y = WG.TOP_BUTTON_Y,
 		width = 110,
-		height = 45,
+		height = WG.BUTTON_HEIGHT,
 		caption = i18n("more"),
-		font = Configuration:GetFont(3),
+		objectOverrideFont = Configuration:GetButtonFont(3),
 		classname = "option_button",
 		parent = parentControl,
 		OnClick = {
@@ -252,11 +254,11 @@ local function InitializeControls(parentControl)
 	}
 	--local btnClose = Button:New {
 	--	right = 11,
-	--	y = 7,
+	--	y = WG.TOP_BUTTON_Y,
 	--	width = 80,
-	--	height = 45,
+	--	height = WG.BUTTON_HEIGHT,
 	--	caption = i18n("close"),
-	--	font = Configuration:GetFont(3),
+	--	objectOverrideFont = Configuration:GetButtonFont(3),
 	--	classname = "negative_button",
 	--	OnClick = {
 	--		function()
@@ -269,11 +271,11 @@ local function InitializeControls(parentControl)
 	if WG.BrowserHandler and Configuration.gameConfig.link_replays ~= nil then
 		Button:New {
 			x = 220,
-			y = 7,
+			y = WG.TOP_BUTTON_Y,
 			width = 110,
-			height = 45,
+			height = WG.BUTTON_HEIGHT,
 			caption = i18n("download"),
-			font = Configuration:GetFont(3),
+			objectOverrideFont = Configuration:GetButtonFont(3),
 			classname = "option_button",
 			parent = parentControl,
 			OnClick = {

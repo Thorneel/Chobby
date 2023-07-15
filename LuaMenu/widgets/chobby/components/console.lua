@@ -36,7 +36,7 @@ function Console:init(channelName, sendMessageListener, noHistoryLoad, onResizeF
 		lineSpacing = 2,
 		bottom = 0,
 		text = "",
-		fontsize = Configuration.chatFontSize,
+		objectOverrideFont = Configuration:GetFont(Configuration.chatFontSize, "console_" .. Configuration.chatFontSize, false, true),
 		parent = self.spHistory,
 		selectable = true,
 		subTooltips = true,
@@ -63,7 +63,8 @@ function Console:init(channelName, sendMessageListener, noHistoryLoad, onResizeF
 		height = 25,
 		right = 2,
 		text = "",
-		fontsize = Configuration.chatFontSize,
+		objectOverrideFont = Configuration:GetFont(Configuration.chatFontSize, "console_" .. Configuration.chatFontSize, false, true),
+		objectOverrideHintFont = Configuration:GetHintFont(Configuration.chatFontSize, "console_hint_" .. Configuration.chatFontSize, false, true),
 		--hint = i18n("type_here_to_chat"),
 	}
 
@@ -79,10 +80,10 @@ function Console:init(channelName, sendMessageListener, noHistoryLoad, onResizeF
 				shadow       = oldFont.shadow,
 				size         = value,
 			}
-			self.ebInputText.font = Font:New(fontSettings)
+			self.ebInputText.font = Configuration:GetFont(value, "console_font", fontSettings, true)
 			self.ebInputText:UpdateLayout()
 
-			self.tbHistory.font = Font:New(fontSettings)
+			self.tbHistory.font = Configuration:GetFont(value, "console_font", fontSettings, true)
 			self.tbHistory:UpdateLayout()
 		end
 	end
@@ -192,8 +193,9 @@ function Console:SendMessage()
 	end
 end
 
+-- TODO: Refactor method to use an options table
 -- if date is not passed, current time is assumed
-function Console:AddMessage(message, userName, dateOverride, color, thirdPerson, nameColor, nameTooltip, supressNameClick)
+function Console:AddMessage(message, userName, dateOverride, color, thirdPerson, nameColor, nameTooltip, supressNameClick, suppressLogging)
 	nameColor = nameColor or "\255\50\160\255"
 	nameTooltip = nameTooltip or (userName and ("user_chat_s_" .. userName))
 	local txt = ""
@@ -287,7 +289,7 @@ function Console:AddMessage(message, userName, dateOverride, color, thirdPerson,
 		self.tbHistory:AddLine(txt, textTooltip, onTextClick)
 	end
 
-	if self.channelName then
+	if self.channelName and not suppressLogging then
 		Spring.CreateDir("chatLogs")
 		local logFile, errorMessage = io.open('chatLogs/' .. self.channelName .. ".txt", 'a')
 		if logFile then
@@ -302,7 +304,10 @@ function Console:AddMessage(message, userName, dateOverride, color, thirdPerson,
 end
 
 function Console:SetTopic(newTopic)
-	self:AddMessage(newTopic, nil, nil, Configuration.meColor)
+	if self.currentTopic == nil or newTopic ~= self.currentTopic then
+		self.currentTopic = newTopic
+		self:AddMessage(newTopic, nil, nil, Configuration.meColor, nil, nil, nil, nil, true)
+	end
 end
 
 local function lineIterator(s)

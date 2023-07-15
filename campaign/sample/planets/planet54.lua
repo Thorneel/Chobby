@@ -828,6 +828,18 @@ local function GetPlanet(planetUtilities, planetID)
 							},
               messageWhenDestroyed = planetUtilities.messages.enemyProdDestroyed,
 						},
+						{
+							name = "energypylon",
+							x = 5020,
+							z = 5420,
+							facing = 3,
+						},
+						{
+							name = "energypylon",
+							x = 5620,
+							z = 5844,
+							facing = 3,
+						},
  						{
 							name = "staticcon",
 							x = 4824,

@@ -43,6 +43,10 @@ local function GetPlanet(planetUtilities, planetID)
 				image = "unitpics/striderdante.png",
 				text = [[The Dante's heatrays and napalm rockets are most lethal at close range. Keep your distance until the Dante is disarmed or dead.]]
 			},
+			{
+				image = "LuaUI/Images/ibeam.png",
+				text = [[Metal income from extractors is split evenly between teammates, with whoever builds an extractor temporarily recieving a slightly larger share as payment. Reclaim is private though, as is any metal in storage. Mouse over the metal icon at the top of the screen for a detailed breakdown.]]
+			},
 		},
 		gameConfig = {
 			mapName = "Violence_4.2",
@@ -748,6 +752,30 @@ local function GetPlanet(planetUtilities, planetID)
 							},
 							difficultyAtLeast = 3,
               messageWhenDestroyed = planetUtilities.messages.enemyProdDestroyed,
+						},
+						{
+							name = "energypylon",
+							x = 7580,
+							z = 7454,
+							facing = 3,
+						},
+						{
+							name = "energypylon",
+							x = 8260,
+							z = 7120,
+							facing = 3,
+						},
+						{
+							name = "energypylon",
+							x = 7200,
+							z = 7730,
+							facing = 3,
+						},
+						{
+							name = "energypylon",
+							x = 6920,
+							z = 8190,
+							facing = 3,
 						},
 						{
 							name = "striderdante",

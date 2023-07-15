@@ -304,6 +304,7 @@ local function StartBattleForReal(planetID, planetData)
 		planetmissioninformationtext = TableToBase64(informationText),
 		planetmissionnewtonfirezones = TableToBase64(gameConfig.playerConfig.newtonFirezones),
 		fixedstartpos = 1,
+		init_terra_save_fix = gameConfig.initTerraSaveFix and "1" or "0",
 		planetmissiondifficulty = missionDifficulty,
 		singleplayercampaignbattleid = planetID,
 		initalterraform = TableToBase64(gameConfig.terraform),
@@ -376,7 +377,7 @@ function PlanetBattleHandler.StartBattle(planetID, planetData)
 	if Spring.GetGameName() == "" then
 		StartBattleFunc()
 	else
-		WG.Chobby.ConfirmationPopup(StartBattleFunc, "Are you sure you want to leave your current game to attack this planet?", nil, 315, 200)
+		WG.Chobby.ConfirmationPopup(StartBattleFunc, "Are you sure you want to leave your current game to play this mission?", nil, 315, 200)
 	end
 end
 

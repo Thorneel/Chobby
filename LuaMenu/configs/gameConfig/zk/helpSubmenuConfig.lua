@@ -18,11 +18,11 @@ local function CreateLine(lineText, linkText, onClick)
 		local linkButton = Button:New {
 			x = 3,
 			y = 3,
-			height = 34,
-			width = 95,
+			height = WG.BUTTON_HEIGHT,
+			width = 110,
 			caption = linkText,
 			classname = "action_button",
-			font = WG.Chobby.Configuration:GetFont(2),
+			objectOverrideFont = WG.Chobby.Configuration:GetButtonFont(2),
 			OnClick = {
 				onClick
 			},
@@ -32,12 +32,12 @@ local function CreateLine(lineText, linkText, onClick)
 
 	local text = TextBox:New {
 		name = "text",
-		x = 110,
-		y = 12,
+		x = 125,
+		y = 16,
 		right = 0,
 		height = 20,
 		valign = 'center',
-		fontsize = Configuration:GetFont(2).size,
+		objectOverrideFont = Configuration:GetFont(2),
 		text = lineText,
 		parent = lineHolder,
 	}
@@ -201,16 +201,16 @@ local communityControl = Control:New {
 				width = 180,
 				height = 30,
 				parent = obj,
-				font = WG.Chobby.Configuration:GetFont(3),
+				objectOverrideFont = WG.Chobby.Configuration:GetFont(3),
 				caption = "Community and development links",
 			}
 
 			Button:New {
 				right = 11,
-				y = 7,
+				y = WG.TOP_BUTTON_Y,
 				width = 80,
-				height = 45,
-				font = WG.Chobby.Configuration:GetFont(3),
+				height = WG.BUTTON_HEIGHT,
+				objectOverrideFont = WG.Chobby.Configuration:GetButtonFont(3),
 				caption = i18n("close"),
 				classname = "negative_button",
 				OnClick = {
@@ -231,7 +231,7 @@ local communityControl = Control:New {
 				draggable = false,
 				padding = {0, 0, 0, 0},
 			}
-			local list = SortableList(listHolder)
+			local list = SortableList(listHolder, false, WG.BUTTON_HEIGHT + 3)
 
 			local items = {}
 			for i = 1, #communityLines do
@@ -268,16 +268,16 @@ local bugControl = Control:New {
 				width = 180,
 				height = 30,
 				parent = obj,
-				font = Configuration:GetFont(3),
+				objectOverrideFont = Configuration:GetFont(3),
 				caption = "Send a bug report",
 			}
 
 			Button:New {
 				right = 11,
-				y = 7,
+				y = WG.TOP_BUTTON_Y,
 				width = 80,
-				height = 45,
-				font = Configuration:GetFont(3),
+				height = WG.BUTTON_HEIGHT,
+				objectOverrideFont = Configuration:GetButtonFont(3),
 				caption = i18n("close"),
 				classname = "negative_button",
 				OnClick = {
@@ -295,7 +295,7 @@ local bugControl = Control:New {
 				y = offset,
 				height = 35,
 				text ="Title:",
-				fontsize = Configuration:GetFont(3).size,
+				objectOverrideFont = Configuration:GetFont(3),
 				parent = obj,
 			}
 			offset = offset + 36
@@ -305,7 +305,8 @@ local bugControl = Control:New {
 				y = offset - 9,
 				height = 35,
 				text = "",
-				font = Configuration:GetFont(3),
+				objectOverrideFont = Configuration:GetFont(3),
+				objectOverrideHintFont = Configuration:GetHintFont(3),
 				parent = obj,
 			}
 			offset = offset + 36
@@ -317,7 +318,7 @@ local bugControl = Control:New {
 				y = offset,
 				height = 35,
 				text ="Description:",
-				fontsize = Configuration:GetFont(3).size,
+				objectOverrideFont = Configuration:GetFont(3),
 				parent = obj,
 			}
 			offset = offset + 36
@@ -327,7 +328,8 @@ local bugControl = Control:New {
 				y = offset - 9,
 				height = 35,
 				text = "",
-				font = Configuration:GetFont(3),
+				objectOverrideFont = Configuration:GetFont(3),
+				objectOverrideHintFont = Configuration:GetHintFont(3),
 				parent = obj,
 			}
 			offset = offset + 36
@@ -339,7 +341,7 @@ local bugControl = Control:New {
 				y = offset,
 				height = 35,
 				text = "Using Spring engine version " .. Spring.Utilities.GetEngineVersion() .. " " .. ((WG.Chobby.Configuration:GetIsRunning64Bit() and "64-bit.") or "32-bit."),
-				fontsize = Configuration:GetFont(2).size,
+				objectOverrideFont = Configuration:GetFont(2),
 				parent = obj,
 			}
 			offset = offset + 36
@@ -352,7 +354,7 @@ local bugControl = Control:New {
 				height = 80,
 				caption = "Submit",
 				tooltip = "Closes the game and submits the report. Click OK to the resulting pop-up.",
-				font = Configuration:GetFont(4),
+				objectOverrideFont = Configuration:GetButtonFont(4),
 				classname = "action_button",
 				OnClick = {
 					function()

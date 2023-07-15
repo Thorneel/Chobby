@@ -33,14 +33,14 @@ local function GetPlanet(planetUtilities, planetID)
 			,
 			extendedText = "They were building not one but two superweapons here. If this was to be humanity's last stand, they would give it all."
 			.. "\n "
-			.. "\nUnfortunately, only one is operational, and it is pointed right at me. Well, so be it. I will hold off their assault, even supported by a Disco Rave Party rapid-fire cannon - until my Starlight orbital chisel is complete."
+			.. "\nUnfortunately, only one is operational, and it is pointed right at me. Well, so be it. I will hold off their assault, even supported by a Disco Rave Party rapid-fire cannon - until my Starlight is complete and powered up."
 			.. "\n "
 			.. "\nCome hell or high water, I will find out what happened here."
 		},
 		tips = {
 			{
 				image = "unitpics/mahlazer.png",
-				text = [[The Starlight is a planetary-scale chisel repurposed as the ultimate superweapon, firing a laser from space which will cut through anything. The mirror satellite rotates slowly, so make sure it doesn't strike your own units and structures.]]
+				text = [[The Starlight is a planetary-scale chisel repurposed as the ultimate superweapon, firing a laser from space which will cut through anything. The mirror satellite rotates slowly, so make sure it doesn't strike your own units and structures. It must be connected to a grid with 600 energy.]]
 			},
 			{
 				image = "unitpics/cremcom.png",
@@ -67,7 +67,7 @@ local function GetPlanet(planetUtilities, planetID)
 						x = 928,
 						z = 3600,
 						facing = 3,
-						buildProgress = 0.625,
+						buildProgress = 0.718,
 						difficultyAtLeast = 1,
 						difficultyAtMost = 1,
                         terraformHeight = 310,
@@ -77,7 +77,7 @@ local function GetPlanet(planetUtilities, planetID)
 						x = 928,
 						z = 3600,
 						facing = 3,
-						buildProgress = 0.55,
+						buildProgress = 0.662,
 						difficultyAtLeast = 2,
 						difficultyAtMost = 2,
                         terraformHeight = 310,
@@ -87,7 +87,7 @@ local function GetPlanet(planetUtilities, planetID)
 						x = 928,
 						z = 3600,
 						facing = 3,
-						buildProgress = 0.475,
+						buildProgress = 0.606,
 						difficultyAtLeast = 3,
 						difficultyAtMost = 3,
                         terraformHeight = 310,
@@ -97,7 +97,7 @@ local function GetPlanet(planetUtilities, planetID)
 						x = 928,
 						z = 3600,
 						facing = 3,
-						buildProgress = 0.4,
+						buildProgress = 0.55,
 						difficultyAtLeast = 4,
 						difficultyAtMost = 4,
                         terraformHeight = 310,
@@ -1699,6 +1699,13 @@ local function GetPlanet(planetUtilities, planetID)
 						}
 					},
 					startUnits = {
+						{
+							name = "staticheavyradar",
+							x = 7936,
+							z = 3584,
+							facing = 0,
+							difficultyAtLeast = 3,
+						},
 						{
 							name = "staticmex",
 							x = 8776,

@@ -3,6 +3,7 @@ Configuration = LCS.class{}
 VFS.Include("libs/liblobby/lobby/json.lua")
 
 LIB_LOBBY_DIRNAME = "libs/liblobby/lobby/"
+MINIMAP_THUMB_DOWNLOAD_DIR = "LuaMenu/Images/MinimapThumbnails"
 
 
 -- all configuration attribute changes should use the :Set*Attribute*() and :Get*Attribute*() methods in order to assure proper functionality
@@ -36,6 +37,7 @@ function Configuration:init()
 	self.friendMaxNameLength = 290
 	self.notificationMaxNameLength = 230
 	self.steamOverlayEnablable = (Platform.osFamily ~= "Linux" and Platform.osFamily ~= "FreeBSD")
+	self.useChatTabBadges = false
 
 	self.userName = false
 	self.suggestedNameFromSteam = false
@@ -51,7 +53,7 @@ function Configuration:init()
 	self.hideWelcomeMessage = false
 	self.lobbyTimeoutTime = 60 -- Seconds
 
-	self.battleFilterPassworded2 = true
+	self.battleFilterPassworded3 = false
 	self.battleFilterNonFriend = false
 	self.battleFilterRunning = false
 
@@ -66,6 +68,21 @@ function Configuration:init()
 	self.manualWindowed = {
 		game = {},
 		lobby = {},
+	}
+
+	self.settingsToSendExternal = {
+		'HardwareCursor',
+		'ShadowMapSize',
+		'GroundDecals',
+		'MaxParticles',
+		'UnitLodDist',
+		'UnitIconDist',
+		'AdvUnitShading',
+		'snd_volmaster',
+		'snd_volbattle',
+		'snd_volui',
+		'snd_volunitreply',
+		'snd_volgeneral',
 	}
 
 	self.ignoreLevel = false
@@ -89,7 +106,7 @@ function Configuration:init()
 
 	self.loadLocalWidgets = false
 	self.displayBots = false
-	self.displayBadEngines2 = false
+	self.displayBadEngines3 = true
 	self.allEnginesRunnable = true
 	self.doNotSetAnySpringSettings = false
 	self.agressivelySetBorderlessWindowed = false
@@ -192,9 +209,11 @@ function Configuration:init()
 
 	self.lastLoginChatLength = 25
 	self.notifyForAllChat = true
+	self.autosaveOnMatchmaker = true
 	self.planetwarsNotifications = false -- Possibly too intrusive? See how it goes.
 	self.ingameNotifcations = true -- Party, chat
 	self.nonFriendNotifications = true -- Party, chat
+	self.friendNotifyIngame = true
 	self.simplifiedSkirmishSetup = true
 	self.debugMode = false
 	self.devMode = (VFS.FileExists("devmode.txt") and true) or false
@@ -207,9 +226,11 @@ function Configuration:init()
 	self.campaignSpawnDebug = false
 	self.editCampaign = false
 	self.activeDebugConsole = false
+	self.debugLobbyGameChat = false
 	self.onlyShowFeaturedMaps = true
 	self.showFullModList = false
-	self.simpleAiList = true
+	self.simpleAiList2 = true
+	self.enableDebugBuffer = false
 	self.useSpringRestart = false
 	self.menuMusicVolume = 0.5
 	self.menuNotificationVolume = 0.8
@@ -234,14 +255,16 @@ function Configuration:init()
 	self.languages = {
 		["en"] = {locale = "en", name="English"},
 		["de"] = {locale = "de", name="Deutsch (unvollständig)"},
+		["it"] = {locale = "it", name="Italiano"},
 	}
 
-	self.lobby_fullscreen = 1
-	self.game_fullscreen = 1
+	self.lobby_fullscreen = 3
+	self.game_fullscreen = 3
 
 	self.chatFontSize = 18
 
-	self.font = {
+	self.fontName = "LuaMenu/widgets/chili/skins/Evolved/fonts/n019003l.pfb"
+	self.fontRaw = {
 		[0] = {size = 10, shadow = false},
 		[1] = {size = 14, shadow = false},
 		[2] = {size = 18, shadow = false},
@@ -249,6 +272,19 @@ function Configuration:init()
 		[4] = {size = 32, shadow = false},
 		[5] = {size = 48, shadow = false},
 	}
+	
+	self.fontSpecial = {}
+	self.font = {}
+	for i = 0, #self.fontRaw do
+		self.font[i] = WG.Chili.Font:New {
+			size         = self.fontRaw[i].size,
+			font         = self.fontName,
+			color        = {1,1,1,1},
+			outlineColor = {0.05,0.05,0.05,0.9},
+			outline      = false,
+			shadow       = false,
+		}
+	end
 
 	self.configParamTypes = {}
 	for _, param in pairs(Spring.GetConfigParams()) do
@@ -256,7 +292,6 @@ function Configuration:init()
 	end
 
 	self.AtiIntelSettingsOverride = {
-		Water = 1,
 		AdvSky = 0,
 		UsePBO = 0,
 	}
@@ -281,7 +316,7 @@ function Configuration:init()
 
 	self.animate_lobby = (gl.CreateShader ~= nil)
 	self.minimapDownloads = {}
-	self.minimapThumbDownloads = {}
+	self.minimapDownloadStarted = {}
 	self.downloadRetryCount = 3
 
 	local saneCharacterList = {
@@ -293,6 +328,11 @@ function Configuration:init()
 	for i = 1, #saneCharacterList do
 		self.saneCharacters[saneCharacterList[i]] = true
 	end
+
+	-- UI Styling globals that are really not config, but need to be somewhere.
+	WG.TOP_LABEL_Y = 16
+	WG.TOP_BUTTON_Y = 8
+	WG.BUTTON_HEIGHT = 41
 end
 
 ---------------------------------------------------------------------------------
@@ -469,7 +509,7 @@ function Configuration:SetConfigData(data)
 		self.serverAddress = "zero-k.info"
 	end
 
-	local newSpringsettings, onlyIfMissingSettings = VFS.Include(LUA_DIRNAME .. "configs/springsettings/springsettingsChanges.lua")
+	local newSpringsettings, onlyIfMissingSettings, onlyIfOutdated, settingsVersion = VFS.Include(LUA_DIRNAME .. "configs/springsettings/springsettingsChanges.lua")
 	for key, value in pairs(newSpringsettings) do
 		self.game_settings[key] = value
 	end
@@ -477,6 +517,18 @@ function Configuration:SetConfigData(data)
 		if self.game_settings[key] == nil then
 			self.game_settings[key] = value
 		end
+	end
+	
+	if (self.lobbySettingsVersion or 0) < 1 then
+		self.settingsMenuValues.InterfaceScale = nil -- Reset the setting
+	end
+	self.lobbySettingsVersion = 1
+	
+	if (self.settingsVersion or 0) < settingsVersion then
+		for key, value in pairs(onlyIfOutdated) do
+			self.game_settings[key] = value
+		end
+		self.settingsVersion = settingsVersion
 	end
 
 	if data.settingsMenuValues then
@@ -502,7 +554,7 @@ function Configuration:GetConfigData()
 		steamLinkComplete = self.steamLinkComplete,
 		alreadySeenFactionPopup4 = self.alreadySeenFactionPopup4,
 		firstBattleStarted = self.firstBattleStarted,
-		battleFilterPassworded2 = self.battleFilterPassworded2,
+		battleFilterPassworded3 = self.battleFilterPassworded3,
 		battleFilterNonFriend = self.battleFilterNonFriend,
 		battleFilterRunning = self.battleFilterRunning,
 		channels = self.channels,
@@ -520,6 +572,7 @@ function Configuration:GetConfigData()
 		planetwarsNotifications = self.planetwarsNotifications,
 		ingameNotifcations = self.ingameNotifcations,
 		nonFriendNotifications = self.nonFriendNotifications,
+		friendNotifyIngame = self.friendNotifyIngame,
 		simplifiedSkirmishSetup = self.simplifiedSkirmishSetup,
 		debugMode = self.debugMode,
 		debugAutoWin = self.debugAutoWin,
@@ -536,15 +589,18 @@ function Configuration:GetConfigData()
 		drawAtFullSpeed = self.drawAtFullSpeed,
 		lobbyIdleSleep = self.lobbyIdleSleep,
 		rememberQueuesOnStart2 = self.rememberQueuesOnStart2,
+		queue_handicap = self.queue_handicap,
+		queue_wide = self.queue_wide,
 		loadLocalWidgets = self.loadLocalWidgets,
 		activeDebugConsole = self.activeDebugConsole,
+		debugLobbyGameChat = self.debugLobbyGameChat,
 		onlyShowFeaturedMaps = self.onlyShowFeaturedMaps,
 		showFullModList = self.showFullModList,
-		simpleAiList = self.simpleAiList,
+		simpleAiList2 = self.simpleAiList2,
 		coopConnectDelay = self.coopConnectDelay,
 		useSpringRestart = self.useSpringRestart,
 		displayBots = self.displayBots,
-		displayBadEngines2 = self.displayBadEngines2,
+		displayBadEngines3 = self.displayBadEngines3,
 		useWrongEngine = self.useWrongEngine,
 		multiplayerLaunchNewSpring = self.multiplayerLaunchNewSpring,
 		doNotSetAnySpringSettings = self.doNotSetAnySpringSettings,
@@ -572,6 +628,8 @@ function Configuration:GetConfigData()
 		nextCampaignSaveNumber = self.nextCampaignSaveNumber,
 		steamReleasePopupSeen = self.steamReleasePopupSeen,
 		campaignConfigName = self.campaignConfigName,
+		settingsVersion = self.settingsVersion,
+		lobbySettingsVersion = self.lobbySettingsVersion,
 	}
 end
 
@@ -610,6 +668,10 @@ end
 ---------------------------------------------------------------------------------
 -- Getters
 ---------------------------------------------------------------------------------
+
+function Configuration:IsLobbyVisible()
+	return WG.Chobby.interfaceRoot.GetLobbyInterfaceHolder().visible
+end
 
 function Configuration:GetServerAddress()
 	if self.ForceDefaultServer then
@@ -690,12 +752,43 @@ function Configuration:GetTick()
 	return self:GetSuccessColor() .. "O"
 end
 
-function Configuration:GetFont(sizeScale, fontName)
-	return {
-		size = self.font[sizeScale].size,
-		shadow = self.font[sizeScale].shadow,
-		font = fontName,
-	}
+function Configuration:GetFont(sizeScale, specialName, specialData, rawSize)
+	if not specialName and not rawSize then
+		return self.font[sizeScale]
+	end
+	local size = (rawSize and sizeScale) or self.fontRaw[sizeScale].size
+	if not self.fontSpecial[size] then
+		self.fontSpecial[size] = {}
+	end
+	if not self.fontSpecial[size][specialName] then
+		specialData = specialData or {}
+		specialData.font = self.fontName
+		specialData.size = size
+		
+		specialData.color        = specialData.color or {1,1,1,1}
+		specialData.outlineColor = specialData.outlineColor or {0.05,0.05,0.05,0.9}
+		specialData.outline      = specialData.outline or false
+		specialData.shadow       = specialData.shadow or false
+		
+		self.fontSpecial[size][specialName] = WG.Chili.Font:New(specialData)
+	end
+	return self.fontSpecial[size][specialName]
+end
+
+function Configuration:GetHintFont(sizeScale, specialName, specialData, rawSize)
+	specialName = (specialName or "") .. "_hint_" .. sizeScale
+	specialData = specialData or {}
+	specialData.color = {1,1,1,0.48}
+	return self:GetFont(sizeScale, specialName, specialData, rawSize)
+end
+
+function Configuration:GetButtonFont(sizeScale, specialName, specialData, rawSize)
+	specialName = (specialName or "") .. "_button_" .. sizeScale
+	specialData = specialData or {}
+	specialData.outline = true
+	specialData.outlineWidth = 3
+	specialData.outlineHeight = 3
+	return self:GetFont(sizeScale, specialName, specialData, rawSize)
 end
 
 function Configuration:AllowNotification(playerName, playerList)
@@ -728,23 +821,25 @@ function Configuration:AllowNotification(playerName, playerList)
 end
 
 function Configuration:GetMinimapSmallImage(mapName)
-	if not self.gameConfig.minimapThumbnailPath then
-		return LUA_DIRNAME .. "images/minimapNotFound1.png"
-	end
 	mapName = string.gsub(mapName, " ", "_")
+
 	local filePath = self.gameConfig.minimapThumbnailPath .. mapName .. ".png"
-	if not VFS.FileExists(filePath) then
-		filePath = "LuaMenu/Images/MinimapThumbnails" .. mapName .. ".jpg"
+	if VFS.FileExists(filePath) then
+		return filePath, false
 	end
-	if WG.WrapperLoopback and WG.WrapperLoopback.DownloadImage and (not VFS.FileExists(filePath)) then
-		if not self.minimapThumbDownloads[mapName] then
-			Spring.CreateDir("LuaMenu/Images/MinimapThumbnails")
-			WG.WrapperLoopback.DownloadImage({ImageUrl = "http://zero-k.info/Resources/" .. mapName .. ".thumbnail.jpg", TargetPath = filePath})
-			self.minimapThumbDownloads[mapName] = true
-		end
-		return filePath, true
+
+	filePath = MINIMAP_THUMB_DOWNLOAD_DIR .. mapName .. ".jpg"
+	if VFS.FileExists(filePath) then
+		return filePath, false
 	end
-	return filePath
+
+	if not self.minimapDownloadStarted[mapName] and WG.WrapperLoopback and WG.WrapperLoopback.DownloadImage then
+		Spring.CreateDir(MINIMAP_THUMB_DOWNLOAD_DIR)
+		WG.WrapperLoopback.DownloadImage({ImageUrl = "http://zero-k.info/Resources/" .. mapName .. ".thumbnail.jpg", TargetPath = filePath})
+		self.minimapDownloadStarted[mapName] = true
+	end
+
+	return filePath, true
 end
 
 function Configuration:GetMinimapImage(mapName)
@@ -794,18 +889,52 @@ function Configuration:GetHeadingImage(fullscreenMode, title)
 	end
 end
 
-function Configuration:GetTruncatedEngineVersion()
-	if tonumber(Spring.Utilities.GetEngineVersion()) then
+function Configuration:GetTruncatedEngineVersion(overrideEngineName)
+	local engineVer = overrideEngineName or Spring.Utilities.GetEngineVersion()
+	if tonumber(engineVer) then
 		-- Master releases lack the '.0' at the end. Who knows what other cases are wrong.
 		-- Add as required.
-		return (Spring.Utilities.GetEngineVersion() .. ".0")
+		return (engineVer .. ".0")
 	else
-		return string.gsub(string.gsub(string.gsub(Spring.Utilities.GetEngineVersion(), " BAR", ""), " maintenance", ""), " develop", "")
+		return string.gsub(string.gsub(string.gsub(string.gsub(string.gsub(engineVer, " BAR105", ""), " BAR", ""), "Spring ", ""), " maintenance", ""), " develop", "")
 	end
 end
 
 function Configuration:IsValidEngineVersion(engineVersion)
 	return engineVersion == Spring.Utilities.GetEngineVersion() or engineVersion == self:GetTruncatedEngineVersion()
+end
+
+function Configuration:IsCurrentVersionNewerThan(rel, dev)
+	-- Argument example, <rel>.0.1-<dev>-g5072695
+	local thisVersion = self:GetTruncatedEngineVersion()
+	local thisRel, thisDev
+	local i = 1
+	for word in thisVersion:gmatch("[^%-]+") do
+		if i == 1 then
+			local j = 1
+			for subword in word:gmatch("[^%.]+") do
+				if j == 1 then
+					thisRel = tonumber(subword)
+					if thisRel then
+						if thisRel < rel then
+							return false
+						end
+						if thisRel > rel then
+							return true
+						end
+					end
+				end
+				j = j + 1
+			end
+		elseif i == 2 then
+			thisDev = tonumber(word)
+			if thisDev then
+				return thisDev > dev
+			end
+		end
+		i = i + 1
+	end
+	return false -- A newer version would not fail to return before now
 end
 
 function Configuration:SanitizeName(name, usedNames)
@@ -891,11 +1020,14 @@ function Configuration:GetIsRunning64Bit()
 	return false
 end
 
-function Configuration:GetIsDevEngine()
-	local engine = self:GetTruncatedEngineVersion()
+function Configuration:GetIsDevEngine(overrideEngineName)
+	local engine = self:GetTruncatedEngineVersion(overrideEngineName)
 	local splits = engine:split("-")
-	if splits and splits[2] and tonumber(splits[2]) then
-		return tonumber(splits[2]) > 400
+	for i = 1, #splits do
+		splits[i] = splits[i]:split("%.")[1]
+	end
+	if splits and splits[1] and tonumber(splits[1]) then
+		return tonumber(splits[1]) > 104
 	end
 	return false
 end

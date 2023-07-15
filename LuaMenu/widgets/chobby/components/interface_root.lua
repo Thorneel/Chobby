@@ -241,13 +241,12 @@ function GetInterfaceRoot(optionsParent, mainWindowParent, fontFunction)
 		y = 0,
 		right = 0,
 		bottom = 0,
-		classname = "main_window",
+		classname = "main_window_large",
 		name = "rightPanel_window",
 		caption = "", -- Panel Window
 		parent = holder_rightPanel,
 		resizable = false,
 		draggable = false,
-		padding = {5, 4, 5, 2},
 		children = {}
 	}
 	rightPanel_window:Hide()
@@ -321,13 +320,12 @@ function GetInterfaceRoot(optionsParent, mainWindowParent, fontFunction)
 		y = 0,
 		right = 0,
 		bottom = 0,
-		classname = "main_window",
+		classname = "main_window_large",
 		name = "mainContent_window",
 		caption = "", -- Content Place
 		parent = mainWindow_mainContent,
 		resizable = false,
 		draggable = false,
-		padding = {5, 4, 5, 2},
 		children = {}
 	}
 	mainContent_window:Hide()
@@ -349,7 +347,7 @@ function GetInterfaceRoot(optionsParent, mainWindowParent, fontFunction)
 		right = BUTTON_SIDE_SPACING,
 		height = 70,
 		caption = i18n("exit"),
-		font = Configuration:GetFont(3),
+		objectOverrideFont = Configuration:GetFont(3),
 		parent = buttonsHolder_buttons,
 		OnClick = {MakeExitPopup},
 	}
@@ -487,7 +485,6 @@ function GetInterfaceRoot(optionsParent, mainWindowParent, fontFunction)
 	}
 
 	local function UpdateTitle(newTitle)
-		Spring.Echo("newTitle", newTitle, math.random())
 		heading_image.file = Configuration:GetHeadingImage(doublePanelMode, newTitle)
 		heading_image:Invalidate()
 	end
@@ -892,7 +889,7 @@ function GetInterfaceRoot(optionsParent, mainWindowParent, fontFunction)
 		height = 38,
 		name = "switchToMenuButton",
 		caption = "Menu",
-		font = WG.Chobby.Configuration:GetFont(3),
+		objectOverrideFont = WG.Chobby.Configuration:GetFont(3),
 		parent = ingameInterfaceHolder,
 		resizable = false,
 		draggable = false,
@@ -911,7 +908,7 @@ function GetInterfaceRoot(optionsParent, mainWindowParent, fontFunction)
 		bottom = 11,
 		name = "switchToGameButton",
 		caption = "Return to Battle",
-		font = WG.Chobby.Configuration:GetFont(4),
+		objectOverrideFont = WG.Chobby.Configuration:GetFont(4),
 		parent = holder_topBar,
 		resizable = false,
 		draggable = false,
@@ -930,7 +927,7 @@ function GetInterfaceRoot(optionsParent, mainWindowParent, fontFunction)
 		bottom = 11,
 		name = "leaveGameButton",
 		caption = "Leave Battle",
-		font = WG.Chobby.Configuration:GetFont(4),
+		objectOverrideFont = WG.Chobby.Configuration:GetFont(4),
 		parent = holder_topBar,
 		resizable = false,
 		draggable = false,

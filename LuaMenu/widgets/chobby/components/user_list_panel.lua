@@ -1,9 +1,10 @@
 UserListPanel = LCS.class{}
 
-function UserListPanel:init(userUpdateFunction, spacing, showCount, getUserFunction)
+function UserListPanel:init(userUpdateFunction, spacing, showCount, getUserFunction, userFuncArg)
 	self.userUpdateFunction = userUpdateFunction
 	self.spacing = spacing
 	self.getUserFunction = getUserFunction
+	self.userFuncArg = userFuncArg
 
 	if showCount then
 		self.textCount = TextBox:New {
@@ -13,7 +14,7 @@ function UserListPanel:init(userUpdateFunction, spacing, showCount, getUserFunct
 			height = 20,
 			bottom = 2,
 			align = "left",
-			fontsize = Configuration:GetFont(2).size,
+			objectOverrideFont = Configuration:GetFont(2),
 			text = lobby:GetUserCount() .. " players online",
 		}
 	end
@@ -129,7 +130,7 @@ function UserListPanel:AddUser(userName)
 		return
 	end
 
-	local userControl = (self.getUserFunction and self.getUserFunction(userName)) or WG.UserHandler.GetChannelUser(userName)
+	local userControl = (self.getUserFunction and self.getUserFunction(userName, self.userFuncArg)) or WG.UserHandler.GetChannelUser(userName, self.userFuncArg)
 	userControl:SetPos(nil, #(self.userPanel.children) * self.spacing)
 	self.userPanel:AddChild(userControl)
 end

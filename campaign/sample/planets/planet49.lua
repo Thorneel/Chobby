@@ -111,6 +111,12 @@ local function GetPlanet(planetUtilities, planetID)
 						 buildProgress = 0.6
 					},
 					{
+						name = "energypylon",
+						x = 2650,
+						z = 3000,
+						facing = 3,
+					},
+					{
 						name = "energygeo",
 						x = 2984,
 						z = 2888,
@@ -310,12 +316,12 @@ local function GetPlanet(planetUtilities, planetID)
 						"amphbomb",
 						"amphaa",
 						"striderhub",
-						"striderarty",
+						"striderdante",
 					},
 					commander = false,
 					midgameUnits = {
 						{
-							name = "striderarty",
+							name = "striderdante",
 							x = 400,
 							z = 3500,
 							facing = 0,
@@ -3705,6 +3711,12 @@ local function GetPlanet(planetUtilities, planetID)
 							name = "striderhub",
 							x = 8896,
 							z = 2896,
+							facing = 3,
+						},
+						{
+							name = "energypylon",
+							x = 8960,
+							z = 3880,
 							facing = 3,
 						},
  						{

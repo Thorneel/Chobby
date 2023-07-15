@@ -5,13 +5,23 @@ local settings = {
 	ROAM = 1,
 	SplashScreenDir = "./MenuLoadscreens",
 	UseDistToGroundForIcons = 1.1,
+	
 	UseLuaMemPools = 0,
 	VFSCacheArchiveFiles = 0,
+	UnitLodDist = 999999,
 }
 
 local onlyIfMissingSettings = {
 	FeatureDrawDistance = 600000,
 	FeatureFadeDistance = 600000,
+	MaxTextureAtlasSizeX = 4096,
+	MaxTextureAtlasSizeY = 4096,
 }
 
-return settings, onlyIfMissingSettings
+local onlyIfOutdated = {
+	LuaGarbageCollectionMemLoadMult = 2.5,
+	LuaGarbageCollectionRunTimeMult = 1.5,
+}
+local settingsVersion = 1
+
+return settings, onlyIfMissingSettings, onlyIfOutdated, settingsVersion

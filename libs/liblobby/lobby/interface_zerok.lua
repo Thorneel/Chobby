@@ -227,7 +227,7 @@ function Interface:HostBattle(battleTitle, password, modeName, mapName, gameName
 	if tonumber(Spring.Utilities.GetEngineVersion()) then
 		engineName = Spring.Utilities.GetEngineVersion() .. ".0"
 	else
-		engineName = string.gsub(string.gsub(string.gsub(Spring.Utilities.GetEngineVersion(), " BAR", ""), " maintenance", ""), " develop", "")
+		engineName = string.gsub(string.gsub(string.gsub(Spring.Utilities.GetEngineVersion(), " BAR105", ""), " maintenance", ""), " develop", "")
 	end
 
 	local sendData = {
@@ -447,6 +447,14 @@ function Interface:SelectGame(gameName, force)
 	return self
 end
 
+function Interface:GetCustomGameMode(modeName)
+	local sendData = {
+		ShortName = modeName
+	}
+	self:_SendCommand("GetCustomGameMode " .. json.encode(sendData))
+	return self
+end
+
 ------------------------
 -- Channel & private chat commands
 ------------------------
@@ -536,7 +544,6 @@ end
 function Interface:JoinMatchMaking(queueNamePossiblyList)
 	self.joinedQueues = self.joinedQueues or {}
 	self.joinedQueueList = self.joinedQueueList or {}
-
 	self.pendingQueueRequests = self.pendingQueueRequests + 1
 
 	if type(queueNamePossiblyList) == "table" then
@@ -550,7 +557,7 @@ function Interface:JoinMatchMaking(queueNamePossiblyList)
 	else
 		local queueName = queueNamePossiblyList
 		if not self.joinedQueues[queueName] then
-			self.joinedQueues[#self.joinedQueues + 1] = queueName
+			self.joinedQueues[queueName] = true
 			self.joinedQueueList[#self.joinedQueueList + 1] =  queueName
 		end
 	end
@@ -780,7 +787,7 @@ local registerResponseCodes = {
 
 local loginResponseCodes = {
 	[0] = "Ok",
-	[2] = "Invalid characters in name",
+	[2] = "Invalid name (check case)",
 	[3] = "Incorrect password",
 	[4] = "Banned",
 	[5] = "Steam linking error. Restart Steam and ensure it is in online mode.",
@@ -788,6 +795,8 @@ local loginResponseCodes = {
 	[7] = "Steam account not yet linked. Re-register.",
 	[8] = "Your steam account is already linked to a different account.",
 	[9] = "Sorry, the server is full, please retry later.",
+	[10] = "Invalid RSA signature",
+	[11] = "RSA signature could not be verified",
 }
 
 function Interface:_Welcome(data)
@@ -841,7 +850,7 @@ function Interface:_LoginResponse(data)
 	if data.ResultCode == 0 then
 		self:_OnAccepted(data.Name)
 	else
-		self:_OnDenied(loginResponseCodes[data.ResultCode] or "Reason error " .. tostring(data.ResultCode))
+		self:_OnDenied(loginResponseCodes[data.ResultCode] or "Reason error " .. tostring(data.ResultCode), data.BanReason)
 	end
 end
 Interface.jsonCommands["LoginResponse"] = Interface._LoginResponse
@@ -1031,7 +1040,7 @@ function Interface:_BattleAdded(data)
 		maxEvenPlayers = header.MaxEvenPlayers,
 		passworded = (header.Password and header.Password ~= "" and true) or false,
 
-		engineName = "Spring " .. header.Engine,
+		engineName = header.Engine,
 		engineVersion = header.Engine,
 		gameName = header.Game,
 		mapName = header.Map,
@@ -1730,6 +1739,11 @@ function Interface:_SetModOptions(data)
 end
 Interface.jsonCommands["SetModOptions"] = Interface._SetModOptions
 
+function Interface:_CustomGameMode(data)
+	self:_CallListeners("OnCustomGameMode", data.ShortName, data.DisplayName, data.GameModeJson)
+end
+Interface.jsonCommands["CustomGameModeResponse"] = Interface._CustomGameMode
+
 function Interface:_BattleDebriefing(data)
 	--{
 	--	"Url":"http://zero-k.info/Battles/Detail/445337",
@@ -1781,6 +1795,15 @@ function Interface:_OnSiteToLobbyCommand(msg)
 			self:SelectMap(mapName)
 		else
 			self:HostBattle((self:GetMyUserName() or "Player") .. "'s Battle", nil, nameToMode["Custom"], mapName)
+		end
+		return
+	end
+
+	s,e = springLink:find('chat/battle@select_customGameMode:')
+	if s then
+		local modeName = springLink:sub(e + 1)
+		if modeName then
+			self:GetCustomGameMode(modeName)
 		end
 		return
 	end

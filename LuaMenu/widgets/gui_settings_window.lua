@@ -23,6 +23,8 @@ local lobbyFullscreen = 1
 
 local FUDGE = 0
 
+local SET_SCREEN_MODE_SANE = false
+
 local inLobby = true
 local currentMode = false
 local currentManualBorderless = false
@@ -62,31 +64,6 @@ local function ToPercent(value)
 	return tostring(math.floor(0.5 + value)) .. "%"
 end
 
-local function ToggleFullscreenOff()
-	Spring.SetConfigInt("Fullscreen", 1, false)
-	Spring.SetConfigInt("Fullscreen", 0, false)
-
-	if WG.Chobby.Configuration.agressivelySetBorderlessWindowed and not currentManualBorderless then
-		local screenX, screenY = Spring.GetScreenGeometry()
-		if currentManualBorderless then
-			Spring.SetConfigInt("XResolutionWindowed", currentManualBorderless.width or (screenX - FUDGE*2), false)
-			Spring.SetConfigInt("YResolutionWindowed", currentManualBorderless.height or (screenY - FUDGE*2), false)
-			Spring.SetConfigInt("WindowPosX", currentManualBorderless.x or FUDGE, false)
-			Spring.SetConfigInt("WindowPosY", currentManualBorderless.y or FUDGE, false)
-		else
-			Spring.SetConfigInt("XResolutionWindowed", screenX - FUDGE*2, false)
-			Spring.SetConfigInt("YResolutionWindowed", screenY - FUDGE*2, false)
-			Spring.SetConfigInt("WindowPosX", FUDGE, false)
-			Spring.SetConfigInt("WindowPosY", FUDGE, false)
-		end
-	end
-end
-
-local function ToggleFullscreenOn()
-	Spring.SetConfigInt("Fullscreen", 0, false)
-	Spring.SetConfigInt("Fullscreen", 1, false)
-end
-
 local function SaveWindowPos(width, height, x, y)
 	local Configuration = WG.Chobby.Configuration
 
@@ -113,6 +90,18 @@ local function SaveWindowPos(width, height, x, y)
 	Spring.SetConfigInt("WindowState", (x == 0 and 1) or 0, false)
 end
 
+local function EnableProfilerFunc(newState)
+	if newState then
+		WG.WidgetProfiler.Enable()
+	else
+		WG.WidgetProfiler.Disable()
+	end
+end
+
+local function EnableInspectorFunc(newState)
+	widgetHandler:ToggleWidget("ChiliInspector")
+end
+
 local function ManualBorderlessChange(modeName)
 	oldBorders = currentManualBorderless
 	if not oldBorders then
@@ -126,6 +115,85 @@ local function ManualBorderlessChange(modeName)
 	end
 
 	return not (oldBorders.x == borders.x and oldBorders.y == borders.y and oldBorders.width == borders.width and oldBorders.height == borders.height)
+end
+
+local function SetLobbyFullscreenMode_Sane(mode, borderOverride)
+	Spring.Echo("SetLobbyFullscreenMode_Sane", mode)
+
+	local Configuration = WG.Chobby.Configuration
+	local screenX, screenY = Spring.GetScreenGeometry()
+
+	if mode == 1 then -- Borderless
+		currentManualBorderless = false
+		Spring.SetConfigInt("Fullscreen", 0, false)
+		Spring.SetConfigInt("WindowBorderless", 1, false)
+		Spring.SetConfigInt("XResolutionWindowed", screenX, false)
+		Spring.SetConfigInt("YResolutionWindowed", screenY, false)
+		Spring.SetConfigInt("WindowPosX", 0, false)
+		Spring.SetConfigInt("WindowPosY", 0, false)
+	elseif mode == 2 then -- Windowed
+		local winSizeX, winSizeY, winPosX, winPosY = Spring.GetViewGeometry()
+		winPosX = Configuration.window_WindowPosX or winPosX
+		winSizeX = Configuration.window_XResolutionWindowed or winSizeX
+		winSizeY = Configuration.window_YResolutionWindowed or winSizeY
+
+		-- Windowed mode does not work at all, but as far as I can tell it should.
+		Spring.SetConfigInt("WindowBorderless", 0, false)
+		Spring.SetConfigInt("Fullscreen", 0)
+
+		if Configuration.window_WindowPosY then
+			winPosY = Configuration.window_WindowPosY
+		else
+			winPosY = screenY - winPosY - winSizeY
+		end
+
+		if winPosY > 10 then
+			-- Window is not stuck at the top of the screen
+			Spring.SetConfigInt("WindowPosX", math.min(winPosX, screenX - 50), false)
+			Spring.SetConfigInt("WindowPosY", math.min(winPosY, screenY - 50), false)
+			Spring.SetConfigInt("XResolutionWindowed",  math.min(winSizeX, screenX), false)
+			Spring.SetConfigInt("YResolutionWindowed",  math.min(winSizeY, screenY - 50), false)
+		else
+			-- Reset window to screen centre
+			Spring.SetConfigInt("WindowPosX", screenX/4, false)
+			Spring.SetConfigInt("WindowPosY", screenY/8, false)
+			Spring.SetConfigInt("XResolutionWindowed", screenX/2, false)
+			Spring.SetConfigInt("YResolutionWindowed", screenY*3/4, false)
+		end
+	elseif mode == 3 then -- Fullscreen
+		Spring.SetConfigInt("XResolution", screenX, false)
+		Spring.SetConfigInt("YResolution", screenY, false)
+		Spring.SetConfigInt("Fullscreen", 1, false)
+	elseif mode == 4 or mode == 6 then -- Manual Borderless and windowed
+		local borders = borderOverride
+		if not borders then
+			local modeName = (mode == 4 and "manualBorderless") or "manualWindowed"
+			if inLobby then
+				borders = WG.Chobby.Configuration[modeName].lobby or {}
+			else
+				borders = WG.Chobby.Configuration[modeName].game or {}
+			end
+		end
+		currentManualBorderless = Spring.Utilities.CopyTable(borders)
+
+		Spring.SetConfigInt("WindowBorderless", (mode == 4 and 1) or 0, false)
+		Spring.SetConfigInt("Fullscreen", 0, false)
+
+		Spring.SetConfigInt("XResolutionWindowed", borders.width or (screenX - FUDGE*2), false)
+		Spring.SetConfigInt("YResolutionWindowed", borders.height or (screenY - FUDGE*2), false)
+		Spring.SetConfigInt("WindowPosX", borders.x or FUDGE, false)
+		Spring.SetConfigInt("WindowPosY", borders.y or FUDGE, false)
+	elseif mode == 5 then -- Manual Fullscreen
+		local resolution
+		if inLobby then
+			resolution = WG.Chobby.Configuration.manualFullscreen.lobby or {}
+		else
+			resolution = WG.Chobby.Configuration.manualFullscreen.game or {}
+		end
+		Spring.SetConfigInt("XResolution", resolution.width or screenX, false)
+		Spring.SetConfigInt("YResolution", resolution.height or screenY, false)
+		Spring.SetConfigInt("Fullscreen", 1, false)
+	end
 end
 
 local function SetLobbyFullscreenMode(mode, borderOverride)
@@ -149,9 +217,13 @@ local function SetLobbyFullscreenMode(mode, borderOverride)
 		return
 	end
 
+	if SET_SCREEN_MODE_SANE then
+		SetLobbyFullscreenMode_Sane(mode, borderOverride)
+	end
+
 	local screenX, screenY = Spring.GetScreenGeometry()
 
-	Spring.Echo("SetLobbyFullscreenMode", mode)
+	Spring.Echo("SetLobbyFullscreenMode", mode, screenX, screenY)
 	--Spring.Log(LOG_SECTION, LOG.ERROR, debug.traceback("problem"))
 
 	if mode == 1 then -- Borderless
@@ -200,7 +272,6 @@ local function SetLobbyFullscreenMode(mode, borderOverride)
 		Spring.SetConfigInt("XResolution", screenX, false)
 		Spring.SetConfigInt("YResolution", screenY, false)
 		Spring.SetConfigInt("Fullscreen", 1, false)
-		--WG.Delay(ToggleFullscreenOn, 0.1)
 	elseif mode == 4 or mode == 6 then -- Manual Borderless and windowed
 		local borders = borderOverride
 		if not borders then
@@ -271,7 +342,7 @@ local function GetValueEntryBox(parent, name, position, currentValue)
 		align = "right",
 		height = 35,
 		caption = name .. ":",
-		font = Configuration:GetFont(3),
+		objectOverrideFont = Configuration:GetFont(3),
 		parent = parent,
 	}
 
@@ -293,7 +364,8 @@ local function GetValueEntryBox(parent, name, position, currentValue)
 		y = position,
 		height = 35,
 		text = tostring(currentValue),
-		font = Configuration:GetFont(3),
+		objectOverrideFont = Configuration:GetFont(3),
+		objectOverrideHintFont = Configuration:GetHintFont(3),
 		useIME = false,
 		parent = parent,
 		OnFocusUpdate = {
@@ -334,7 +406,7 @@ local function ShowWindowGeoConfig(name, modeNum, modeName, retreatPadding)
 		right = 15,
 		y = 15,
 		height = 35,
-		font = Configuration:GetFont(3),
+		objectOverrideFont = Configuration:GetFont(3),
 		caption = i18n("set_window_position"),
 		parent = manualWindow,
 	}
@@ -397,7 +469,7 @@ local function ShowWindowGeoConfig(name, modeNum, modeName, retreatPadding)
 		bottom = 1,
 		height = 70,
 		caption = i18n("apply"),
-		font = Configuration:GetFont(3),
+		objectOverrideFont = Configuration:GetButtonFont(3),
 		classname = "action_button",
 		OnClick = {
 			function()
@@ -412,7 +484,7 @@ local function ShowWindowGeoConfig(name, modeNum, modeName, retreatPadding)
 		bottom = 1,
 		height = 70,
 		caption = i18n("cancel"),
-		font = Configuration:GetFont(3),
+		objectOverrideFont = Configuration:GetButtonFont(3),
 		classname = "negative_button",
 		OnClick = {
 			function()
@@ -446,7 +518,7 @@ local function ShowManualFullscreenEntryWindow(name)
 		right = 15,
 		y = 15,
 		height = 35,
-		font = Configuration:GetFont(3),
+		objectOverrideFont = Configuration:GetFont(3),
 		caption = i18n("set_resolution"),
 		parent = manualWindow,
 	}
@@ -503,7 +575,7 @@ local function ShowManualFullscreenEntryWindow(name)
 		bottom = 1,
 		height = 70,
 		caption = i18n("apply"),
-		font = Configuration:GetFont(3),
+		objectOverrideFont = Configuration:GetButtonFont(3),
 		classname = "action_button",
 		OnClick = {
 			function()
@@ -518,7 +590,7 @@ local function ShowManualFullscreenEntryWindow(name)
 		bottom = 1,
 		height = 70,
 		caption = i18n("cancel"),
-		font = Configuration:GetFont(3),
+		objectOverrideFont = Configuration:GetButtonFont(3),
 		classname = "negative_button",
 		OnClick = {
 			function()
@@ -554,7 +626,7 @@ local function AddCheckboxSetting(offset, caption, key, default, clickFunc, tool
 		caption = caption,
 		checked = checked,
 		tooltip = tooltip,
-		font = Configuration:GetFont(2),
+		objectOverrideFont = Configuration:GetFont(2),
 		OnChange = {function (obj, newState)
 			Configuration:SetConfigValue(key, newState)
 			if clickFunc then
@@ -577,7 +649,7 @@ local function AddNumberSetting(offset, caption, desc, key, default, minVal, max
 		valign = "top",
 		align = "left",
 		caption = caption,
-		font = Configuration:GetFont(2),
+		objectOverrideFont = Configuration:GetFont(2),
 		tooltip = desc,
 	}
 
@@ -603,7 +675,8 @@ local function AddNumberSetting(offset, caption, desc, key, default, minVal, max
 		width = COMBO_WIDTH,
 		height = 30,
 		text = ToPercent(default*100),
-		font = Configuration:GetFont(2),
+		objectOverrideFont = Configuration:GetFont(2),
+		objectOverrideHintFont = Configuration:GetHintFont(2),
 		useIME = false,
 		OnFocusUpdate = {
 			function (obj)
@@ -652,7 +725,7 @@ local function GetLobbyTabControls()
 		height = 40,
 		valign = "top",
 		align = "left",
-		font = Configuration:GetFont(2),
+		objectOverrideFont = Configuration:GetFont(2),
 		caption = "Language",
 	}
 	children[#children + 1] = ComboBox:New {
@@ -661,8 +734,7 @@ local function GetLobbyTabControls()
 		width = COMBO_WIDTH,
 		height = 30,
 		items = langNames,
-		font = Configuration:GetFont(2),
-		itemFontSize = Configuration:GetFont(2).size,
+		objectOverrideFont = Configuration:GetFont(2),
 		selected = selectedLang,
 		OnSelect = {
 			function (obj)
@@ -683,7 +755,7 @@ local function GetLobbyTabControls()
 		height = 40,
 		valign = "top",
 		align = "left",
-		font = Configuration:GetFont(2),
+		objectOverrideFont = Configuration:GetFont(2),
 		caption = "Split Panel Mode",
 	}
 	children[#children + 1] = ComboBox:New {
@@ -692,8 +764,7 @@ local function GetLobbyTabControls()
 		width = COMBO_WIDTH,
 		height = 30,
 		items = {"Autodetect", "Always Two", "Always One"},
-		font = Configuration:GetFont(2),
-		itemFontSize = Configuration:GetFont(2).size,
+		objectOverrideFont = Configuration:GetFont(2),
 		selected = Configuration.panel_layout or 1,
 		OnSelect = {
 			function (obj)
@@ -716,7 +787,7 @@ local function GetLobbyTabControls()
 		height = 40,
 		valign = "top",
 		align = "left",
-		font = Configuration:GetFont(2),
+		objectOverrideFont = Configuration:GetFont(2),
 		caption = "Chat Font Size",
 	}
 	children[#children + 1] = Trackbar:New {
@@ -746,7 +817,7 @@ local function GetLobbyTabControls()
 		height = 40,
 		valign = "top",
 		align = "left",
-		font = Configuration:GetFont(2),
+		objectOverrideFont = Configuration:GetFont(2),
 		caption = "Menu Music Volume",
 	}
 	children[#children + 1] = Trackbar:New {
@@ -776,7 +847,7 @@ local function GetLobbyTabControls()
 		height = 40,
 		valign = "top",
 		align = "left",
-		font = Configuration:GetFont(2),
+		objectOverrideFont = Configuration:GetFont(2),
 		caption = "Notification Volume",
 	}
 	children[#children + 1] = Trackbar:New {
@@ -806,7 +877,7 @@ local function GetLobbyTabControls()
 		height = 40,
 		valign = "top",
 		align = "left",
-		font = Configuration:GetFont(2),
+		objectOverrideFont = Configuration:GetFont(2),
 		caption = "Background Brightness",
 	}
 	children[#children + 1] = Trackbar:New {
@@ -836,7 +907,7 @@ local function GetLobbyTabControls()
 		height = 40,
 		valign = "top",
 		align = "left",
-		font = Configuration:GetFont(2),
+		objectOverrideFont = Configuration:GetFont(2),
 		caption = "Game Overlay Opacity",
 	}
 	children[#children + 1] = Trackbar:New {
@@ -866,7 +937,7 @@ local function GetLobbyTabControls()
 		height = 40,
 		valign = "top",
 		align = "left",
-		font = Configuration:GetFont(2),
+		objectOverrideFont = Configuration:GetFont(2),
 		caption = "Coop Connection Delay",
 		tooltip = "Hosts with poor internet may require their clients to add a delay in order to connect.",
 	}
@@ -899,7 +970,7 @@ local function GetLobbyTabControls()
 		boxsize = 20,
 		caption = i18n("autoLogin"),
 		checked = Configuration.autoLogin or false,
-		font = Configuration:GetFont(2),
+		objectOverrideFont = Configuration:GetFont(2),
 		OnChange = {function (obj, newState)
 			freezeSettings = true
 			Configuration:SetConfigValue("autoLogin", newState)
@@ -917,14 +988,16 @@ local function GetLobbyTabControls()
 	if not Configuration.gameConfig.disablePlanetwars then
 		children[#children + 1], offset = AddCheckboxSetting(offset, i18n("planetwars_notifications"), "planetwarsNotifications", false)
 	end
+	
+	children[#children + 1], offset = AddCheckboxSetting(offset, "Autosave SP on matchmaker", "autosaveOnMatchmaker", true)
 	children[#children + 1], offset = AddCheckboxSetting(offset, i18n("ingame_notifcations"), "ingameNotifcations", true)
 	children[#children + 1], offset = AddCheckboxSetting(offset, i18n("non_friend_notifications"), "nonFriendNotifications", true)
+	children[#children + 1], offset = AddCheckboxSetting(offset, "Friend online notifies ingame", "friendNotifyIngame", true)
 	children[#children + 1], offset = AddCheckboxSetting(offset, i18n("notifyForAllChat"), "notifyForAllChat", false)
 	children[#children + 1], offset = AddCheckboxSetting(offset, i18n("hideWelcomeMessage"), "hideWelcomeMessage", false)
 	children[#children + 1], offset = AddCheckboxSetting(offset, i18n("only_featured_maps"), "onlyShowFeaturedMaps", true)
 	children[#children + 1], offset = AddCheckboxSetting(offset, i18n("show_technical_mod_list"), "showFullModList", true)
 	children[#children + 1], offset = AddCheckboxSetting(offset, i18n("simplifiedSkirmishSetup"), "simplifiedSkirmishSetup", true)
-	children[#children + 1], offset = AddCheckboxSetting(offset, i18n("simple_ai_list"), "simpleAiList", true)
 	children[#children + 1], offset = AddCheckboxSetting(offset, i18n("animate_lobby"), "animate_lobby", true)
 	children[#children + 1], offset = AddCheckboxSetting(offset, i18n("drawFullSpeed"), "drawAtFullSpeed", false)
 	children[#children + 1], offset = AddCheckboxSetting(offset, "Minimize lobby updates", "lobbyIdleSleep", true)
@@ -939,7 +1012,7 @@ local function GetLobbyTabControls()
 		height = 40,
 		valign = "top",
 		align = "left",
-		font = Configuration:GetFont(2),
+		objectOverrideFont = Configuration:GetFont(2),
 		caption = "Clear Channel History",
 	}
 	children[#children + 1] = Button:New {
@@ -949,7 +1022,7 @@ local function GetLobbyTabControls()
 		height = 30,
 		caption = "Apply",
 		tooltip = "Clears chat history displayed in the lobby, does not affect the chat history files saved to your computer.",
-		font = Configuration:GetFont(2),
+		objectOverrideFont = Configuration:GetFont(2),
 		OnClick = {
 			function (obj)
 				WG.Chobby.interfaceRoot.GetChatWindow():ClearHistory()
@@ -966,7 +1039,7 @@ local function GetLobbyTabControls()
 		height = 40,
 		valign = "top",
 		align = "left",
-		font = Configuration:GetFont(2),
+		objectOverrideFont = Configuration:GetFont(2),
 		caption = "Delete Path Cache",
 	}
 	children[#children + 1] = Button:New {
@@ -976,7 +1049,7 @@ local function GetLobbyTabControls()
 		height = 30,
 		caption = "Apply",
 		tooltip = "Deletes path cache. May solve desync.",
-		font = Configuration:GetFont(2),
+		objectOverrideFont = Configuration:GetFont(2),
 		OnClick = {
 			function (obj)
 				if WG.CacheHandler then
@@ -1005,11 +1078,9 @@ end
 
 local function GetVoidTabControls()
 	local freezeSettings = true
-
 	local Configuration = WG.Chobby.Configuration
 
 	local offset = 5
-
 	local children = {}
 
 	children[#children + 1] = TextBox:New {
@@ -1019,23 +1090,19 @@ local function GetVoidTabControls()
 		height = 40,
 		valign = "top",
 		align = "left",
-		fontsize = Configuration:GetFont(3).size,
+		objectOverrideFont = Configuration:GetFont(3),
 		text = "Warning: These settings are experimental and not officially supported, proceed at your own risk.",
 	}
 	offset = offset + 65
 
-	local function EnableProfilerFunc(newState)
-		if newState then
-			WG.WidgetProfiler.Enable()
-		else
-			WG.WidgetProfiler.Disable()
-		end
-	end
-
 	children[#children + 1], offset = AddCheckboxSetting(offset, i18n("debugMode"), "debugMode", false)
 	children[#children + 1], offset = AddCheckboxSetting(offset, "Debug server messages", "activeDebugConsole", false)
+	children[#children + 1], offset = AddCheckboxSetting(offset, "Debug lobby to game chat", "debugLobbyGameChat", false)
 	children[#children + 1], offset = AddCheckboxSetting(offset, "Debug raw server messages", "debugRawMessages", false)
 	children[#children + 1], offset = AddCheckboxSetting(offset, "Debug auto win", "debugAutoWin", false)
+	children[#children + 1], offset = AddCheckboxSetting(offset, i18n("simple_ai_list"), "simpleAiList2", true)
+	children[#children + 1], offset = AddCheckboxSetting(offset, "Debug Ingame Buffer", "enableDebugBuffer", false)
+	children[#children + 1], offset = AddCheckboxSetting(offset, "Enable Inspector", "enableInspector", false, EnableInspectorFunc)
 	children[#children + 1], offset = AddCheckboxSetting(offset, "Enable Profiler", "enableProfiler", false, EnableProfilerFunc)
 	children[#children + 1], offset = AddCheckboxSetting(offset, "Show Planet Unlocks", "showPlanetUnlocks", false)
 	children[#children + 1], offset = AddCheckboxSetting(offset, "Show Planet Codex", "showPlanetCodex", false)
@@ -1044,11 +1111,11 @@ local function GetVoidTabControls()
 	children[#children + 1], offset = AddCheckboxSetting(offset, "Campaign Spawn Debug", "campaignSpawnDebug", false)
 	children[#children + 1], offset = AddCheckboxSetting(offset, "Edit Campaign", "editCampaign", false)
 	children[#children + 1], offset = AddCheckboxSetting(offset, "Show channel bots", "displayBots", false)
-	children[#children + 1], offset = AddCheckboxSetting(offset, "Show wrong engines", "displayBadEngines2", false)
+	children[#children + 1], offset = AddCheckboxSetting(offset, "Show wrong engines", "displayBadEngines3", true)
 	children[#children + 1], offset = AddCheckboxSetting(offset, "Debug for MatchMaker", "showMatchMakerBattles", false)
 	children[#children + 1], offset = AddCheckboxSetting(offset, "Hide interface", "hideInterface", false)
 	children[#children + 1], offset = AddCheckboxSetting(offset, "Neuter Settings", "doNotSetAnySpringSettings", false)
-	children[#children + 1], offset = AddCheckboxSetting(offset, "Agressive Set Borderless", "agressivelySetBorderlessWindowed", false)
+	children[#children + 1], offset = AddCheckboxSetting(offset, "Aggressive Set Borderless", "agressivelySetBorderlessWindowed", false)
 	children[#children + 1], offset = AddCheckboxSetting(offset, "Use wrong engine", "useWrongEngine", false)
 	children[#children + 1], offset = AddCheckboxSetting(offset, "Show old AI versions", "showOldAiVersions", false)
 
@@ -1059,7 +1126,7 @@ local function GetVoidTabControls()
 		height = 40,
 		valign = "top",
 		align = "left",
-		font = Configuration:GetFont(2),
+		objectOverrideFont = Configuration:GetFont(2),
 		caption = "Disable Lobby",
 	}
 	children[#children + 1] = Button:New {
@@ -1069,7 +1136,7 @@ local function GetVoidTabControls()
 		height = 30,
 		caption = "Disable",
 		tooltip = "Disables the entire lobby and menu.",
-		font = Configuration:GetFont(2),
+		objectOverrideFont = Configuration:GetFont(2),
 		OnClick = {
 			function (obj)
 				WG.Chobby.ConfirmationPopup(DisableAllWidgets, "This will break everything. Are you sure?", nil, 315, 170, i18n("yes"), i18n("cancel"))
@@ -1085,7 +1152,7 @@ local function GetVoidTabControls()
 		height = 40,
 		valign = "top",
 		align = "left",
-		font = Configuration:GetFont(2),
+		objectOverrideFont = Configuration:GetFont(2),
 		caption = "Server Address                                                                           (zero-k.info or test.zero-k.info for testing)",
 	}
 	children[#children + 1] = EditBox:New {
@@ -1094,7 +1161,8 @@ local function GetVoidTabControls()
 		width = COMBO_WIDTH,
 		height = 30,
 		text = Configuration.serverAddress,
-		font = Configuration:GetFont(2),
+		objectOverrideFont = Configuration:GetFont(2),
+		objectOverrideHintFont = Configuration:GetHintFont(2),
 		useIME = false,
 		OnFocusUpdate = {
 			function (obj)
@@ -1116,7 +1184,7 @@ local function GetVoidTabControls()
 		height = 40,
 		valign = "top",
 		align = "left",
-		font = Configuration:GetFont(2),
+		objectOverrideFont = Configuration:GetFont(2),
 		caption = "Server Port                                                                                  (8200 or 8202 for testing)",
 	}
 	children[#children + 1] = EditBox:New {
@@ -1125,7 +1193,8 @@ local function GetVoidTabControls()
 		width = COMBO_WIDTH,
 		height = 30,
 		text = tostring(Configuration.serverPort),
-		font = Configuration:GetFont(2),
+		objectOverrideFont = Configuration:GetFont(2),
+		objectOverrideHintFont = Configuration:GetHintFont(2),
 		useIME = false,
 		OnFocusUpdate = {
 			function (obj)
@@ -1155,7 +1224,7 @@ local function GetVoidTabControls()
 		valign = "top",
 		align = "left",
 		parent = window,
-		font = Configuration:GetFont(2),
+		objectOverrideFont = Configuration:GetFont(2),
 		caption = "Singleplayer",
 	}
 
@@ -1176,8 +1245,7 @@ local function GetVoidTabControls()
 		height = 30,
 		parent = window,
 		items = Configuration.gameConfigHumanNames,
-		font = Configuration:GetFont(2),
-		itemFontSize = Configuration:GetFont(2).size,
+		objectOverrideFont = Configuration:GetFont(2),
 		selected = singleplayerSelected,
 		OnSelect = {
 			function (obj)
@@ -1198,7 +1266,7 @@ local function GetVoidTabControls()
 		valign = "top",
 		align = "left",
 		parent = window,
-		font = Configuration:GetFont(2),
+		objectOverrideFont = Configuration:GetFont(2),
 		caption = "Campaign",
 	}
 
@@ -1219,8 +1287,7 @@ local function GetVoidTabControls()
 		height = 30,
 		parent = window,
 		items = Configuration.campaignConfigHumanNames,
-		font = Configuration:GetFont(2),
-		itemFontSize = Configuration:GetFont(2).size,
+		objectOverrideFont = Configuration:GetFont(2),
 		selected = campaignSelected,
 		OnSelect = {
 			function (obj)
@@ -1257,7 +1324,7 @@ local function MakeRestartWarning(offset)
 		valign = "top",
 		align = "left",
 		parent = window,
-		font = Configuration:GetFont(2),
+		objectOverrideFont = Configuration:GetFont(2),
 		caption = "Warning: Most changes do not affect battles in progress.",
 	}
 	
@@ -1276,7 +1343,7 @@ local function MakePresetsControl(settingPresets, offset)
 		valign = "top",
 		align = "left",
 		parent = window,
-		font = Configuration:GetFont(2),
+		objectOverrideFont = Configuration:GetFont(2),
 		caption = "Preset:",
 	}
 
@@ -1291,7 +1358,7 @@ local function MakePresetsControl(settingPresets, offset)
 			width = 75,
 			height = 30,
 			caption = caption,
-			font = Configuration:GetFont(2),
+			objectOverrideFont = Configuration:GetFont(2),
 			customSettings = not settings,
 			OnClick = {
 				function (obj)
@@ -1383,7 +1450,7 @@ local function ProcessScreenSizeOption(data, offset)
 		valign = "top",
 		align = "left",
 		caption = data.humanName,
-		font = Configuration:GetFont(2),
+		objectOverrideFont = Configuration:GetFont(2),
 		tooltip = data.desc,
 	}
 
@@ -1403,8 +1470,7 @@ local function ProcessScreenSizeOption(data, offset)
 		width = COMBO_WIDTH,
 		height = 30,
 		items = items,
-		font = Configuration:GetFont(2),
-		itemFontSize = Configuration:GetFont(2).size,
+		objectOverrideFont = Configuration:GetFont(2),
 		selected = selectedOption,
 		OnSelect = {
 			function (obj)
@@ -1459,7 +1525,7 @@ local function ProcessSettingsOption(data, offset, defaults, customSettingsSwitc
 		valign = "top",
 		align = "left",
 		caption = data.humanName,
-		font = Configuration:GetFont(2),
+		objectOverrideFont = Configuration:GetFont(2),
 		tooltip = data.desc,
 	}
 
@@ -1484,8 +1550,7 @@ local function ProcessSettingsOption(data, offset, defaults, customSettingsSwitc
 		width = COMBO_WIDTH,
 		height = 30,
 		items = items,
-		font = Configuration:GetFont(2),
-		itemFontSize = Configuration:GetFont(2).size,
+		objectOverrideFont = Configuration:GetFont(2),
 		selected = defaultItem,
 		OnSelect = {
 			function (obj, num)
@@ -1519,7 +1584,7 @@ local function ProcessSettingsNumber(data, offset, defaults, customSettingsSwitc
 		valign = "top",
 		align = "left",
 		caption = data.humanName,
-		font = Configuration:GetFont(2),
+		objectOverrideFont = Configuration:GetFont(2),
 		tooltip = data.desc,
 	}
 
@@ -1550,7 +1615,8 @@ local function ProcessSettingsNumber(data, offset, defaults, customSettingsSwitc
 		width = COMBO_WIDTH,
 		height = 30,
 		text = FormatFunc(Configuration.settingsMenuValues[data.name] or defaults[data.name]),
-		font = Configuration:GetFont(2),
+		objectOverrideFont = Configuration:GetFont(2),
+		objectOverrideHintFont = Configuration:GetHintFont(2),
 		useIME = false,
 		OnFocusUpdate = {
 			function (obj)
@@ -1569,6 +1635,33 @@ local function ProcessSettingsNumber(data, offset, defaults, customSettingsSwitc
 	end
 
 	return label, numberInput, offset + ITEM_OFFSET
+end
+
+local function ProcessSettingsLabel(data, offset)
+	local Configuration = WG.Chobby.Configuration
+
+	local label = Label:New {
+		x = 20,
+		y = offset + TEXT_OFFSET,
+		width = 350,
+		height = 30,
+		valign = "top",
+		align = "left",
+		caption = data.humanName,
+		objectOverrideFont = Configuration:GetFont(data.size),
+	}
+
+	local descLabel = Label:New {
+		x = COMBO_X,
+		y = offset + TEXT_OFFSET,
+		width = COMBO_WIDTH,
+		height = 30,
+		valign = "top",
+		align = "center",
+		caption = data.desc,
+		objectOverrideFont = Configuration:GetFont(data.size),
+	}
+	return label, descLabel, offset + ITEM_OFFSET
 end
 
 local function PopulateTab(settingPresets, settingOptions, settingsDefault)
@@ -1592,6 +1685,8 @@ local function PopulateTab(settingPresets, settingOptions, settingsDefault)
 			label, list, offset = ProcessScreenSizeOption(data, offset)
 		elseif data.isNumberSetting then
 			label, list, offset = ProcessSettingsNumber(data, offset, settingsDefault, customSettingsSwitch)
+		elseif data.isLabelSetting then
+			label, list, offset = ProcessSettingsLabel(data, offset, settingsDefault, customSettingsSwitch)
 		else
 			label, list, offset = ProcessSettingsOption(data, offset, settingsDefault, customSettingsSwitch)
 		end
@@ -1614,13 +1709,14 @@ local function MakeTab(name, children)
 		bottom = 8,
 		padding = {0,0,0,10},
 		horizontalScrollbar = false,
+		objectOverrideFont = WG.Chobby.Configuration:GetFont(2),
 		children = children
 	}
 
 	return {
 		name = name,
 		caption = name,
-		font = WG.Chobby.Configuration:GetFont(3),
+		objectOverrideFont = WG.Chobby.Configuration:GetFont(3),
 		children = {contentsPanel}
 	}
 end
@@ -1763,6 +1859,8 @@ function SettingsWindow.WriteGameSpringsettings(fileName)
 		WriteToFile("WindowBorderless", 0)
 		WriteToFile("Fullscreen", 1)
 	end
+	
+	settingsFile:close()
 end
 
 function SettingsWindow.GetSettingsString()
@@ -1776,8 +1874,17 @@ function SettingsWindow.GetSettingsString()
 		end
 	end
 
-	local gameSettings = WG.Chobby.Configuration.game_settings
-	local settingsOverride = WG.Chobby.Configuration.fixedSettingsOverride
+	local conf = WG.Chobby.Configuration
+	for i = 1, #conf.settingsToSendExternal do
+		local value = Spring.GetConfigInt(conf.settingsToSendExternal[i], -1234)
+		--Spring.Echo("conf.settingsToSendExternal", conf.settingsToSendExternal[i], value)
+		if value ~= -1234 then
+			WriteSetting(conf.settingsToSendExternal[i], value)
+		end
+	end
+
+	local gameSettings = conf.game_settings
+	local settingsOverride = conf.fixedSettingsOverride
 	for key, value in pairs(gameSettings) do
 		WriteSetting(key, (settingsOverride and settingsOverride[key]) or value)
 	end
@@ -1802,14 +1909,14 @@ function SettingsWindow.GetSettingsString()
 		WriteSetting("WindowBorderless", 0)
 		WriteSetting("Fullscreen", 1)
 	elseif battleStartDisplay == 4 then -- Manual Borderless
-		local borders = WG.Chobby.Configuration.manualBorderless.game or {}
+		local borders = conf.manualBorderless.game or {}
 		WriteSetting("XResolutionWindowed", borders.width or screenX)
 		WriteSetting("YResolutionWindowed", borders.height or screenY)
 		WriteSetting("WindowPosX", borders.x or 0)
 		WriteSetting("WindowPosY", borders.y or 0)
 		WriteSetting("WindowBorderless", 1)
 	elseif battleStartDisplay == 5 then -- Manual Fullscreen
-		local resolution = WG.Chobby.Configuration.manualFullscreen.game or {}
+		local resolution = conf.manualFullscreen.game or {}
 		WriteSetting("XResolution", resolution.width or screenX)
 		WriteSetting("YResolution", resolution.height or screenY)
 		WriteSetting("WindowBorderless", 0)
@@ -1873,46 +1980,49 @@ function widget:Initialize()
 		local screenX, screenY = Spring.GetScreenGeometry()
 
 		inLobby = false
-		SetLobbyFullscreenMode(battleStartDisplay)
 		local Configuration = WG.Chobby.Configuration
 
 		-- Settings which rely on io
 		local gameSettings = Configuration.game_settings
+	
+		if lobbyFullscreen ~= battleStartDisplay or battleStartDisplay >= 4 then
+			SetLobbyFullscreenMode(battleStartDisplay)
 
-		if battleStartDisplay == 1 then -- Borderless Window
-			Configuration:SetSpringsettingsValue("XResolutionWindowed", screenX)
-			Configuration:SetSpringsettingsValue("YResolutionWindowed", screenY)
-			Configuration:SetSpringsettingsValue("WindowPosX", 0)
-			Configuration:SetSpringsettingsValue("WindowPosY", 0)
-			Configuration:SetSpringsettingsValue("WindowBorderless", 1)
-		elseif battleStartDisplay == 2 then -- Window
-			Configuration:SetSpringsettingsValue("WindowPosX", 0)
-			Configuration:SetSpringsettingsValue("WindowPosY", 80)
-			Configuration:SetSpringsettingsValue("XResolutionWindowed", screenX)
-			Configuration:SetSpringsettingsValue("YResolutionWindowed", screenY - 80)
-			Configuration:SetSpringsettingsValue("WindowBorderless", 0)
-			Configuration:SetSpringsettingsValue("WindowBorderless", 0)
-			Configuration:SetSpringsettingsValue("Fullscreen", 0)
-		elseif battleStartDisplay == 3 then -- Fullscreen
-			Configuration:SetSpringsettingsValue("XResolution", screenX)
-			Configuration:SetSpringsettingsValue("YResolution", screenY)
-			Configuration:SetSpringsettingsValue("WindowPosX", 0)
-			Configuration:SetSpringsettingsValue("WindowPosY", 0)
-			Configuration:SetSpringsettingsValue("Fullscreen", 1)
-		elseif battleStartDisplay == 4 then -- Manual Borderless
-			local borders = WG.Chobby.Configuration.manualBorderless.game or {}
-			Configuration:SetSpringsettingsValue("XResolutionWindowed", borders.width or screenX)
-			Configuration:SetSpringsettingsValue("YResolutionWindowed", borders.height or screenY)
-			Configuration:SetSpringsettingsValue("WindowPosX", borders.x or 0)
-			Configuration:SetSpringsettingsValue("WindowPosY", borders.y or 0)
-			Configuration:SetSpringsettingsValue("WindowBorderless", 1)
-		elseif battleStartDisplay == 5 then -- Manual Fullscreen
-			local resolution = WG.Chobby.Configuration.manualFullscreen.game or {}
-			Configuration:SetSpringsettingsValue("XResolution", resolution.width or screenX)
-			Configuration:SetSpringsettingsValue("YResolution", resolution.height or screenY)
-			Configuration:SetSpringsettingsValue("WindowPosX", 0)
-			Configuration:SetSpringsettingsValue("WindowPosY", 0)
-			Configuration:SetSpringsettingsValue("Fullscreen", 1)
+			if battleStartDisplay == 1 then -- Borderless Window
+				Configuration:SetSpringsettingsValue("XResolutionWindowed", screenX)
+				Configuration:SetSpringsettingsValue("YResolutionWindowed", screenY)
+				Configuration:SetSpringsettingsValue("WindowPosX", 0)
+				Configuration:SetSpringsettingsValue("WindowPosY", 0)
+				Configuration:SetSpringsettingsValue("WindowBorderless", 1)
+			elseif battleStartDisplay == 2 then -- Window
+				Configuration:SetSpringsettingsValue("WindowPosX", 0)
+				Configuration:SetSpringsettingsValue("WindowPosY", 80)
+				Configuration:SetSpringsettingsValue("XResolutionWindowed", screenX)
+				Configuration:SetSpringsettingsValue("YResolutionWindowed", screenY - 80)
+				Configuration:SetSpringsettingsValue("WindowBorderless", 0)
+				Configuration:SetSpringsettingsValue("WindowBorderless", 0)
+				Configuration:SetSpringsettingsValue("Fullscreen", 0)
+			elseif battleStartDisplay == 3 then -- Fullscreen
+				Configuration:SetSpringsettingsValue("XResolution", screenX)
+				Configuration:SetSpringsettingsValue("YResolution", screenY)
+				Configuration:SetSpringsettingsValue("WindowPosX", 0)
+				Configuration:SetSpringsettingsValue("WindowPosY", 0)
+				Configuration:SetSpringsettingsValue("Fullscreen", 1)
+			elseif battleStartDisplay == 4 then -- Manual Borderless
+				local borders = WG.Chobby.Configuration.manualBorderless.game or {}
+				Configuration:SetSpringsettingsValue("XResolutionWindowed", borders.width or screenX)
+				Configuration:SetSpringsettingsValue("YResolutionWindowed", borders.height or screenY)
+				Configuration:SetSpringsettingsValue("WindowPosX", borders.x or 0)
+				Configuration:SetSpringsettingsValue("WindowPosY", borders.y or 0)
+				Configuration:SetSpringsettingsValue("WindowBorderless", 1)
+			elseif battleStartDisplay == 5 then -- Manual Fullscreen
+				local resolution = WG.Chobby.Configuration.manualFullscreen.game or {}
+				Configuration:SetSpringsettingsValue("XResolution", resolution.width or screenX)
+				Configuration:SetSpringsettingsValue("YResolution", resolution.height or screenY)
+				Configuration:SetSpringsettingsValue("WindowPosX", 0)
+				Configuration:SetSpringsettingsValue("WindowPosY", 0)
+				Configuration:SetSpringsettingsValue("Fullscreen", 1)
+			end
 		end
 
 		for key, value in pairs(gameSettings) do

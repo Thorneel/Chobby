@@ -219,7 +219,7 @@ local function GetLinkButton(holder, x, y, width, text, link)
 		y = 3,
 		right = 20,
 		align = "left",
-		fontsize = config:GetFont(3).size,
+		objectOverrideFont = config:GetFont(3),
 		parent = btnLink,
 	}
 	local imgLink = Image:New {
@@ -330,7 +330,7 @@ local function InitializeActivityPromptHandler()
 		bottom = 4,
 		padding = {0,0,0,0},
 		caption = "Join",
-		font = Configuration:GetFont(3),
+		objectOverrideFont = Configuration:GetButtonFont(3),
 		classname = "action_button",
 		OnClick = {
 			function()
@@ -350,7 +350,7 @@ local function InitializeActivityPromptHandler()
 		y = 18,
 		width = 195,
 		height = 20,
-		fontsize = Configuration:GetFont(2).size,
+		objectOverrideFont = Configuration:GetFont(2),
 		text = "",
 		parent = holder
 	}
@@ -359,7 +359,7 @@ local function InitializeActivityPromptHandler()
 		y = 18,
 		width = 195,
 		height = 20,
-		fontsize = Configuration:GetFont(2).size,
+		objectOverrideFont = Configuration:GetFont(2),
 		text = "",
 		parent = holder
 	}
@@ -576,7 +576,7 @@ local function MakePlanetControl(planetData, DeselectOtherFunc, attacking, defen
 
 	local btnPlanetLink = Button:New {
 		x = 130,
-		y = 7,
+		y = WG.TOP_BUTTON_Y,
 		width = PLANET_NAME_LENGTH,
 		height = 24,
 		classname = "button_square",
@@ -594,7 +594,7 @@ local function MakePlanetControl(planetData, DeselectOtherFunc, attacking, defen
 		y = 3,
 		right = 20,
 		align = "left",
-		fontsize = config:GetFont(3).size,
+		objectOverrideFont = config:GetFont(3),
 		parent = btnPlanetLink,
 	}
 	local imgPlanetLink = Image:New {
@@ -614,7 +614,7 @@ local function MakePlanetControl(planetData, DeselectOtherFunc, attacking, defen
 		width = 350,
 		height = 20,
 		valign = 'center',
-		fontsize = Configuration:GetFont(3).size,
+		objectOverrideFont = Configuration:GetFont(3),
 		text = "0/0",
 		parent = holder,
 	}
@@ -669,9 +669,9 @@ local function MakePlanetControl(planetData, DeselectOtherFunc, attacking, defen
 		x = 100,
 		width = 160,
 		bottom = 6,
-		height = 45,
+		height = WG.BUTTON_HEIGHT,
 		caption = i18n("defend_planet"),
-		font = Configuration:GetFont(3),
+		objectOverrideFont = Configuration:GetButtonFont(3),
 		classname = "option_button",
 		OnClick = {
 			function(obj)
@@ -873,9 +873,9 @@ local function MakeFactionSelector(parent, x, y, SelectionFunc, CancelFunc, righ
 			x = 140,
 			y = offset,
 			width = 260,
-			height = 45,
+			height = WG.BUTTON_HEIGHT,
 			caption = "Join " .. name,
-			font = Configuration:GetFont(3),
+			objectOverrideFont = Configuration:GetButtonFont(3),
 			classname = "action_button",
 			OnClick = {
 				function()
@@ -894,7 +894,7 @@ local function MakeFactionSelector(parent, x, y, SelectionFunc, CancelFunc, righ
 				y = offset + 56,
 				width = 240,
 				height = 45,
-				fontsize = Configuration:GetFont(2).size,
+				objectOverrideFont = Configuration:GetFont(2),
 				text = [["]] .. factionData.motto .. [["]] .. "\n" .. factionData.desc,
 				parent = holder,
 			}
@@ -909,7 +909,7 @@ local function MakeFactionSelector(parent, x, y, SelectionFunc, CancelFunc, righ
 		width = 170,
 		height = 35,
 		caption = "Factions Page",
-		font = Configuration:GetFont(2),
+		objectOverrideFont = Configuration:GetButtonFont(2),
 		classname = "option_button",
 		padding = {2,4,4,4},
 		OnClick = {
@@ -936,7 +936,7 @@ local function MakeFactionSelector(parent, x, y, SelectionFunc, CancelFunc, righ
 			y = offset,
 			width = 84,
 			height = 35,
-			font =  WG.Chobby.Configuration:GetFont(2),
+			objectOverrideFont =  WG.Chobby.Configuration:GetButtonFont(2),
 			caption = i18n("cancel"),
 			classname = "negative_button",
 			OnClick = {
@@ -989,7 +989,7 @@ local function MakeFactionSelectionPopup()
 		right = 15,
 		y = 15,
 		height = 35,
-		fontsize = Configuration:GetFont(3).size,
+		objectOverrideFont = Configuration:GetFont(3),
 		text = "Join a faction to play Planetwars",
 		parent = factionWindow,
 	}
@@ -1014,20 +1014,20 @@ local function InitializeControls(window)
 	local lblTitle = Label:New {
 		x = 20,
 		right = 5,
-		y = 17,
+		y = WG.TOP_LABEL_Y,
 		height = 20,
-		font = Configuration:GetFont(3),
+		objectOverrideFont = Configuration:GetFont(3),
 		caption = "Planetwars",
 		parent = window
 	}
 
 	local btnClose = Button:New {
 		right = 11,
-		y = 7,
+		y = WG.TOP_BUTTON_Y,
 		width = 80,
-		height = 45,
+		height = WG.BUTTON_HEIGHT,
 		caption = i18n("close"),
-		font = Configuration:GetFont(3),
+		objectOverrideFont = Configuration:GetButtonFont(3),
 		classname = "negative_button",
 		OnClick = {
 			function()
@@ -1052,7 +1052,7 @@ local function InitializeControls(window)
 		width = 150,
 		height = 32,
 		caption = "Galaxy Map",
-		font = Configuration:GetFont(2),
+		objectOverrideFont = Configuration:GetButtonFont(2),
 		classname = "option_button",
 		padding = {2,4,4,4},
 		OnClick = {
@@ -1077,7 +1077,7 @@ local function InitializeControls(window)
 		right = 16,
 		bottom = 18,
 		height = 50,
-		fontsize = Configuration:GetFont(2).size,
+		objectOverrideFont = Configuration:GetFont(2),
 		text = "Select planets on the Galaxy Map for more options.",
 		parent = window
 	}
@@ -1089,7 +1089,7 @@ local function InitializeControls(window)
 		right = 16,
 		y = 60,
 		height = 50,
-		fontsize = Configuration:GetFont(2).size,
+		objectOverrideFont = Configuration:GetFont(2),
 		text = "",
 		parent = window
 	}

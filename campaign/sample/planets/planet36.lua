@@ -155,10 +155,17 @@ local function GetPlanet(planetUtilities, planetID)
 						x = 4160,
 						z = 2788,
 						facing = 0,
+						difficultyAtMost = 3,
 					},
 					{
 						name = "gunshipraid",
-						x = 4159,
+						x = 4210,
+						z = 2891,
+						facing = 0,
+					},
+					{
+						name = "gunshipraid",
+						x = 4110,
 						z = 2891,
 						facing = 0,
 					},
@@ -216,7 +223,8 @@ local function GetPlanet(planetUtilities, planetID)
 							spawnRadius = 50,
 							delay = 2*30*60,
 							orbitalDrop = true,
-              warningText = planetUtilities.messages.enemyOrbitalDrop,
+							difficultyAtLeast = 4,
+							warningText = planetUtilities.messages.enemyOrbitalDrop,
 						},
 						{
 							name = "shieldaa",
@@ -226,6 +234,7 @@ local function GetPlanet(planetUtilities, planetID)
 							spawnRadius = 50,
 							delay = 2*30*60,
 							orbitalDrop = true,
+							difficultyAtLeast = 3,
 						},
 						{
 							name = "shieldaa",
@@ -234,7 +243,7 @@ local function GetPlanet(planetUtilities, planetID)
 							facing = 2,
 							spawnRadius = 50,
 							delay = 2*30*60,
-							difficultyAtLeast = 3,
+							difficultyAtLeast = 4,
 							orbitalDrop = true,
 						},
 						{
@@ -244,7 +253,7 @@ local function GetPlanet(planetUtilities, planetID)
 							facing = 2,
 							spawnRadius = 50,
 							delay = 2*30*60,
-							difficultyAtLeast = 3,
+							difficultyAtLeast = 4,
 							orbitalDrop = true,
 						},
 						{
@@ -255,7 +264,8 @@ local function GetPlanet(planetUtilities, planetID)
 							spawnRadius = 50,
 							delay = 5*30*60,
 							orbitalDrop = true,
-              warningText = planetUtilities.messages.enemyOrbitalDrop,
+							difficultyAtLeast = 3,
+							warningText = planetUtilities.messages.enemyOrbitalDrop,
 						},
 						{
 							name = "shieldaa",
@@ -265,6 +275,7 @@ local function GetPlanet(planetUtilities, planetID)
 							spawnRadius = 50,
 							delay = 5*30*60,
 							orbitalDrop = true,
+							difficultyAtLeast = 2,
 						},
 						{
 							name = "shieldaa",
@@ -274,6 +285,7 @@ local function GetPlanet(planetUtilities, planetID)
 							spawnRadius = 50,
 							delay = 5*30*60,
 							orbitalDrop = true,
+							difficultyAtLeast = 3,
 						},
 						{
 							name = "shieldaa",
@@ -283,6 +295,7 @@ local function GetPlanet(planetUtilities, planetID)
 							spawnRadius = 50,
 							delay = 5*30*60,
 							orbitalDrop = true,
+							difficultyAtLeast = 4,
 						},
 						{
 							name = "shieldfelon",
@@ -292,7 +305,8 @@ local function GetPlanet(planetUtilities, planetID)
 							spawnRadius = 50,
 							delay = 8*30*60,
 							orbitalDrop = true,
-              warningText = planetUtilities.messages.enemyOrbitalDrop,
+							difficultyAtLeast = 2,
+							warningText = planetUtilities.messages.enemyOrbitalDrop,
 						},
 						{
 							name = "shieldaa",
@@ -311,6 +325,7 @@ local function GetPlanet(planetUtilities, planetID)
 							spawnRadius = 50,
 							delay = 8*30*60,
 							orbitalDrop = true,
+							difficultyAtLeast = 3,
 						},
 						{
 							name = "shieldassault",
@@ -329,6 +344,7 @@ local function GetPlanet(planetUtilities, planetID)
 							spawnRadius = 50,
 							delay = 8*30*60,
 							orbitalDrop = true,
+							difficultyAtLeast = 3,
 						},
 					},
 					startUnits = {
@@ -451,6 +467,7 @@ local function GetPlanet(planetUtilities, planetID)
 							x = 168,
 							z = 2168,
 							facing = 0,
+							difficultyAtLeast = 3,
 						},
 						{
 							name = "staticmex",
@@ -463,24 +480,28 @@ local function GetPlanet(planetUtilities, planetID)
 							x = 2696,
 							z = 536,
 							facing = 0,
+							difficultyAtLeast = 2,
 						},
 						{
 							name = "turretlaser",
 							x = 2928,
 							z = 576,
 							facing = 1,
+							difficultyAtLeast = 3,
 						},
 						{
 							name = "turretlaser",
 							x = 2784,
 							z = 4288,
 							facing = 2,
+							difficultyAtLeast = 2,
 						},
 						{
 							name = "turretlaser",
 							x = 304,
 							z = 2144,
 							facing = 1,
+							difficultyAtLeast = 4,
 						},
 						{
 							name = "shieldaa",

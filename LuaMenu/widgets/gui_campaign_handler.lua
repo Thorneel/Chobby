@@ -13,6 +13,9 @@ function widget:GetInfo()
 	}
 end
 
+local DEBUG_SHOW_ALLY = false
+local DEBUG_SHOW_INGAME_BRIEF = false
+
 local GALAXY_IMAGE = LUA_DIRNAME .. "images/heic1403aDowngrade.jpg"
 local IMAGE_BOUNDS = {
 	x = 810/4000,
@@ -136,7 +139,7 @@ local function MakeFeedbackWindow(parent, feedbackLink)
 		y = 15,
 		height = 35,
 		text = "Campaign Testing",
-		fontsize = Configuration:GetFont(4).size,
+		objectOverrideFont = Configuration:GetFont(4),
 		parent = textWindow,
 	}
 
@@ -154,7 +157,7 @@ local function MakeFeedbackWindow(parent, feedbackLink)
 		height = 35,
 		lineSpacing = 1,
 		text = "New missions are released every Sunday. Currently there are " .. (missionCount or "??") .. " missions. Please post your thoughts, feedback and issues on the forum.",
-		fontsize = Configuration:GetFont(2).size,
+		objectOverrideFont = Configuration:GetFont(2),
 		parent = textWindow,
 	}
 
@@ -162,10 +165,10 @@ local function MakeFeedbackWindow(parent, feedbackLink)
 		x = 95,
 		right = 95,
 		bottom = 12,
-		height = 45,
+		height = WG.BUTTON_HEIGHT,
 		caption = "Post Feedback",
 		classname = "action_button",
-		font = WG.Chobby.Configuration:GetFont(3),
+		objectOverrideFont = WG.Chobby.Configuration:GetButtonFont(3),
 		OnClick = {
 			function ()
 				WG.BrowserHandler.OpenUrl(feedbackLink)
@@ -182,11 +185,11 @@ local function MakeFeedbackButton(parentControl, link, x, y, right, bottom)
 		right = right,
 		bottom = bottom,
 		width = 116,
-		height = 45,
+		height = WG.BUTTON_HEIGHT,
 		padding = {0, 0, 0, 0},
 		caption = "Feedback   ",
 		classname = "option_button",
-		font = WG.Chobby.Configuration:GetFont(2),
+		objectOverrideFont = WG.Chobby.Configuration:GetButtonFont(2),
 		tooltip = "Post feedback on the forum",
 		OnClick = {
 			function ()
@@ -252,7 +255,7 @@ local function InitializeDifficultySetting()
 		height = 30,
 		valign = "top",
 		align = "left",
-		font = Configuration:GetFont(2),
+		objectOverrideFont = Configuration:GetFont(2),
 		caption = "Difficulty",
 		parent = window,
 	}
@@ -265,8 +268,7 @@ local function InitializeDifficultySetting()
 		items = {"Easy", "Normal", "Hard", "Brutal"},
 		selected = 2,
 		preferComboUp = true,
-		font = Configuration:GetFont(2),
-		itemFontSize = Configuration:GetFont(2).size,
+		objectOverrideFont = Configuration:GetFont(2),
 		selected = WG.CampaignData.GetDifficultySetting(),
 		OnSelect = {
 			function (obj)
@@ -338,7 +340,7 @@ local function MakeReward(rewardName, rewardsHolder, position, scroll, stackHeig
 			right = 4,
 			height = 30,
 			text = name,
-			font = Configuration:GetFont(2),
+			objectOverrideFont = Configuration:GetFont(2),
 			parent = rewardsHolder
 		}
 
@@ -388,7 +390,7 @@ local function MakeReward(rewardName, rewardsHolder, position, scroll, stackHeig
 				right = 4,
 				bottom = 6,
 				align = "right",
-				fontsize = Configuration:GetFont(3).size,
+				objectOverrideFont = Configuration:GetFont(3),
 				caption = count,
 				parent = image,
 			}
@@ -403,7 +405,7 @@ local function MakeReward(rewardName, rewardsHolder, position, scroll, stackHeig
 			width = REWARD_ICON_SIZE*widthMult,
 			height = REWARD_ICON_SIZE/stackHeight,
 			caption = string.gsub(tooltip, "_COUNT_", ""),
-			font = Configuration:GetFont(2),
+			objectOverrideFont = Configuration:GetFont(2),
 			OnClick = clickFunc and {
 				function()
 					clickFunc(rewardName)
@@ -607,7 +609,7 @@ local function MakeWinPopup(planetData, bonusObjectiveSuccess, difficulty, extra
 		height = 30,
 		align = "center",
 		caption = "Victory on " .. planetData.name .. "!",
-		font = WG.Chobby.Configuration:GetFont(4),
+		objectOverrideFont = WG.Chobby.Configuration:GetFont(4),
 		parent = victoryWindow
 	}
 
@@ -646,7 +648,7 @@ local function MakeWinPopup(planetData, bonusObjectiveSuccess, difficulty, extra
 		bottom = 1,
 		height = 70,
 		caption = i18n("continue"),
-		font = WG.Chobby.Configuration:GetFont(3),
+		objectOverrideFont = WG.Chobby.Configuration:GetButtonFont(3),
 		parent = victoryWindow,
 		classname = "action_button",
 		OnClick = {
@@ -732,10 +734,10 @@ local function ProcessPlanetVictory(planetID, battleFrames, bonusObjectives, bon
 end
 
 local function ProcessPlanetDefeat(planetID, battleFrames)
-	if selectedPlanet then
-		selectedPlanet.Close()
-		selectedPlanet = nil
-	end
+	--if selectedPlanet then
+	--	selectedPlanet.Close()
+	--	selectedPlanet = nil
+	--end
 	WG.Chobby.InformationPopup("Battle for " .. planetConfig[planetID].name .. " lost.", {caption = i18n("continue")})
 	WG.CampaignData.AddPlayTime(battleFrames, true)
 
@@ -747,12 +749,191 @@ local function ProcessPlanetResign(planetID, battleFrames)
 	WG.Analytics.SendIndexedRepeatEvent("campaign:planet_" .. planetID .. ":difficulty_" .. WG.CampaignData.GetDifficultySetting() .. ":lose", math.floor(battleFrames/30), ":resign")
 end
 
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Briefing Window (Debug Only)
+
+local function GetNewTextHandler(parentControl, paragraphSpacing, imageSize)
+	local offset = 0
+	
+	local holder = Chili.Control:New{
+		x = 0,
+		y = 0,
+		right = 0,
+		padding = {0,0,0,0},
+		parent = parentControl,
+	}
+	
+	local externalFunctions = {}
+	
+	function externalFunctions.AddEntry(textBody, imageFile)
+		local textPos = 4
+		if imageFile then
+			textPos = imageSize + 10
+			
+			local image = Chili.Image:New{
+				x = 4,
+				y = offset,
+				width = imageSize,
+				height = imageSize,
+				keepAspect = true,
+				file = imageFile,
+				parent = holder
+			}
+			local label = Chili.TextBox:New{
+				x = 0,
+				y = 0,
+				right = 4,
+				height = textSpacing,
+				align = "left",
+				valign = "top",
+				text = "\0\0\0\0" .. imageFile,
+				fontsize = 12,
+				parent = image,
+			}
+		end
+		
+		local label = Chili.TextBox:New{
+			x = textPos,
+			y = offset + 6,
+			right = 4,
+			height = textSpacing,
+			align = "left",
+			valign = "top",
+			text = textBody,
+			fontsize = 16, -- The ingame font is not the same as chobby, so size is different
+			parent = holder,
+		}
+		
+		local offsetSize = (#label.physicalLines)*14 + 2
+		if imageFile and (offsetSize < imageSize) then
+			offsetSize = imageSize
+		end
+		
+		offset = offset + offsetSize + paragraphSpacing
+		holder:SetPos(nil, nil, nil, offset - paragraphSpacing/2)
+		return offset
+	end
+	
+	return externalFunctions
+end
+
+local function InitializeBriefingWindow(planetInformation)
+	local BRIEF_WIDTH = 720
+	local BRIEF_HEIGHT = 680
+	
+	local SCROLL_POS = 70
+	local SCROLL_HEIGHT = 170
+	local DEFAULT_SCROLL_SIZE = 320
+	
+	local wantUnpause = true
+	
+	local externalFunctions = {}
+	
+	local screenWidth, screenHeight = Spring.GetViewGeometry()
+	
+	local briefingWindow = Chili.Window:New{
+		classname = "main_window",
+		name = 'mission_galaxy_brief',
+		x = math.floor((screenWidth - BRIEF_WIDTH)/2),
+		y = math.max(50, math.floor((screenHeight - BRIEF_HEIGHT)/2.5)),
+		width = BRIEF_WIDTH,
+		height = BRIEF_HEIGHT,
+		minWidth = BRIEF_WIDTH,
+		minHeight = BRIEF_HEIGHT,
+		dockable = false,
+		draggable = false,
+		resizable = false,
+		tweakDraggable = true,
+		tweakResizable = true,
+		parent = Chili.Screen0,
+	}
+	briefingWindow:BringToFront()
+	
+	Chili.Label:New{
+		x = 0,
+		y = 12,
+		width = briefingWindow.width - (briefingWindow.padding[2] + briefingWindow.padding[4]),
+		height = 26,
+		fontsize = 44,
+		align = "center",
+		caption = "Planet " .. planetInformation.name,
+		parent = briefingWindow,
+	}
+	
+	local mainHolder = Chili.ScrollPanel:New{
+		x = "4%",
+		y = SCROLL_POS,
+		width = "44%",
+		height = SCROLL_HEIGHT,
+		horizontalScrollbar = false,
+		parent = briefingWindow,
+	}
+	
+	local bonusHolder
+	if bonusObjectiveBlock then
+		bonusHolder = Chili.ScrollPanel:New{
+			right = "4%",
+			y = SCROLL_POS,
+			width = "44%",
+			height = SCROLL_HEIGHT,
+			horizontalScrollbar = false,
+			parent = briefingWindow,
+		}
+	end
+	
+	local textScroll = Chili.ScrollPanel:New{
+		x = "4%",
+		y = SCROLL_POS + SCROLL_HEIGHT + 22,
+		right = "4%",
+		bottom = 80,
+		horizontalScrollbar = false,
+		parent = briefingWindow,
+	}
+	local planetTextHandler = GetNewTextHandler(textScroll, 22, 64)
+	local textSize = planetTextHandler.AddEntry(planetInformation.infoDisplay.extendedText)
+	
+	if planetInformation.tips then
+		local tips = tipsOverride or planetInformation.tips
+		for i = 1, #tips do
+			textSize = planetTextHandler.AddEntry(tips[i].text, tips[i].image)
+		end
+	end
+	
+	local totalSize = math.min(math.floor(screenHeight*0.90), (BRIEF_HEIGHT + math.max(0, textSize - DEFAULT_SCROLL_SIZE)))
+	local finalPosition = math.max(50, math.floor((screenHeight - totalSize)/2.5))
+	briefingWindow:SetPos(nil, finalPosition, nil, totalSize)
+	
+	function externalFunctions.Close()
+		briefingWindow:Dispose()
+	end
+
+	Chili.Button:New{
+		x = "38%",
+		right = "38%",
+		bottom = 10,
+		height = 60,
+		caption = "Continue",
+		fontsize = 26,
+		OnClick = {
+			function ()
+				externalFunctions.Close()
+			end
+		},
+		parent = briefingWindow
+	}
+	
+	return externalFunctions
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- TODO: use shader animation to ease info panel in
 
 local function SelectPlanet(popupOverlay, planetHandler, planetID, planetData, startable)
 	local Configuration = WG.Chobby.Configuration
+	local debugBriefWindow = DEBUG_SHOW_INGAME_BRIEF and Configuration.debugMode and InitializeBriefingWindow(planetData)
 
 	WG.Chobby.interfaceRoot.GetRightPanelHandler().CloseTabs()
 	WG.Chobby.interfaceRoot.GetMainWindowHandler().CloseTabs()
@@ -778,14 +959,14 @@ local function SelectPlanet(popupOverlay, planetHandler, planetID, planetData, s
 		x = 8,
 		y = 8,
 		caption = planetName,
-		font = Configuration:GetFont(4),
+		objectOverrideFont = Configuration:GetFont(4),
 	}
 
 	local fluffLabels = {
-		Label:New{caption = "Primary", font = Configuration:GetFont(3)},
-		Label:New{caption = planetData.infoDisplay.primary .. " (" .. planetData.infoDisplay.primaryType .. ") ", font = Configuration:GetFont(3)},
-		Label:New{caption = "Type", font = Configuration:GetFont(3)},
-		Label:New{caption = planetData.infoDisplay.terrainType or "<UNKNOWN>", font = Configuration:GetFont(3)},
+		Label:New{caption = "Primary", objectOverrideFont = Configuration:GetFont(3)},
+		Label:New{caption = planetData.infoDisplay.primary .. " (" .. planetData.infoDisplay.primaryType .. ") ", objectOverrideFont = Configuration:GetFont(3)},
+		Label:New{caption = "Type", objectOverrideFont = Configuration:GetFont(3)},
+		Label:New{caption = planetData.infoDisplay.terrainType or "<UNKNOWN>", objectOverrideFont = Configuration:GetFont(3)},
 	}
 	fluffGrid = Grid:New{
 		x = 8,
@@ -804,8 +985,8 @@ local function SelectPlanet(popupOverlay, planetHandler, planetID, planetData, s
 		bottom = "25%",
 		padding = {0, 0, 10, 0},
 		text = ((startable or Configuration.debugMode) and planetData.infoDisplay.text) or "This planet will need to be approached for further study.",
-		font = Configuration:GetFont(3),
-	}	
+		objectOverrideFont = Configuration:GetFont(3),
+	}
 
 
 	local subPanel = Panel:New{
@@ -849,7 +1030,7 @@ local function SelectPlanet(popupOverlay, planetHandler, planetID, planetData, s
 			classname = "action_button",
 			parent = buttonHolder,
 			caption = i18n("start"),
-			font = Configuration:GetFont(4),
+			objectOverrideFont = Configuration:GetButtonFont(4),
 			OnClick = {
 				function(self)
 					WG.PlanetBattleHandler.StartBattle(planetID, planetData)
@@ -864,7 +1045,7 @@ local function SelectPlanet(popupOverlay, planetHandler, planetID, planetData, s
 				width = 160,
 				height = 38,
 				padding = {0, 0, 0, 0},
-				font = Configuration:GetFont(2),
+				objectOverrideFont = Configuration:GetButtonFont(2),
 				caption = i18n("invite_friends") .. "   ",
 				classname = "option_button",
 				OnClick = {
@@ -895,7 +1076,7 @@ local function SelectPlanet(popupOverlay, planetHandler, planetID, planetData, s
 				parent = buttonHolder,
 				caption = i18n("skip_tutorial"),
 				tooltip = "Skip quick tutorial. Only recommended for Zero-K veterans or players who have completed Tutorials 1 and 2.",
-				font = Configuration:GetFont(4),
+				objectOverrideFont = Configuration:GetButtonFont(4),
 				OnClick = {
 					function(self)
 						local function SkipFunc()
@@ -916,7 +1097,7 @@ local function SelectPlanet(popupOverlay, planetHandler, planetID, planetData, s
 				classname = "action_button",
 				parent = buttonHolder,
 				caption = "Full Auto",
-				font = Configuration:GetFont(4),
+				objectOverrideFont = Configuration:GetButtonFont(4),
 				OnClick = {
 					function(self)
 						ProcessPlanetVictory(planetID, 0, MakeRandomBonusVictoryList(2, 8), nil, WG.CampaignData.GetDifficultySetting())
@@ -931,7 +1112,7 @@ local function SelectPlanet(popupOverlay, planetHandler, planetID, planetData, s
 				classname = "action_button",
 				parent = buttonHolder,
 				caption = "Auto Win",
-				font = Configuration:GetFont(4),
+				objectOverrideFont = Configuration:GetButtonFont(4),
 				OnClick = {
 					function(self)
 						ProcessPlanetVictory(planetID, 352, MakeRandomBonusVictoryList(0.75, 8), nil, WG.CampaignData.GetDifficultySetting())
@@ -946,7 +1127,7 @@ local function SelectPlanet(popupOverlay, planetHandler, planetID, planetData, s
 				classname = "action_button",
 				parent = buttonHolder,
 				caption = "Auto Lose",
-				font = Configuration:GetFont(4),
+				objectOverrideFont = Configuration:GetButtonFont(4),
 				OnClick = {
 					function(self)
 						ProcessPlanetDefeat(planetID, 351)
@@ -958,6 +1139,10 @@ local function SelectPlanet(popupOverlay, planetHandler, planetID, planetData, s
 
 	-- close button
 	local function CloseFunc()
+		if debugBriefWindow then
+			debugBriefWindow.Close()
+			debugBriefWindow = false
+		end
 		if starmapInfoPanel then
 			starmapInfoPanel:Dispose()
 			starmapInfoPanel = nil
@@ -970,16 +1155,15 @@ local function SelectPlanet(popupOverlay, planetHandler, planetID, planetData, s
 		y = 0,
 		right = 0,
 		width = 80,
-		height = 45,
+		height = WG.BUTTON_HEIGHT,
 		classname = "negative_button",
 		caption = i18n("close"),
-		font = Configuration:GetFont(3),
+		objectOverrideFont = Configuration:GetButtonFont(3),
 		OnClick = {
 			CloseFunc
 		},
 		parent = buttonHolder,
 	}
-
 
 	WG.Chobby.interfaceRoot.SetBackgroundCloseListener(CloseFunc)
 
@@ -1016,10 +1200,9 @@ local function SelectPlanet(popupOverlay, planetHandler, planetID, planetData, s
 
 	local function SizeUpdate()
 		local fluffFont = Configuration:GetFont(((planetHandler.height < 720) and 2) or 3)
-		local descFont = Configuration:GetFont(((planetHandler.height < 720) and 1) or 2) 
-
-		planetDesc.font.size = descFont.size
+		planetDesc.font = Configuration:GetFont(((planetHandler.height < 720) and 1) or 2)
 		planetDesc:Invalidate()
+		
 		if planetHandler.height < 560 then
 			planetDesc._relativeBounds.top = 60
 			fluffGrid:SetVisibility(false)
@@ -1050,7 +1233,7 @@ local function SelectPlanet(popupOverlay, planetHandler, planetID, planetData, s
 		subPanel:UpdateClientArea(false)
 
 		for i = 1, 4 do
-			fluffLabels[i].font.size = fluffFont.size
+			fluffLabels[i].font = fluffFont
 			fluffLabels[i]:Invalidate()
 		end
 		fluffGrid:Invalidate()
@@ -1195,7 +1378,7 @@ local function GetPlanet(popupOverlay, planetListHolder, planetID, planetData, a
 						align = "left",
 						valign = "center",
 						caption = rewards.codexEntries[i],
-						font = Configuration:GetFont(1),
+						objectOverrideFont = Configuration:GetFont(1),
 						parent = debugHolder,
 					}
 				end
@@ -1294,15 +1477,36 @@ local function GetPlanet(popupOverlay, planetListHolder, planetID, planetData, a
 	if (not LIVE_TESTING) and Configuration.debugMode then
 		local number = Label:New {
 			x = 3,
-			y = 3,
+			y = 8,
 			right = 6,
-			bottom = 6,
 			align = "center",
-			valign = "center",
+			valign = "top",
 			caption = planetID,
-			font = Configuration:GetFont(3),
+			fontsize = 8,
+			objectOverrideFont = Configuration:GetFont(3),
 			parent = image,
 		}
+		
+		if DEBUG_SHOW_ALLY then
+			local allies = 1 -- The player
+			for i = 1, #planetData.gameConfig.aiConfig do
+				if planetData.gameConfig.aiConfig[i].allyTeam == 0 then
+					allies = allies + 1
+				end
+			end
+			local enemies = #planetData.gameConfig.aiConfig - allies + 1
+			local teamSizes = Label:New {
+				x = 3,
+				y = 20,
+				right = 6,
+				align = "center",
+				valign = "top",
+				caption = allies .. "v" .. enemies,
+				fontsize = 8,
+				objectOverrideFont = Configuration:GetFont(3),
+				parent = image,
+			}
+		end
 	end
 
 	local function UpdateSize(sizeScale)
@@ -1438,7 +1642,7 @@ local function GetPlanet(popupOverlay, planetListHolder, planetID, planetData, a
 				right = 12,
 				y = 8,
 				bottom = 8,
-				font = Configuration:GetFont(4),
+				objectOverrideFont = Configuration:GetFont(4),
 				text = planetData.mapDisplay.hintText,
 				parent = tipHolder,
 			}

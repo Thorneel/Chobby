@@ -70,7 +70,6 @@ local function GetPlanet(planetUtilities, planetID)
 						chickens			=  {time = 1,  squadSize = 1.0}, --spiker
 						chickena			=  {time = 3,  squadSize = 0.5}, --cockatrice
 						chicken_sporeshooter=  {time = 5,  squadSize = 0.5},
-						chicken_leaper	=  {time = 10,  squadSize = 0.8},
 						chickenr			=  {time = 13,  squadSize = 1.2}, -- lobber
 						chickenc			=  {time = 20,  squadSize = 0.5}, -- basilisk
 						chicken_tiamat		=  {time = 25,  squadSize = 0.2},
@@ -94,7 +93,6 @@ local function GetPlanet(planetUtilities, planetID)
 						chickens			=  {time = 1,  squadSize = 1.0}, --spiker
 						chickena			=  {time = 3,  squadSize = 0.5}, --cockatrice
 						chicken_sporeshooter=  {time = 5,  squadSize = 0.5},
-						chicken_leaper	=  {time = 10,  squadSize = 0.8},
 						chickenr			=  {time = 11,  squadSize = 1.2}, -- lobber
 						chickenc			=  {time = 15,  squadSize = 0.5}, -- basilisk
 						chicken_tiamat		=  {time = 20,  squadSize = 0.2},
@@ -118,7 +116,6 @@ local function GetPlanet(planetUtilities, planetID)
 						chickens			=  {time = 1,  squadSize = 1.6}, --spiker
 						chickena			=  {time = 3,  squadSize = 1.2}, --cockatrice
 						chicken_sporeshooter=  {time = 5,  squadSize = 0.8},
-						chicken_leaper	=  {time = 10,  squadSize = 0.8},
 						chickenr			=  {time = 10,  squadSize = 1.2}, -- lobber
 						chickenc			=  {time = 13,  squadSize = 0.5}, -- basilisk
 						chicken_tiamat		=  {time = 16,  squadSize = 0.2},
@@ -142,7 +139,6 @@ local function GetPlanet(planetUtilities, planetID)
 						chickens			=  {time = 1,  squadSize = 1.6}, --spiker
 						chickena			=  {time = 3,  squadSize = 1.2}, --cockatrice
 						chicken_sporeshooter=  {time = 5,  squadSize = 0.8},
-						chicken_leaper	=  {time = 10,  squadSize = 0.8},
 						chickenr			=  {time = 9,  squadSize = 1.4}, -- lobber
 						chickenc			=  {time = 11,  squadSize = 0.6}, -- basilisk
 						chicken_tiamat		=  {time = 13,  squadSize = 0.2},
@@ -307,6 +303,66 @@ local function GetPlanet(planetUtilities, planetID)
 							{cmdID = planetUtilities.COMMAND.PATROL, pos = {1433, 4898}, options = {"shift"}},
 						},
 					},
+					{
+						name = "energypylon",
+						x = 1040,
+						z = 5246,
+						facing = 3,
+					},
+					{
+						name = "energysolar",
+						x = 520,
+						z = 4333,
+						facing = 3,
+					},
+					{
+						name = "energysolar",
+						x = 490,
+						z = 4600,
+						facing = 3,
+					},
+					{
+						name = "energysolar",
+						x = 635,
+						z = 4620,
+						facing = 3,
+					},
+					{
+						name = "energysolar",
+						x = 745,
+						z = 4700,
+						facing = 3,
+					},
+					{
+						name = "energysolar",
+						x = 8200,
+						z = 4811,
+						facing = 3,
+					},
+					{
+						name = "energysolar",
+						x = 1864,
+						z = 5884,
+						facing = 3,
+					},
+					{
+						name = "energysolar",
+						x = 1600,
+						z = 6072,
+						facing = 3,
+					},
+					{
+						name = "energysolar",
+						x = 324,
+						z = 4222,
+						facing = 3,
+					},
+					{
+						name = "energysolar",
+						x = 200,
+						z = 4150,
+						facing = 3,
+					}, 
  					{
 						name = "striderdante",
 						x = 1403,

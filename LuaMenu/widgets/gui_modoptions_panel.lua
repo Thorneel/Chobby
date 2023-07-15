@@ -21,6 +21,9 @@ local battleLobby
 local localModoptions = {}
 local modoptionControlNames = {}
 
+local hostedModeName
+local wantedGameResponse = false
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Utility Function
@@ -71,11 +74,11 @@ local function ProcessListOption(data, index)
 		x = 5,
 		y = 0,
 		width = 350,
-		height = 30,
+		height = 26,
 		valign = "center",
 		align = "left",
 		caption = data.name,
-		font = WG.Chobby.Configuration:GetFont(2),
+		objectOverrideFont = WG.Chobby.Configuration:GetFont(2),
 		tooltip = data.desc,
 	}
 
@@ -101,8 +104,7 @@ local function ProcessListOption(data, index)
 		width = 180,
 		height = 30,
 		items = items,
-		font = WG.Chobby.Configuration:GetFont(2),
-		itemFontSize = WG.Chobby.Configuration:GetFont(2).size,
+		objectOverrideFont = WG.Chobby.Configuration:GetFont(2),
 		tooltip = data.desc,
 		selectByName = true,
 		selected = defaultItem,
@@ -142,12 +144,12 @@ local function ProcessBoolOption(data, index)
 		x = 5,
 		y = index*32,
 		width = 355,
-		height = 40,
+		height = 28,
 		boxalign = "right",
 		boxsize = 20,
 		caption = data.name,
 		checked = checked,
-		font = WG.Chobby.Configuration:GetFont(2),
+		objectOverrideFont = WG.Chobby.Configuration:GetFont(2),
 		tooltip = data.desc,
 
 		OnChange = {
@@ -167,11 +169,11 @@ local function ProcessNumberOption(data, index)
 		x = 5,
 		y = 0,
 		width = 350,
-		height = 30,
+		height = 26,
 		valign = "center",
 		align = "left",
 		caption = data.name,
-		font = WG.Chobby.Configuration:GetFont(2),
+		objectOverrideFont = WG.Chobby.Configuration:GetFont(2),
 		tooltip = data.desc,
 	}
 
@@ -184,7 +186,8 @@ local function ProcessNumberOption(data, index)
 		height = 30,
 		text   = oldText,
 		useIME = false,
-		fontSize = WG.Chobby.Configuration:GetFont(2).size,
+		objectOverrideFont = WG.Chobby.Configuration:GetFont(2),
+		objectOverrideHintFont = WG.Chobby.Configuration:GetHintFont(2),
 		tooltip = data.desc,
 		OnFocusUpdate = {
 			function (obj)
@@ -202,7 +205,7 @@ local function ProcessNumberOption(data, index)
 				-- Bound the number
 				newValue = math.min(data.max, math.max(data.min, newValue))
 				-- Round to step size
-				newValue = math.floor(newValue/data.step + 0.5)*data.step + 0.01*data.step
+				newValue = math.floor(newValue/data.step + 0.49)*data.step + 0.01*data.step
 
 				oldText = TextFromNum(newValue, data.step)
 				localModoptions[data.key] = oldText
@@ -231,11 +234,11 @@ local function ProcessStringOption(data, index)
 		x = 5,
 		y = 0,
 		width = 350,
-		height = 30,
+		height = 26,
 		valign = "center",
 		align = "left",
 		caption = data.name,
-		font = WG.Chobby.Configuration:GetFont(2),
+		objectOverrideFont = WG.Chobby.Configuration:GetFont(2),
 		tooltip = data.desc,
 	}
 
@@ -249,7 +252,8 @@ local function ProcessStringOption(data, index)
 		text   = oldText,
 		useIME = false,
 		tooltip = data.desc,
-		fontSize = WG.Chobby.Configuration:GetFont(2).size,
+		objectOverrideFont = WG.Chobby.Configuration:GetFont(2),
+		objectOverrideHintFont = WG.Chobby.Configuration:GetHintFont(2),
 		OnFocusUpdate = {
 			function (obj)
 				if obj.focused then
@@ -305,6 +309,81 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Game Mode Handler
+
+local function OnCustomGameMode(_, shortName, displayName, gameModeJson)
+	if not (shortName and displayName and gameModeJson) then
+		Spring.Echo("Missing shortName", shortName)
+		Spring.Echo("Missing displayName", displayName)
+		Spring.Echo("Missing gameModeJson", gameModeJson)
+		return
+	end
+	
+	local fileName = "CustomModes/" .. shortName .. ".json"
+	local modeDataOld = Spring.Utilities.json.loadFile(fileName)
+	local modeData = Spring.Utilities.json.decode(gameModeJson)
+	Spring.Utilities.TableEcho(modeData, "modeData")
+	
+	if hostedModeName and modeDataOld
+			and modeDataOld.shortName == modeData.shortName
+			and modeDataOld.name == modeData.name
+			and modeDataOld.game == modeData.game
+			and modeDataOld.map == modeData.map then
+		-- The mode is already being hosted and the version matches (name should be updated),
+		-- so don't rehost.
+		hostedModeName = false
+		return
+	end
+	hostedModeName = false
+	
+	-- Write (or overwrite) the mode json locally.
+	local modeFile, errorMessage = io.open(fileName, 'w')
+	if not modeFile then
+		Spring.Echo("Error writing file", fileName)
+		return
+	end
+	modeFile:write(gameModeJson)
+	modeFile:close()
+	
+	-- Host or change the room to match the mode.
+	local lobby = WG.LibLobby.lobby
+	if lobby:GetMyBattleID() then
+		if modeData.game then
+			lobby:SelectGame(modeData.game, true)
+		end
+		if modeData.rapidTag then
+			lobby:SelectGame(modeData.rapidTag, true, true)
+		end
+		if modeData.roomType then
+			lobby:SetBattleType(modeData.roomType)
+		end
+		if modeData.map then
+			lobby:SelectMap(modeData.map)
+		end
+		if modeData.options then
+			lobby:SetModOptions(modeData.options)
+		end
+	else
+		lobby:HostBattle(
+			(lobby:GetMyUserName() or "Player") .. "'s Battle", nil,
+			modeData.roomType or "Custom",
+			modeData.map,
+			modeData.game,
+			modeData.options
+		)
+	end
+end
+
+local function DelayedCustomModeUpdate(modeName)
+	local lobby = WG.LibLobby.lobby
+	local function ModeUpdate()
+		lobby:GetCustomGameMode(modeName)
+	end
+	WG.Delay(ModeUpdate, 3)
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Modoptions Window Handler
 
 local function CreateModoptionWindow()
@@ -313,7 +392,7 @@ local function CreateModoptionWindow()
 		name = "modoptionsSelectionWindow",
 		parent = WG.Chobby.lobbyInterfaceHolder,
 		width = 920,
-		height = 500,
+		height = 504,
 		resizable = false,
 		draggable = false,
 		classname = "main_window",
@@ -331,7 +410,7 @@ local function CreateModoptionWindow()
 		local fontSize = 2
 		local tooltip = nil
 		local origCaption = caption
-		caption = StringUtilities.GetTruncatedStringWithDotDot(caption, Font:New(WG.Chobby.Configuration:GetFont(fontSize)), tabWidth)
+		caption = StringUtilities.GetTruncatedStringWithDotDot(caption, WG.Chobby.Configuration:GetFont(fontSize), tabWidth)
 		if origCaption ~= caption then
 			tooltip = origCaption
 		end
@@ -339,7 +418,7 @@ local function CreateModoptionWindow()
 			name = key,
 			caption = caption,
 			tooltip = tooltip,
-			font = WG.Chobby.Configuration:GetFont(fontSize),
+			objectOverrideFont = WG.Chobby.Configuration:GetFont(fontSize),
 			children = PopulateTab(data.options)
 		}
 	end
@@ -399,6 +478,9 @@ local function CreateModoptionWindow()
 		local function SetCustomModeSuccess(modeData)
 			if not modeData then
 				return
+			end
+			if modeData.shortName then
+				DelayedCustomModeUpdate(modeData.shortName)
 			end
 			buttonCustom.caption = modeData.name
 			if modeData.map then
@@ -463,7 +545,7 @@ local function CreateModoptionWindow()
 		bottom = 1,
 		height = 70,
 		caption = i18n("select_custom_mode"),
-		font = WG.Chobby.Configuration:GetFont(3),
+		objectOverrideFont = WG.Chobby.Configuration:GetButtonFont(3),
 		parent = modoptionsSelectionWindow,
 		classname = "option_button",
 		OnClick = {
@@ -480,7 +562,7 @@ local function CreateModoptionWindow()
 			bottom = 1,
 			height = 70,
 			caption = i18n("select_mod"),
-			font = WG.Chobby.Configuration:GetFont(3),
+			objectOverrideFont = WG.Chobby.Configuration:GetButtonFont(3),
 			parent = modoptionsSelectionWindow,
 			classname = "option_button",
 			OnClick = {
@@ -497,7 +579,7 @@ local function CreateModoptionWindow()
 		bottom = 1,
 		height = 70,
 		caption = i18n("reset"),
-		font = WG.Chobby.Configuration:GetFont(3),
+		objectOverrideFont = WG.Chobby.Configuration:GetButtonFont(3),
 		parent = modoptionsSelectionWindow,
 		classname = "option_button",
 		OnClick = {
@@ -513,7 +595,7 @@ local function CreateModoptionWindow()
 		bottom = 1,
 		height = 70,
 		caption = i18n("apply"),
-		font = WG.Chobby.Configuration:GetFont(3),
+		objectOverrideFont = WG.Chobby.Configuration:GetButtonFont(3),
 		parent = modoptionsSelectionWindow,
 		classname = "action_button",
 		OnClick = {
@@ -529,7 +611,7 @@ local function CreateModoptionWindow()
 		bottom = 1,
 		height = 70,
 		caption = i18n("cancel"),
-		font = WG.Chobby.Configuration:GetFont(3),
+		objectOverrideFont = WG.Chobby.Configuration:GetButtonFont(3),
 		parent = modoptionsSelectionWindow,
 		classname = "negative_button",
 		OnClick = {
@@ -558,7 +640,7 @@ local function InitializeModoptionsDisplay()
 		right = 1,
 		y = 1,
 		autoresize = true,
-		font = WG.Chobby.Configuration:GetFont(1),
+		objectOverrideFont = WG.Chobby.Configuration:GetFont(1),
 		text = "",
 		parent = mainScrollPanel,
 	}
@@ -616,7 +698,7 @@ local modoptionsDisplay
 
 local ModoptionsPanel = {}
 
-function ModoptionsPanel.LoadModotpions(gameName, newBattleLobby)
+function ModoptionsPanel.LoadModoptions(gameName, newBattleLobby)
 	battleLobby = newBattleLobby
 
 	modoptions = WG.Chobby.Configuration.gameConfig.defaultModoptions
@@ -625,6 +707,16 @@ function ModoptionsPanel.LoadModotpions(gameName, newBattleLobby)
 		sectionTitles = {},
 		sections = {}
 	}
+	
+	--if WG.WrapperLoopback then
+	--	WG.WrapperLoopback.GetResourceInfo(gameName)
+	--	wantedGameResponse = gameName
+	--	local function StopWaiting()
+	--		wantedGameResponse = false
+	--	end
+	--	WG.Delay(StopWaiting, 5)
+	--end
+	
 	if not modoptions then
 		return
 	end
@@ -661,6 +753,19 @@ function ModoptionsPanel.LoadModotpions(gameName, newBattleLobby)
 			end
 		end
 	end
+end
+
+local function ProcessWrapperModoptions(responseName, responseData)
+	--Spring.Echo("responseName", responseName, wantedGameResponse)
+	--Spring.Utilities.TableEcho(responseData, "responseData")
+	if responseName ~= wantedGameResponse then
+		return
+	end
+	--CreateModoptionWindow()
+end
+
+function ModoptionsPanel.WrapperModoptionResponse(responseName, responseData)
+	ProcessWrapperModoptions(responseName, responseData)
 end
 
 function ModoptionsPanel.ShowModoptions()
@@ -700,13 +805,29 @@ function ModoptionsPanel.GetCustomModes(modeList, excludeHostMenuHide)
 	return modeList, modeMap
 end
 
+function ModoptionsPanel.UpdateCustomMode(modeName, isHostingAlready)
+	local lobby = WG.LibLobby.lobby
+	if isHostingAlready then
+		DelayedCustomModeUpdate(modeName)
+		return
+	end
+	
+	lobby:GetCustomGameMode(modeName)
+end
+
 --------------------------------------------------------------------------
 --------------------------------------------------------------------------
 -- Initialization
+
+function DelayedInitialize()
+	local lobby = WG.LibLobby.lobby
+	lobby:AddListener("OnCustomGameMode", OnCustomGameMode)
+end
 
 function widget:Initialize()
 	CHOBBY_DIR = LUA_DIRNAME .. "widgets/chobby/"
 	VFS.Include(LUA_DIRNAME .. "widgets/chobby/headers/exports.lua", nil, VFS.RAW_FIRST)
 
 	WG.ModoptionsPanel = ModoptionsPanel
+	WG.Delay(DelayedInitialize, 0.1)
 end

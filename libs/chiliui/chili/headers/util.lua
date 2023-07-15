@@ -92,7 +92,6 @@ function IsObject(v)
 	return ((type(v) == "metatable") or (type(v) == "userdata")) and (v.classname)
 end
 
-
 function IsNumber(v)
 	return (type(v) == "number")
 end
@@ -262,12 +261,12 @@ end
 
 --// =============================================================================
 
-function AreRectsOverlapping(rect1, rect2)
+function AreRectsOverlapping(x1, y1, w1, h1, x2, y2, w2, h2)
 	return
-		(rect1[1] <= rect2[1] + rect2[3]) and
-		(rect1[1] + rect1[3] >= rect2[1]) and
-		(rect1[2] <= rect2[2] + rect2[4]) and
-		(rect1[2] + rect1[4] >= rect2[2])
+		(x1 <= x2 + w2) and
+		(x1 + w1 >= x2) and
+		(y1 <= y2 + h2) and
+		(y1 + h1 >= y2)
 end
 
 --// =============================================================================
@@ -336,10 +335,14 @@ function table:shallowcopy()
 	return newTable
 end
 
-function table:arrayshallowcopy()
-	local newArray = {}
-	for i = 1, #self do
-		newArray[i] = self[i]
+function table:deepcopy()
+	local newTable = {}
+	for k, v in pairs(self) do
+		if type(v) == 'table' then
+			newTable[k] = table.deepcopy(v)
+		else
+			newTable[k] = v
+		end
 	end
 	return newTable
 end
@@ -347,12 +350,6 @@ end
 function table:arrayappend(t)
 	for i = 1, #t do
 		self[#self + 1] = t[i]
-	end
-end
-
-function table:arraymap(fun)
-	for i = 1, #self do
-		newTable[i] = fun(self[i])
 	end
 end
 
@@ -399,14 +396,13 @@ end
 
 function table:merge(table2)
 	for i, v in pairs(table2) do
-		if (type(v) == 'table') then
-			local sv = type(self[i])
-			if (sv == 'table') or (sv == 'nil') then
-				if (sv == 'nil') then self[i] = {} end
-				table.merge(self[i], v)
-			end
-		elseif (self[i] == nil) then
-			self[i] = v
+		local sv = self[i]
+		if type(v) ~= 'table' or (sv and type(sv) ~= 'table') then
+			self[i] = sv or v
+		elseif sv then
+			table.merge(sv, v)
+		else
+			self[i] = table.deepcopy(v)
 		end
 	end
 	return self

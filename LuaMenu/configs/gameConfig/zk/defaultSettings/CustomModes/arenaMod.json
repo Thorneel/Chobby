@@ -1,6 +1,0 @@
-{
-    "name" : "Arena Mod",
-    "description" : "Use an HQ building to spawn units and defeat your enemy",
-    "roomType" : "Team",
-    "game" : "Arena Mod v1.0.2"
-}

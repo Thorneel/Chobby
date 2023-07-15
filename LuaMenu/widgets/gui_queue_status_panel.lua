@@ -19,17 +19,58 @@ end
 local statusQueueLobby -- global for timer update
 local statusQueueIngame
 local readyCheckPopup
+
 local findingMatch = false
+local wantAutosave = false
+
 local ALLOW_REJECT_QUICKPLAY = true
 local ALLOW_REJECT_REGULAR = false
 
-local instantStartQueuePriority = {
-	["Battle"] = 5,
-	["Sortie"] = 4,
-	["Teams"] = 3,
-	["1v1"] = 2,
-	["Coop"] = 1,
+local SEND_AUTOSAVE = "MatchmakerAutosaveRequired"
+
+local queueNameOverride = {
+	["1v1 Narrow"] = "1v1",
+	["1v1"] = "1v1 Handicap",
+	["1v1 Wide"] = "1v1 Wide",
 }
+
+local subQueueListName = {
+	["1v1"] = "Handicap",
+	["1v1 Wide"] = "Wide",
+}
+
+local alwaysParen = {
+	["1v1 Narrow"] = true,
+}
+
+local subQueues = {
+	["1v1"] = "1v1 Narrow",
+	["1v1 Wide"] = "1v1 Narrow",
+}
+
+local function GetQueueStartPriority()
+	local Configuration = WG.Chobby.Configuration
+	if Configuration.queue_handicap or not Configuration.queue_wide then
+		return {
+			["Battle"] = 5,
+			["Sortie"] = 4,
+			["Teams"] = 3,
+			["1v1 Narrow"] = 2.5,
+			["1v1"] = 2,
+			["1v1 Wide"] = 1.5,
+			["Coop"] = 1,
+		}
+	end
+	return {
+		["Battle"] = 5,
+		["Sortie"] = 4,
+		["Teams"] = 3,
+		["1v1 Narrow"] = 2.5,
+		["1v1 Wide"] = 2,
+		["1v1"] = 1.5,
+		["Coop"] = 1,
+	}
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -86,7 +127,7 @@ local function InitializeQueueStatusHandler(name, ControlType, parent, pos)
 		bottom = 4,
 		padding = {0,0,0,0},
 		caption = "Cancel",
-		font = WG.Chobby.Configuration:GetFont(3),
+		objectOverrideFont = WG.Chobby.Configuration:GetButtonFont(3),
 		classname = "negative_button",
 		OnClick = {
 			function()
@@ -111,7 +152,7 @@ local function InitializeQueueStatusHandler(name, ControlType, parent, pos)
 		y = 12,
 		right = rightBound,
 		bottom = bottomBound,
-		fontsize = WG.Chobby.Configuration:GetFont(2).size,
+		objectOverrideFont = WG.Chobby.Configuration:GetFont(2),
 		text = "",
 		parent = queuePanel
 	}
@@ -126,7 +167,10 @@ local function InitializeQueueStatusHandler(name, ControlType, parent, pos)
 		end
 		timeWaiting = newTimeWaiting
 		timeString = SecondsToMinutes(timeWaiting)
-		queueStatusText:SetText("Finding Match - " .. timeString .. "\n" .. queueString .. ((bigMode and  "\nPlayers: ") or "\nPlay: ") .. playersString)
+		local doAutosave = wantAutosave and WG.Chobby.Configuration.autosaveOnMatchmaker
+		local thirdLine = (wantAutosave and "\nAutosave Enabled") or (((bigMode and  "\nPlayers: ") or "\nPlay: ") .. playersString)
+		local truncatedQueueString = StringUtilities.GetTruncatedStringWithDotDot(queueString or "", queueStatusText.font, 195) or queueString
+		queueStatusText:SetText("Finding Match - " .. timeString .. "\n" .. truncatedQueueString .. thirdLine)
 	end
 
 	local function UpdateQueueText()
@@ -163,14 +207,48 @@ local function InitializeQueueStatusHandler(name, ControlType, parent, pos)
 		local firstQueue = true
 		playersString = ""
 		queueString = ""
+		
+		local joinedQueues = {}
 		for i = 1, #joinedQueueList do
-			if not firstQueue then
-				queueString = queueString .. ", "
-				playersString = playersString .. ", "
+			joinedQueues[joinedQueueList[i]] = true
+		end
+		local extraInfoList = {}
+		for i = 1, #joinedQueueList do
+			local queueName = joinedQueueList[i]
+			if subQueues[queueName] and joinedQueues[subQueues[queueName]] then
+				local extraData = extraInfoList[subQueues[queueName]] or {}
+				extraData[#extraData + 1] = queueName
+				extraInfoList[subQueues[queueName]] = extraData
 			end
-			playersString = playersString .. ((queueCounts and queueCounts[joinedQueueList[i]]) or 0)
-			firstQueue = false
-			queueString = queueString .. joinedQueueList[i]
+		end
+		--local abbreviate = (#joinedQueueList >= 3)
+		for i = 1, #joinedQueueList do
+			local queueName = joinedQueueList[i]
+			if not (subQueues[queueName] and joinedQueues[subQueues[queueName]]) then
+				if not firstQueue then
+					queueString = queueString .. ", "
+					playersString = playersString .. ", "
+				end
+				playersString = playersString .. ((queueCounts and queueCounts[queueName]) or 0)
+				firstQueue = false
+				
+				queueString = queueString .. (queueNameOverride[queueName] or queueName)
+				if extraInfoList[queueName] then
+					local extra = extraInfoList[queueName]
+					if #extra == 2 then
+						queueString = queueString .. " (All"
+					else
+						queueString = queueString .. " (Normal"
+						for j = 1, #extra do
+							queueString = queueString .. ", "
+							queueString = queueString .. (subQueueListName[extra[j]] or extra[j])
+						end
+					end
+					queueString = queueString .. ")"
+				elseif alwaysParen[queueName] then
+					queueString = queueString .. " (Normal)"
+				end
+			end
 		end
 
 		UpdateQueueText()
@@ -207,7 +285,7 @@ local function InitializeInstantQueueHandler()
 		bottom = 4,
 		padding = {0,0,0,0},
 		caption = "Play",
-		font = WG.Chobby.Configuration:GetFont(3),
+		objectOverrideFont = WG.Chobby.Configuration:GetButtonFont(3),
 		classname = "action_button",
 		OnClick = {
 			function()
@@ -226,14 +304,14 @@ local function InitializeInstantQueueHandler()
 		y = 18,
 		right = rightBound,
 		bottom = bottomBound,
-		fontsize = WG.Chobby.Configuration:GetFont(3).size,
+		objectOverrideFont = WG.Chobby.Configuration:GetFont(3),
 		text = "",
 		parent = queuePanel
 	}
 
 	local function UpdateQueueText()
 		if queueName then
-			queueStatusText:SetText(queueName .. " Available\nClick to Play")
+			queueStatusText:SetText("Match Available\n" .. (queueNameOverride[queueName] or queueName))
 		end
 	end
 
@@ -243,12 +321,12 @@ local function InitializeInstantQueueHandler()
 		queueStatusText:UpdateClientArea()
 		if ySize < 60 then
 			queueStatusText:SetPos(xSize/4 - 52, 2)
-			queueStatusText.font.size = WG.Chobby.Configuration:GetFont(2).size
+			queueStatusText.font = WG.Chobby.Configuration:GetFont(2)
 			queueStatusText:Invalidate()
 			bigMode = false
 		else
 			queueStatusText:SetPos(xSize/4 - 62, 18)
-			queueStatusText.font.size = WG.Chobby.Configuration:GetFont(3).size
+			queueStatusText.font = WG.Chobby.Configuration:GetFont(3)
 			queueStatusText:Invalidate()
 			bigMode = true
 		end
@@ -271,6 +349,7 @@ local function InitializeInstantQueueHandler()
 		end
 		if instantStartQueues and #instantStartQueues > 0 then
 			local instantQueueName
+			local instantStartQueuePriority = GetQueueStartPriority()
 			local bestPriority = -1
 			for i = 1, #instantStartQueues do
 				local queueName = instantStartQueues[i]
@@ -300,6 +379,10 @@ end
 
 local function CreateReadyCheckWindow(DestroyFunc, secondsRemaining, minWinChance, isQuickPlay)
 	local Configuration = WG.Chobby.Configuration
+	local waitingForAutosave = wantAutosave and Configuration.autosaveOnMatchmaker and Spring.SendLuaUIMsg
+	if waitingForAutosave then
+		Spring.SendLuaUIMsg(SEND_AUTOSAVE)
+	end
 
 	local snd_volui = Spring.GetConfigString("snd_volui")
 	local snd_volmaster = Spring.GetConfigString("snd_volmaster")
@@ -327,7 +410,7 @@ local function CreateReadyCheckWindow(DestroyFunc, secondsRemaining, minWinChanc
 		name = "readyCheckWindow",
 		parent = screen0,
 		width = 310,
-		height = 310,
+		height = waitingForAutosave and 330 or 280,
 		resizable = false,
 		draggable = false,
 		classname = "main_window",
@@ -344,27 +427,37 @@ local function CreateReadyCheckWindow(DestroyFunc, secondsRemaining, minWinChanc
 		y = 15,
 		height = 35,
 		caption = invitationText,
-		font = Configuration:GetFont(4),
+		objectOverrideFont = Configuration:GetFont(4),
 		parent = readyCheckWindow,
 	}
 
 	local statusLabel = TextBox:New {
 		x = 15,
 		width = 250,
-		y = 80,
+		y = 70,
 		height = 35,
 		text = "",
-		fontsize = Configuration:GetFont(3).size,
+		objectOverrideFont = Configuration:GetFont(3),
 		parent = readyCheckWindow,
 	}
 
 	local playersAcceptedLabel = Label:New {
 		x = 15,
 		width = 250,
-		y = 130,
+		y = 115,
 		height = 35,
 		caption = "Players accepted: 0",
-		font = Configuration:GetFont(3),
+		objectOverrideFont = Configuration:GetFont(3),
+		parent = readyCheckWindow,
+	}
+
+	local autosaveLabel = Label:New {
+		x = 15,
+		width = 250,
+		y = 155,
+		height = 35,
+		caption = "",
+		objectOverrideFont = Configuration:GetFont(3),
 		parent = readyCheckWindow,
 	}
 
@@ -404,7 +497,7 @@ local function CreateReadyCheckWindow(DestroyFunc, secondsRemaining, minWinChanc
 		bottom = 1,
 		height = 70,
 		caption = (allowReject and i18n("accept")) or i18n("ready"),
-		font = Configuration:GetFont((allowReject and 3) or 4),
+		objectOverrideFont = Configuration:GetButtonFont((allowReject and 3) or 4),
 		parent = readyCheckWindow,
 		classname = "action_button",
 		OnClick = {
@@ -420,7 +513,7 @@ local function CreateReadyCheckWindow(DestroyFunc, secondsRemaining, minWinChanc
 		bottom = 1,
 		height = 70,
 		caption = i18n("reject"),
-		font = Configuration:GetFont(3),
+		objectOverrideFont = Configuration:GetButtonFont(3),
 		parent = readyCheckWindow,
 		classname = "negative_button",
 		OnClick = {
@@ -437,6 +530,17 @@ local function CreateReadyCheckWindow(DestroyFunc, secondsRemaining, minWinChanc
 		end
 		SetBanFrom(Configuration.matchmakerPopupTime, 1)
 		banChecked = true
+	end
+
+	local function SetAutosaveStatus(stillWaiting, saveName)
+		if stillWaiting then
+			autosaveLabel:SetCaption(Configuration:GetWarningColor() .. "Saving Game")
+		else
+			autosaveLabel:SetCaption(Configuration:GetSuccessColor() .. "Autosave Complete:\n" .. saveName)
+		end
+	end
+	if waitingForAutosave then
+		SetAutosaveStatus(true)
 	end
 
 	local popupHolder = WG.Chobby.PriorityPopup(readyCheckWindow, allowReject and CancelFunc, AcceptFunc, screen0)
@@ -483,6 +587,11 @@ local function CreateReadyCheckWindow(DestroyFunc, secondsRemaining, minWinChanc
 
 	function externalFunctions.DisconnectedRudely()
 		CheckBan()
+	end
+
+	function externalFunctions.OnAutosaveComplete(saveName)
+		waitingForAutosave = false
+		SetAutosaveStatus(false, saveName)
 	end
 
 	function externalFunctions.MatchMakingComplete(success)
@@ -547,6 +656,24 @@ local QueueStatusPanel = {}
 --------------------------------------------------------------------------------
 -- Widget Interface
 
+function QueueStatusPanel.SetWantAutosaveFromGameData(ingameData)
+	if not ingameData then
+		wantAutosave = false
+		return
+	end
+	if ingameData.isReplay then
+		wantAutosave = false
+		return
+	end
+	wantAutosave = (ingameData.isPlayer and ingameData.playerCount == 1) or (not ingameData.isPlayer and ingameData.playerCount == 0)
+end
+
+function QueueStatusPanel.OnAutosaveComplete(saveName)
+	if readyCheckPopup then
+		readyCheckPopup.OnAutosaveComplete(saveName)
+	end
+end
+
 function DelayedInitialize()
 	local lobby = WG.LibLobby.lobby
 
@@ -565,7 +692,7 @@ function DelayedInitialize()
 		findingMatch = inMatchMaking
 
 		if not statusQueueIngame then
-			local pos = {right = 2, y = 52, width = 290, height = 70}
+			local pos = {right = 2, y = 52, width = 300, height = 75}
 			statusQueueIngame = InitializeQueueStatusHandler("ingameQueue", Window, WG.Chobby.interfaceRoot.GetIngameInterfaceHolder(), pos)
 			statusQueueIngame.GetHolder():SetVisibility(inMatchMaking)
 		end
@@ -672,6 +799,10 @@ function widget:Update()
 	if readyCheckPopup then
 		readyCheckPopup.UpdateTimer()
 	end
+end
+
+function widget:ActivateMenu()
+	wantAutosave = false
 end
 
 function widget:Initialize()

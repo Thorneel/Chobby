@@ -96,6 +96,7 @@ local function RunBenchmark(config)
 
 		function RunNext()
 			if aborted then
+				Chotify:Post({title = "Benchmarker",body  = "RunNext aborted",})
 				return
 			end
 			realIndex = perm[index]%runTypes + 1
@@ -110,11 +111,13 @@ local function RunBenchmark(config)
 				Engine = runData[realIndex].engine,
 				SpringSettings = settings,
 			}
+			Chotify:Post({title = "Benchmarker",body  = "Starting " .. runData[realIndex].runName,})
 			WG.WrapperLoopback.StartNewSpring(params)
 		end
 
 		function CheckNextRun()
 			if aborted then
+				Chotify:Post({title = "Benchmarker",body  = "CheckNextRun aborted",})
 				return
 			end
 			dataFile = io.open(dataFilePath, "r")
@@ -125,12 +128,15 @@ local function RunBenchmark(config)
 				index = index + 1
 				realIndex = perm[index%runTypes + 1]
 				if index <= totalRuns then
+					Chotify:Post({title = "Benchmarker",body  = "RunNext Delay",})
 					WG.Delay(RunNext, 4)
 				else
 					UploadBenchmarkFile(config, dataFilePath)
+					Chotify:Post({title = "Benchmarker",body  = "UploadBenchmarkFile",})
 					return
 				end
 			end
+			Chotify:Post({title = "Benchmarker",body  = "CheckNextRun Delay",})
 			WG.Delay(CheckNextRun, 5)
 		end
 
@@ -156,16 +162,16 @@ local function InitializeControls(parentControl)
 		width = 180,
 		height = 30,
 		parent = parentControl,
-		font = Configuration:GetFont(3),
+		objectOverrideFont = Configuration:GetFont(3),
 		caption = "Benchmarker",
 	}
 
 	Button:New {
 		right = 11,
-		y = 7,
+		y = WG.TOP_BUTTON_Y,
 		width = 80,
-		height = 45,
-		font = Configuration:GetFont(3),
+		height = WG.BUTTON_HEIGHT,
+		objectOverrideFont = Configuration:GetButtonFont(3),
 		caption = i18n("close"),
 		classname = "negative_button",
 		OnClick = {
@@ -187,7 +193,7 @@ local function InitializeControls(parentControl)
 			y = offset,
 			height = 50,
 			caption = benchmarkData[i].humanName,
-			font = Configuration:GetFont(3),
+			objectOverrideFont = Configuration:GetButtonFont(3),
 			classname = "action_button",
 			OnClick = {
 				function()
@@ -203,7 +209,7 @@ local function InitializeControls(parentControl)
 			right = 15,
 			y = offset + 6,
 			height = 70,
-			font = Configuration:GetFont(3),
+			objectOverrideFont = Configuration:GetFont(3),
 			text = benchmarkData[i].decription,
 			parent = parentControl,
 		}
@@ -218,7 +224,7 @@ local function InitializeControls(parentControl)
 			height = 80,
 			caption = "Generate Script",
 			tooltip = "Generates a startscript from luamenu/startscripts/config.lua.",
-			font = Configuration:GetFont(4),
+			objectOverrideFont = Configuration:GetButtonFont(4),
 			classname = "action_button",
 			OnClick = {
 				function()

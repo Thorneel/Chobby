@@ -26,7 +26,7 @@ function Interface:init()
 	self.connectionTimeout = 50
 
 	-- private
-	self.buffer = ""
+	self.raggedJsonStore = {}
 
 	self:super("init")
 end
@@ -50,9 +50,9 @@ function Interface:Connect(host, port, user, password, cpu, localIP, lobbyVersio
 		-- The socket is expected to return "timeout" immediately since timeout time is set  to 0
 	elseif not (res == nil and err == "timeout") then
 		Spring.Log(LOG_SECTION, LOG.ERROR, "Error in connect: " .. err)
-    else
-        self.status = "connecting"
-    end
+	else
+		self.status = "connecting"
+	end
 	return true
 end
 
@@ -110,10 +110,13 @@ function Interface:SendCommandToBuffer(cmdName)
 end
 
 function Interface:CommandReceived(command)
+	if command == "" then
+		return true -- Mark as successful to remove the command.
+	end
 	local cmdId, cmdName, arguments
 	local argumentsPos = false
 	if command:sub(1,1) == "#" then
-		i = command:find(" ")
+		local i = command:find(" ")
 		cmdId = command:sub(2, i - 1)
 		argumentsPos = command:find(" ", i + 1)
 		if argumentsPos ~= nil then
@@ -138,15 +141,15 @@ function Interface:CommandReceived(command)
 		end
 		self.commandsInBuffer = self.commandsInBuffer + 1
 		self.commandBuffer[self.commandsInBuffer] = command
-		self:_CallListeners("OnCommandBuffered", command)
-		return
+		self:_CallListeners("OnCommandBuffered", cmdName, command, argumentsPos)
+		return true
 	end
 
 	if argumentsPos then
 		arguments = command:sub(argumentsPos + 1)
 	end
 
-	self:_OnCommandReceived(cmdName, arguments, cmdId)
+	return self:_OnCommandReceived(cmdName, arguments, cmdId)
 end
 
 function Interface:_GetCommandPattern(cmdName)
@@ -194,6 +197,7 @@ function Interface:_OnCommandReceived(cmdName, arguments, cmdId)
 			local success, obj = pcall(json.decode, arguments)
 			if not success then
 				Spring.Log(LOG_SECTION, LOG.ERROR, "Failed to parse JSON: " .. tostring(arguments))
+				return false
 			end
 			if obj then
 				jsonCommandFunction(self, obj)
@@ -203,6 +207,7 @@ function Interface:_OnCommandReceived(cmdName, arguments, cmdId)
 		end
 	end
 	self:_CallListeners("OnCommandReceived", fullCmd)
+	return true
 end
 
 function Interface:_SocketUpdate()
@@ -241,18 +246,45 @@ function Interface:_SocketUpdate()
 			Spring.Log(LOG_SECTION, LOG.DEBUG, commandsStr)
 			
 			if config and config.debugRawMessages then
-				Spring.Echo("self.buffer", self.buffer)
+				Spring.Utilities.TableEcho(self.raggedJsonStore, "self.raggedJsonStore")
 				Spring.Echo("commandsStr", commandsStr)
 			end
 			local commands = explode("\n", commandsStr)
-			commands[1] = self.buffer .. commands[1]
-			for i = 1, #commands-1 do
-				local command = commands[i]
-				if command ~= nil then
-					self:CommandReceived(command)
+			
+			if #commands > 0 then
+				local allFail = true
+				local newRagged = {}
+				for i = 1, #self.raggedJsonStore do
+					local internalSuccess
+					local success = pcall(function () internalSuccess = self:CommandReceived(self.raggedJsonStore[i] .. commands[1]) end)
+					if (success and internalSuccess) then
+						allFail = false
+					else
+						newRagged[#newRagged + 1] = self.raggedJsonStore[i]
+					end
+				end
+				self.raggedJsonStore = newRagged
+				if allFail then
+					local internalSuccess
+					local success = pcall(function () internalSuccess = self:CommandReceived(commands[1]) end)
+					if not (success and internalSuccess) then
+						Spring.Echo("Processing failed for", commands[1])
+					end
+				end
+				for i = 2, #commands-1 do
+					local command = commands[i]
+					if command ~= nil then
+						self:CommandReceived(command)
+					end
+				end
+				if #commands > 1 then
+					local internalSuccess
+					local success = pcall(function () internalSuccess = self:CommandReceived(commands[#commands]) end)
+					if not (success and internalSuccess) then
+						self.raggedJsonStore[#self.raggedJsonStore + 1] = commands[#commands]
+					end
 				end
 			end
-			self.buffer = commands[#commands]
 		elseif status == "closed" then
 			Spring.Log(LOG_SECTION, LOG.INFO, "Disconnected from server.")
 			input:close()

@@ -73,7 +73,7 @@ function LoginWindow:init(failFunction, cancelText, windowClassname, params)
 		y = 14,
 		height = 35,
 		caption = i18n("login_long"),
-		font = Configuration:GetFont(3),
+		objectOverrideFont = Configuration:GetFont(3),
 	}
 
 	self.lblRegisterInstructions = Label:New {
@@ -82,7 +82,7 @@ function LoginWindow:init(failFunction, cancelText, windowClassname, params)
 		y = 14,
 		height = 35,
 		caption = i18n("register_long"),
-		font = Configuration:GetFont(3),
+		objectOverrideFont = Configuration:GetFont(3),
 	}
 	registerChildren[#registerChildren + 1] = self.lblRegisterInstructions
 
@@ -92,7 +92,7 @@ function LoginWindow:init(failFunction, cancelText, windowClassname, params)
 		y = 60,
 		height = 35,
 		text = i18n("username") .. ":",
-		fontsize = Configuration:GetFont(3).size,
+		objectOverrideFont = Configuration:GetFont(3),
 	}
 	self.ebUsername = EditBox:New {
 		x = 135,
@@ -100,7 +100,8 @@ function LoginWindow:init(failFunction, cancelText, windowClassname, params)
 		y = 51,
 		height = 35,
 		text = Configuration.userName or Configuration.suggestedNameFromSteam or "",
-		font = Configuration:GetFont(3),
+		objectOverrideFont = Configuration:GetFont(3),
+			objectOverrideHintFont = Configuration:GetHintFont(3),
 		useIME = false,
 	}
 
@@ -110,7 +111,8 @@ function LoginWindow:init(failFunction, cancelText, windowClassname, params)
 		y = 100,
 		height = 35,
 		text = i18n("password") .. ":",
-		fontsize = Configuration:GetFont(3).size,
+		objectOverrideFont = Configuration:GetFont(3),
+		objectOverrideHintFont = Configuration:GetHintFont(3),
 	}
 	self.ebPassword = EditBox:New {
 		x = 135,
@@ -120,7 +122,8 @@ function LoginWindow:init(failFunction, cancelText, windowClassname, params)
 		text = Configuration.password or "",
 		passwordInput = true,
 		hint = "Enter password",
-		font = Configuration:GetFont(3),
+		objectOverrideFont = Configuration:GetFont(3),
+			objectOverrideHintFont = Configuration:GetHintFont(3),
 		useIME = false,
 		OnKeyPress = {
 			function(obj, key, mods, ...)
@@ -141,7 +144,7 @@ function LoginWindow:init(failFunction, cancelText, windowClassname, params)
 		y = 140,
 		height = 70,
 		text = i18n("confirm") .. ":",
-		fontsize = Configuration:GetFont(3).size,
+		objectOverrideFont = Configuration:GetFont(3),
 		useIME = false,
 	}
 	registerChildren[#registerChildren + 1] = self.txtConfirmPassword
@@ -154,7 +157,8 @@ function LoginWindow:init(failFunction, cancelText, windowClassname, params)
 		text = "",
 		hint = "Confirm password",
 		passwordInput = true,
-		font = Configuration:GetFont(3),
+		objectOverrideFont = Configuration:GetFont(3),
+			objectOverrideHintFont = Configuration:GetHintFont(3),
 		OnKeyPress = {
 			function(obj, key, mods, ...)
 				if key == Spring.GetKeyCode("enter") or key == Spring.GetKeyCode("numpad_enter") then
@@ -174,7 +178,7 @@ function LoginWindow:init(failFunction, cancelText, windowClassname, params)
 			y = 180,
 			height = 35,
 			text = i18n("Email") .. ":",
-			fontsize = Configuration:GetFont(3).size,
+			objectOverrideFont = Configuration:GetFont(3),
 			useIME = false,
 		}
 		registerChildren[#registerChildren + 1] = self.txtEmail
@@ -185,7 +189,8 @@ function LoginWindow:init(failFunction, cancelText, windowClassname, params)
 			y = 171,
 			height = 35,
 			text = "",
-			font = Configuration:GetFont(3),
+			objectOverrideFont = Configuration:GetFont(3),
+			objectOverrideHintFont = Configuration:GetHintFont(3),
 			useIME = false,
 			OnKeyPress = {
 				function(obj, key, mods, ...)
@@ -209,7 +214,7 @@ function LoginWindow:init(failFunction, cancelText, windowClassname, params)
 		boxsize = 15,
 		caption = i18n("autoLogin"),
 		checked = Configuration.autoLogin,
-		font = Configuration:GetFont(2),
+		objectOverrideFont = Configuration:GetFont(2),
 		OnClick = {function (obj)
 			Configuration:SetConfigValue("autoLogin", obj.checked)
 		end},
@@ -221,7 +226,7 @@ function LoginWindow:init(failFunction, cancelText, windowClassname, params)
 		y = self.windowHeight - 216,
 		height = 90,
 		text = "",
-		fontsize = Configuration:GetFont(3).size,
+		objectOverrideFont = Configuration:GetFont(3),
 	}
 
 	self.btnLogin = Button:New {
@@ -230,7 +235,7 @@ function LoginWindow:init(failFunction, cancelText, windowClassname, params)
 		y = self.windowHeight - 143,
 		height = 70,
 		caption = i18n("login_verb"),
-		font = Configuration:GetFont(3),
+		objectOverrideFont = Configuration:GetButtonFont(3),
 		classname = "action_button",
 		OnClick = {
 			function()
@@ -245,7 +250,7 @@ function LoginWindow:init(failFunction, cancelText, windowClassname, params)
 		y = self.windowHeight - 143,
 		height = 70,
 		caption = i18n("register_verb"),
-		font = Configuration:GetFont(3),
+		objectOverrideFont = Configuration:GetButtonFont(3),
 		classname = "option_button",
 		OnClick = {
 			function()
@@ -261,7 +266,7 @@ function LoginWindow:init(failFunction, cancelText, windowClassname, params)
 		y = self.windowHeight - 143,
 		height = 70,
 		caption = i18n(cancelText or "cancel"),
-		font = Configuration:GetFont(3),
+		objectOverrideFont = Configuration:GetButtonFont(3),
 		classname = "negative_button",
 		OnClick = {
 			function()
@@ -281,8 +286,8 @@ function LoginWindow:init(failFunction, cancelText, windowClassname, params)
 		bottom = 0,
 		padding = {0, 0, 0, 0},
 		tabs = {
-			[1] = { name = "login", caption = i18n("login"), children = {self.btnLogin, self.lblLoginInstructions}, font = Configuration:GetFont(2)},
-			[2] = { name = "register", caption = i18n("register_verb"), children = registerChildren, font = Configuration:GetFont(2)},
+			[1] = { name = "login", caption = i18n("login"), children = {self.btnLogin, self.lblLoginInstructions}, objectOverrideFont = Configuration:GetFont(2)},
+			[2] = { name = "register", caption = i18n("register_verb"), children = registerChildren, objectOverrideFont = Configuration:GetFont(2)},
 		},
 	}
 
@@ -411,12 +416,22 @@ function LoginWindow:tryLogin()
 		end
 		lobby:AddListener("OnDisconnected", self.onDisconnected)
 
+		Spring.Echo("Attempting Login", Configuration:GetServerAddress(), Configuration:GetServerPort(), username)
 		lobby:Connect(Configuration:GetServerAddress(), Configuration:GetServerPort(), username, password, 3, nil, GetLobbyName())
 	else
 		lobby:Login(username, password, 3, nil, GetLobbyName())
 	end
 
 	self.loginAttempts = self.loginAttempts + 1
+end
+
+function LoginWindow:ResizeWindow()
+	local linePos = self.txtError:GetPhysicalLinePosition(1, true)
+	
+	self.cbAutoLogin:SetPos(nil, self.windowHeight + linePos - 180)
+	self.btnLogin:SetPos(nil,    self.windowHeight + linePos - 143) -- Disappears for some reason to do with tab panel.
+	self.btnRegister:SetPos(nil, self.windowHeight + linePos - 143) -- Disappears for some reason to do with tab panel.
+	self.btnCancel:SetPos(nil,   self.windowHeight + linePos - 143)
 end
 
 function LoginWindow:tryRegister()
@@ -492,7 +507,7 @@ function LoginWindow:createAgreementWindow()
 		y = 1,
 		height = "100%",
 		text = self.agreementText,
-		font = Configuration:GetFont(2),
+		objectOverrideFont = Configuration:GetFont(2),
 	}
 
 	ScrollPanel:New {
@@ -513,7 +528,7 @@ function LoginWindow:createAgreementWindow()
 			y = 405,
 			height = 35,
 			text = i18n("Email Verification Code") .. ":",
-			fontsize = Configuration:GetFont(2).size,
+			objectOverrideFont = Configuration:GetFont(2),
 			useIME = false,
 			parent = self.agreementWindow,
 		}
@@ -523,7 +538,8 @@ function LoginWindow:createAgreementWindow()
 			y = 395,
 			height = 35,
 			text = "",
-			font = Configuration:GetFont(2),
+			objectOverrideFont = Configuration:GetFont(2),
+			objectOverrideHintFont = Configuration:GetHintFont(2),
 			useIME = false,
 			parent = self.agreementWindow,
 		}
@@ -535,7 +551,7 @@ function LoginWindow:createAgreementWindow()
 		y = 430,
 		height = 70,
 		caption = "Accept",
-		font = Configuration:GetFont(3),
+		objectOverrideFont = Configuration:GetFont(3),
 		OnClick = {
 			function()
 				local verificationCode = ""
@@ -553,7 +569,7 @@ function LoginWindow:createAgreementWindow()
 		y = 430,
 		height = 70,
 		caption = "Decline",
-		font = Configuration:GetFont(3),
+		objectOverrideFont = Configuration:GetFont(3),
 		OnClick = {
 			function()
 				self:declineAgreement()

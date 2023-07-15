@@ -31,10 +31,12 @@ local USE_WRAPPER_DOWNLOAD = true
 local typeMap = {
 	game = "RAPID",
 	map = "MAP",
+	demo = "DEMO",
 }
 local reverseTypeMap = {
 	RAPID = "game",
 	MAP = "map",
+	DEMO = "demo",
 }
 
 --------------------------------------------------------------------------------
@@ -161,8 +163,8 @@ local function RetryDownload(name, fileType)
 		return false
 	end
 	local download = downloadQueue[index]
-	download.attempts = (download.attempts or 0) + 1 
-	if download.attempts >= (WG.Chobby.Configuration.downloadRetryCount or 0) then
+	download.attempts = (download.attempts or 0) + 1
+	if download.attempts >= (WG.Chobby.Configuration.downloadRetryCount or 0) and not WG.BattleRoomWindow.IsCurrentMap(name) then
 		return false
 	end
 
@@ -198,6 +200,20 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Externals Functions
+
+function externalFunctions.HasReplay(name)
+	local replays = VFS.DirList("demos") -- Please improve on this method.
+	if not (string.find(name, "demos/") or string.find(name, "demos\\")) then
+		name = "demos/" .. name
+	end
+	local windowsName = name:gsub('/', '\\')
+	for i = 1, #replays do
+		if replays[i] == name or replays[i] == windowsName then
+			return true
+		end
+	end
+	return false
+end
 
 function externalFunctions.QueueDownload(name, fileType, priority)
 	priority = priority or 1

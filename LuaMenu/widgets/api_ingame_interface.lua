@@ -16,6 +16,13 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+
+VFS.Include("libs/liblobby/lobby/json.lua")
+
+local SEND_USER_CHANGE_MESSAGE = false
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Externals Functions
 
 local externalFunctions = {}
@@ -27,6 +34,12 @@ function externalFunctions.SetLobbyOverlayActive(newActive)
 		Spring.Echo("Spring.SendLuaUIMsg does not exist in LuaMenu")
 	end
 end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Patterns to send
+
+local LOBBY_CHAT_UPDATE = "LobbyChatUpdate_"
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -43,17 +56,29 @@ local RESTART_GAME = "restartGame"
 local GAME_INIT = "ingameInfoInit"
 local GAME_START = "ingameInfoStart"
 local REPORT_USER = "reportUser"
+local AUTOSAVE_COMPLETE = "autosaveComplete"
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Utilities
+
+local function ConvertString(str)
+	if str == "true" then
+		return true
+	elseif str == "false" then
+		return false
+	elseif tonumber(str) then
+		return tonumber(str)
+	end
+	return str
+end
 
 local function StringToDataTable(msg)
 	local data = msg:split("_")
 	local dataTable = {}
 	local index = 3
 	while data[index] do
-		dataTable[data[index - 1]] = data[index]
+		dataTable[data[index - 1]] = ConvertString(data[index])
 		index = index + 2
 	end
 	return dataTable
@@ -161,7 +186,7 @@ end
 --------------------------------------------------------------------------------
 -- Ingame Info
 
-local function MsgToDiscordData(msg)
+local function MsgToIngameData(msg)
 	local data = msg:split("_")
 	if tonumber(data[2]) then
 		return {
@@ -187,7 +212,7 @@ local function HandleGameInfoInit(msg)
 		return
 	end
 	if WG.DiscordHandler then
-		WG.DiscordHandler.SetIngameInfo(MsgToDiscordData(msg))
+		WG.DiscordHandler.SetIngameInfo(MsgToIngameData(msg))
 	end
 end
 
@@ -195,8 +220,12 @@ local function HandleGameInfoStart(msg)
 	if string.find(msg, GAME_START) ~= 1 then
 		return
 	end
+	local ingameData = MsgToIngameData(msg)
 	if WG.DiscordHandler then
-		WG.DiscordHandler.SetIngameInfo(MsgToDiscordData(msg))
+		WG.DiscordHandler.SetIngameInfo(ingameData)
+	end
+	if WG.QueueStatusPanel then
+		WG.QueueStatusPanel.SetWantAutosaveFromGameData(ingameData)
 	end
 end
 
@@ -208,13 +237,170 @@ local function HandleReport(msg)
 	if string.find(msg, REPORT_USER) ~= 1 then
 		return
 	end
-	local data = msg:split("_")
+	local data = msg:split(";")
 	if not (data and data[3]) then
 		return
 	end
 	
 	WG.ReportPanel.OpenReportWindow(data[2], data[3], true)
 	return true
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Autosave
+
+local function HandleAutosaveComplete(msg)
+	if string.find(msg, AUTOSAVE_COMPLETE) ~= 1 then
+		return
+	end
+	local data = msg:split("_")
+	if not (data and data[2]) then
+		return
+	end
+
+	if WG.QueueStatusPanel then
+		local saveName = data[2]
+		local delayAutosave = function ()
+			WG.QueueStatusPanel.OnAutosaveComplete(saveName)
+		end
+		WG.Delay(delayAutosave, 1)
+	end
+
+	return true
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Battle room chat
+
+local function ShouldSendLobbyUpdatesIngame()
+	local Conf = WG.Chobby.Configuration
+	if Conf.enableDebugBuffer then
+		if Conf.debugLobbyGameChat then
+			Spring.Echo("ShouldSendLobbyUpdatesIngame", "debug buffer")
+		end
+		return true
+	end
+	if Spring.GetGameName() == "" then
+		if Conf.debugLobbyGameChat then
+			Spring.Echo("ShouldSendLobbyUpdatesIngame", "GameName")
+		end
+		return false
+	end
+	local lobby = WG.LibLobby.lobby
+	local myBattleID = lobby and lobby:GetMyBattleID()
+	if not myBattleID then
+		if Conf.debugLobbyGameChat then
+			Spring.Echo("ShouldSendLobbyUpdatesIngame", "myBattleID")
+		end
+		return false
+	end
+	if Conf:IsLobbyVisible() then
+		if Conf.debugLobbyGameChat then
+			Spring.Echo("ShouldSendLobbyUpdatesIngame", "lobbyVisible")
+		end
+		return false
+	end
+	local battleIngame = lobby:GetBattle(myBattleID) and lobby:GetBattle(myBattleID).isRunning
+	if Conf.debugLobbyGameChat then
+		Spring.Echo("ShouldSendLobbyUpdatesIngame", "battleIngame", battleIngame)
+	end
+	return not battleIngame
+end
+
+local oldPlayerCount = false
+local oldUsers = false
+
+local function IsNewUserList(newUsers)
+	if not oldUsers then
+		oldUsers = Spring.Utilities.ShallowCopy(newUsers)
+		return true
+	end
+	for i = 1, math.max(#newUsers, #oldUsers) do
+		if newUsers[i] ~= oldUsers[i] then
+			oldUsers = Spring.Utilities.ShallowCopy(newUsers)
+			return true
+		end
+	end
+	return false
+end
+
+local function PlayersUpdate(listeners, updatedBattleID)
+	if not ShouldSendLobbyUpdatesIngame() then
+		return
+	end
+	local lobby = WG.LibLobby.lobby
+	if updatedBattleID ~= lobby:GetMyBattleID() then
+		return
+	end
+	local battle = lobby:GetBattle(lobby:GetMyBattleID()) or {}
+	local newPlayerCount = (lobby:GetBattlePlayerCount(updatedBattleID) or "??")
+	local haveNewUsers = SEND_USER_CHANGE_MESSAGE and IsNewUserList(battle.users)
+	if newPlayerCount == oldPlayerCount and not haveNewUsers then
+		return
+	end
+	oldPlayerCount = newPlayerCount
+	--Spring.Echo(LOBBY_CHAT_UPDATE .. " Players waiting " .. (lobby:GetBattlePlayerCount(updatedBattleID) or "??") .. "/" .. (battle.maxPlayers or "??"))
+	if Spring.SendLuaUIMsg then
+		if battle.users and #battle.users > 0 then
+			Spring.SendLuaUIMsg(LOBBY_CHAT_UPDATE .. "Players waiting: " .. newPlayerCount .. "/" .. (battle.maxPlayers or "??"))
+			if haveNewUsers then
+				local userString = ""
+				for i = 1, (#battle.users) - 1 do
+					userString = userString .. (battle.users[i] or "??") .. ", "
+				end
+				userString = userString .. (battle.users[#battle.users] or "??")
+				Spring.SendLuaUIMsg(LOBBY_CHAT_UPDATE .. userString)
+			end
+		end
+	else
+		Spring.Echo("Spring.SendLuaUIMsg does not exist in LuaMenu")
+	end
+end
+
+local function HandleLobbySay(command, argumentsPos)
+	if not argumentsPos then
+		return
+	end
+	if (string.find(command, [["Place":1]]) or 0) < 1 then
+		return
+	end
+	arguments = command:sub(argumentsPos + 1)
+	local Conf = WG.Chobby.Configuration
+	local success, cmdData = pcall(json.decode, arguments)
+	if not success then
+		Spring.Log(LOG_SECTION, LOG.ERROR, "Failed to parse JSON: " .. tostring(arguments))
+		if Conf.debugLobbyGameChat then
+			Spring.Echo("HandleLobbySay", "json fail")
+		end
+		return false
+	end
+	if cmdData.Place ~= 1 then
+		if Conf.debugLobbyGameChat then
+			Spring.Echo("HandleLobbySay", "Place ~= 1")
+		end
+		return false -- Not battle text
+	end
+	--Spring.Echo(LOBBY_CHAT_UPDATE .. "<" .. (cmdData.User or "unknown") .. "> " .. (cmdData.Text or ""))
+	if Spring.SendLuaUIMsg then
+		Spring.SendLuaUIMsg(LOBBY_CHAT_UPDATE .. (cmdData.User or "unknown") .. ": " .. (cmdData.Text or ""))
+	else
+		Spring.Echo("Spring.SendLuaUIMsg does not exist in LuaMenu")
+	end
+end
+
+local function OnCommandBuffered(_, cmdName, command, argumentsPos)
+	if not ShouldSendLobbyUpdatesIngame() then
+		return
+	end
+	local Conf = WG.Chobby.Configuration
+	if Conf.debugLobbyGameChat then
+		Spring.Echo("OnCommandBuffered")
+	end
+	if cmdName == "Say" then
+		HandleLobbySay(command, argumentsPos)
+	end
 end
 
 --------------------------------------------------------------------------------
@@ -249,7 +435,11 @@ function widget:RecvLuaMsg(msg)
 	if HandleReport(msg) then
 		return
 	end
+	if HandleAutosaveComplete(msg) then
+		return
+	end
 end
+
 
 function widget:ActivateMenu()
 	local Chobby = WG.Chobby
@@ -261,9 +451,18 @@ function widget:ActivateMenu()
 	end
 end
 
+
 function widget:ActivateGame()
 end
 
+
 function widget:Initialize()
 	WG.IngameInterface = externalFunctions
+	
+	local lobby = WG.LibLobby.lobby
+	lobby:AddListener("OnBattleAboutToStart", OnBattleStartMultiplayer)
+	lobby:AddListener("OnCommandBuffered", OnCommandBuffered)
+	lobby:AddListener("OnLeftBattle", PlayersUpdate)
+	lobby:AddListener("OnJoinedBattle", PlayersUpdate)
+	lobby:AddListener("OnUpdateBattleInfo", PlayersUpdate)
 end

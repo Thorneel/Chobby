@@ -58,7 +58,7 @@
 
 		// Limits number of units
 //		"limit": 10,
-		"limit": 2
+		"limit": 3
 
 		// Minimum hp percent before retreat
 //		"retreat": 0.8,
@@ -70,7 +70,7 @@
 	},
 	"cloakraid": {
 		"role": ["raider"],
-		"limit": 0,
+		"limit": 3,
 		"pwr_mod": 1.4,
 		"thr_mod": 1.3
 	},
@@ -88,14 +88,14 @@
 	"cloakriot": {
 		"role": ["raider"],
 		"attribute": ["support"],
-		"limit": 0,
+		"limit": 1,
 		"pwr_mod": 1.8,
 		"thr_mod": 2.0
 	},
 	"cloakassault": {
 		"role": ["raider"],
 		"attribute": ["support"],
-		"limit": 0,
+		"limit": 1,
 		"pwr_mod": 1.1,
 		"thr_mod": 1.29
 	},
@@ -129,12 +129,12 @@
 	// factorygunship
 	"gunshipcon": {
 		"role": ["builder", "air"],
-		"limit": 0,
+		"limit": 2,
 		"retreat": 0.99
 	},
 	"gunshipbomb": {
 		"role": ["mine"],
-		"limit": 0,
+		"limit": 10,
 		"thr_mod": 0.1,
 		"retreat": 0.01
 	},
@@ -142,7 +142,7 @@
 		"role": ["anti_heavy", "air"],
 		"thr_mod": 0.1,
 		"pwr_mod": 0.1,
-		"limit": 0,
+		"limit": 5,
 		"retreat": 0.9
 	},
 	"gunshipskirm": {
@@ -153,7 +153,7 @@
 	},
 	"gunshipraid": {
 		"role": ["scout", "air"],
-		"limit": 0,
+		"limit": 3,
 		"retreat": 0.9,
 		"pwr_mod": 3,
 		"thr_mod": 1
@@ -168,7 +168,7 @@
 	"gunshipassault": {
 		"role": ["anti_heavy", "air"],
 		"fire_state": "return",
-		"limit": 0,
+		"limit": 3,
 		"retreat": 0.7,
 		"pwr_mod": 1.65,
 		"thr_mod": 1.00
@@ -188,7 +188,7 @@
 	},
 	"gunshipaa": {
 		"role": ["anti_air", "air"],
-		"limit": 0,
+		"limit": 6,
 		"retreat": 0.95,
 		"pwr_mod": 2.0,
 		"thr_mod": 1.2
@@ -197,31 +197,31 @@
 	// factoryamph
 	"amphcon": {
 		"role": ["builder"],
-		"limit": 0
+		"limit": 2
 	},
 	"amphraid": {
 		"role": ["raider"],
-		"limit": 0,
+		"limit": 2,
 		"pwr_mod": 1.6,
 		"thr_mod": 1.5
 	},
 	"amphimpulse": {
 		"role": ["raider"],
 		"attribute": ["support"],
-		"limit": 0,
+		"limit": 1,
 		"pwr_mod": 2.0,
 		"thr_mod": 2.0
 	},
 	"amphfloater": {
 		"role": ["raider"],
-		"limit": 0,
+		"limit": 1,
 		"pwr_mod": 1.6,
 		"thr_mod": 1.6
 	},
 	"amphriot": {
 		"role": ["raider"],
 		"attribute": ["melee", "support"],
-		"limit": 0
+		"limit": 1
 	},
 	"amphassault": {
 		"role": ["heavy"],
@@ -236,7 +236,7 @@
 	"amphaa": {
 		"role": ["anti_air"],
 		"attribute": ["melee"],
-		"limit": 0,
+		"limit": 1,
 		"pwr_mod": 2.5,
 		"thr_mod": 1.5
 	},
@@ -248,28 +248,28 @@
 	},
 	"spiderscout": {
 		"role": ["raider"],
-		"limit": 1
+		"limit": 3
 	},
 	"spiderassault": {
 		"role": ["raider"],
-		"limit": 0,
+		"limit": 1,
 		"pwr_mod": 1.15
 	},
 	"spideremp": {
 		"role": ["raider"],
-		"limit": 0,
+		"limit": 1,
 		"attribute": ["support"],
 		"pwr_mod": 1.25
 	},
 	"spiderriot": {
 		"role": ["raider"],
-		"limit": 0,
+		"limit": 1,
 		"pwr_mod": 2.0,
 		"attribute": ["support"]
 	},
 	"spiderskirm": {
 		"role": ["raider"],
-		"limit": 0,
+		"limit": 1,
 		"pwr_mod": 2.0
 	},
 	"spidercrabe": {
@@ -295,34 +295,34 @@
 	// factoryshield
 	"shieldcon": {
 		"role": ["builder", "static"],
-		"limit": 2
+		"limit": 3
 	},
 	"shieldscout": {
 		"role": ["raider"],
 		"attribute": ["support", "melee"],
-		"limit": 1
+		"limit": 2
 	},
 	"shieldraid": {
 		"role": ["raider"],
-		"limit": 0,
+		"limit": 3,
 		"pwr_mod": 1.7,
 		"thr_mod": 1.68
 	},
 	"shieldskirm": {
 		"role": ["raider"],
-		"limit": 0
+		"limit": 1
 	},
 	"shieldassault": {
 		"role": ["raider"],
 		"attribute": ["support"],
-		"limit": 0,
+		"limit": 1,
 		"pwr_mod": 1.2,
 		"thr_mod": 1.2
 	},
 	"shieldriot": {
 		"role": ["raider"],
 		"attribute": ["support"],
-		"limit": 0,
+		"limit": 1,
 		"pwr_mod": 1.7,
 		"thr_mod": 1.7
 	},
@@ -358,36 +358,36 @@
 	// factoryveh
 	"vehcon": {
 		"role": ["builder"],
-		"limit": 2
+		"limit": 3
 	},
 	"vehscout": {
 		"role": ["raider"],
-		"limit": 1
+		"limit": 3
 	},
 	"vehraid": {
 		"role": ["raider"],
 		"attribute": ["melee"],
-		"limit": 0,
+		"limit": 2,
 		"pwr_mod": 1.4,
 		"thr_mod": 1.35
 	},
 	"vehsupport": {
 		"role": ["raider"],
-		"limit": 0,
+		"limit": 1,
 		"attribute": ["support"],
 		"pwr_mod": 1.0,
 		"thr_mod": 0.35
 	},
 	"vehriot": {
 		"role": ["raider"],
-		"limit": 0,
+		"limit": 1,
 		"attribute": ["support"],
 		"pwr_mod": 1.0,
 		"thr_mod": 1.0
 	},
 	"vehassault": {
 		"role": ["raider"],
-		"limit": 0,
+		"limit": 1,
 		"pwr_mod": 1.0,
 		"thr_mod": 1.0
 	},
@@ -418,19 +418,20 @@
 	// factoryjump
 	"jumpcon": {
 		"role": ["builder"],
-		"limit": 2
+		"limit": 3
 	},
 	"jumpscout": {
 		"role": ["riot"],
 		"attribute": ["scout"],
-		"limit": 1,
+		"limit": 0,
 		"attribute": ["scout", "support"]
 	},
 	"jumpraid": {
 		"role": ["raider"],
 		"attribute": ["scout"],  // jump on attack
-		"limit": 0,
+		"limit": 3,
 		"pwr_mod": 1.6,
+		"limit": 2,
 		"thr_mod": 1.5
 	},
 	"jumpblackhole": {
@@ -439,7 +440,7 @@
 	},
 	"jumpskirm": {
 		"role": ["raider"],
-		"limit": 0,
+		"limit": 1,
 		"attribute": ["support"]
 	},
 	"jumpassault": {
@@ -479,24 +480,24 @@
 	// factoryhover
 	"hovercon": {
 		"role": ["builder"],
-		"limit": 0
+		"limit": 3
 	},
 	"hoverraid": {
 		"role": ["raider"],
 		"pwr_mod": 0.9,
 		"pwr_mod": 0.8,
-		"limit": 0
+		"limit": 3
 	},
 	"hoverskirm": {
 		"role": ["raider"],
-		"limit": 0,
+		"limit": 1,
 		"pwr_mod": 2.4,
 		"thr_mod": 1.4
 	},
 	"hoverassault": {
 		"role": ["raider"],
 		"attribute": ["melee", "ret_hold"],
-		"limit": 0,
+		"limit": 1,
 		"pwr_mod": 1.5,
 		"thr_mod": 1.5
 	},
@@ -508,7 +509,7 @@
 	"hoverriot": {
 		"role": ["raider"],
 		"attribute": ["support"],
-		"limit": 0,
+		"limit": 1,
 		"pwr_mod": 1.25,
 		"thr_mod": 1.25
 	},
@@ -521,7 +522,7 @@
 	},
 	"hoveraa": {
 		"role": ["anti_air"],
-		"limit": 0,
+		"limit": 1,
 		"pwr_mod": 2.0,
 		"thr_mod": 1.2
 	},
@@ -529,7 +530,7 @@
 	// factoryplane
 	"planecon": {
 		"role": ["builder", "air"],
-		"limit": 0,
+		"limit": 2,
 		"retreat": 0.99
 	},
 	"planefighter": {
@@ -542,7 +543,7 @@
 	"planeheavyfighter": {
 		"role": ["anti_air", "air"],
 		"attribute": ["siege"],
-		"limit": 0,
+		"limit": 7,
 		"retreat": 0.6,
 		"pwr_mod": 3.0,
 		"thr_mod": 2.0
@@ -550,7 +551,7 @@
 	"bomberprec": {
 		"role": ["bomber", "air"],
 		"attribute": ["siege"],
-		"limit": 0,
+		"limit": 3,
 		"retreat": 0.9,
 		"pwr_mod": 0.1,
 		"thr_mod": 0.1
@@ -562,46 +563,46 @@
 	},
 	"bomberdisarm": {
 		"role": ["support", "air"],
-		"limit": 0,
+		"limit": 2,
 		"retreat": 0.99,
 		"pwr_mod": 0.01,
 		"thr_mod": 0.01
 	},
 	"bomberheavy": {
 		"role": ["bomber", "air"],
-		"limit": 0,
+		"limit": 4,
 		"retreat": 0.99,
 		"pwr_mod": 0.5,
 		"thr_mod": 0.1
 	},
 	"planescout": {
 		"role": ["scout", "air"],
-		"limit": 0,
+		"limit": 1,
 		"retreat": 0.8
 	},
 
 	// factorytank
 	"tankcon": {
 		"role": ["builder"],
-		"limit": 0,
+		"limit": 3,
 		"pwr_mod": 0.40
 	},
 	"tankraid": {
 		"role": ["raider"],
-		"limit": 0,
+		"limit": 1,
 		"thr_mod": 1.0,
 		"pwr_mod": 2.50
 	},
 	"tankheavyraid": {
 		"role": ["raider"],
-		"limit": 0,
+		"limit": 1,
 		"thr_mod": 1.0,
 		"pwr_mod": 0.85
 	},
 	"tankriot": {
 		"role": ["raider"],
 		"attribute": ["support"],
-		"limit": 0
+		"limit": 1
 	},
 	"tankassault": {
 		"role": ["raider"],
@@ -633,7 +634,7 @@
 	"tankaa": {
 		"role": ["anti_air"],
 		"attribute": ["melee", "support"],
-		"limit": 0,
+		"limit": 1,
 		"pwr_mod": 2.0,
 		"thr_mod": 1.2
 	},
@@ -675,7 +676,7 @@
 	},
 	"striderscorpion": {
 		"role": ["anti_heavy", "heavy"],
-		"limit": 0,
+		"limit": 1,
 		"fire_state": "return",
 		"retreat": 0.6,
 		"pwr_mod": 0.8,
@@ -684,7 +685,7 @@
 	"striderdante": {
 		"role": ["heavy"],
 		"attribute": ["melee"],
-		"limit": 0,
+		"limit": 2,
 		"retreat": 0.65,
 		"pwr_mod": 0.8,
 		"thr_mod": 0.75
@@ -860,8 +861,7 @@
 
 	// Enemy Eco!! //
 	"staticmex": {
-		"role": ["mine"],
-		"limit": 5
+		"role": ["mine"]
 	},
 	"energywind": {
 		"role": ["mine"]

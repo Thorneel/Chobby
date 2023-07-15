@@ -70,14 +70,14 @@ local function GetPlanet(planetUtilities, planetID)
 				startUnits = {
 					{
 						name = "staticradar",
-						x = 3730,
-						z = 3625,
+						x = 3010,
+						z = 2540,
 						facing = 3,
 					},
 					{
 						name = "staticradar",
-						x = 3010,
-						z = 2540,
+						x = 2400,
+						z = 3580,
 						facing = 3,
 					},
 					{
@@ -309,6 +309,30 @@ local function GetPlanet(planetUtilities, planetID)
 							z = 130,
 							facing = 2,
 						},
+						{
+							name = "energywind",
+							x = 1140,
+							z = 2440,
+							facing = 2,
+						},
+						{
+							name = "energywind",
+							x = 1120,
+							z = 2528,
+							facing = 2,
+						},
+						{
+							name = "energywind",
+							x = 1095,
+							z = 2600,
+							facing = 2,
+						},
+						{
+							name = "energywind",
+							x = 925,
+							z = 2650,
+							facing = 2,
+						},
 					}
 				},
 			},
@@ -382,8 +406,8 @@ local function GetPlanet(planetUtilities, planetID)
 					description = "Build 10 Ronins",
 					experience = planetUtilities.BONUS_EXP,
 				},
-				[4] = { -- Kill enemy Stardusts in 8 minutes.
-					satisfyByTime = 480,
+				[4] = { -- Kill enemy Stardusts
+                    satisfyOnce = true,
 					comparisionType = planetUtilities.COMPARE.AT_MOST,
 					targetNumber = 0,
 					enemyUnitTypes = {
@@ -391,7 +415,7 @@ local function GetPlanet(planetUtilities, planetID)
 					},
 					image = planetUtilities.ICON_DIR .. "turretriot.png",
 					imageOverlay = planetUtilities.ICON_OVERLAY.ATTACK,
-					description = "Find and destroy all 4 enemy Stardust turrets before 8:00",
+					description = "Find and destroy all 4 enemy Stardust turrets",
 					experience = planetUtilities.BONUS_EXP,
 				},
 			},

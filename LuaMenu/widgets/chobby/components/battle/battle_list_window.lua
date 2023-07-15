@@ -12,11 +12,11 @@ function BattleListWindow:init(parent)
 	if not Configuration.gameConfig.disableBattleListHostButton then
 		self.btnNewBattle = Button:New {
 			x = 260,
-			y = 7,
+			y = WG.TOP_BUTTON_Y,
 			width = 150,
-			height = 45,
+			height = WG.BUTTON_HEIGHT,
 			caption = i18n("open_mp_game"),
-			font = Configuration:GetFont(3),
+			objectOverrideFont = Configuration:GetButtonFont(3),
 			classname = "option_button",
 			parent = self.window,
 			OnClick = {
@@ -52,7 +52,7 @@ function BattleListWindow:init(parent)
 		align = "center",
 		valign = "center",
 		parent = self.infoPanel,
-		font = Configuration:GetFont(3),
+		objectOverrideFont = Configuration:GetFont(3),
 	}
 	self.infoPanel:SetVisibility(false)
 
@@ -61,7 +61,7 @@ function BattleListWindow:init(parent)
 		right = 5,
 		bottom = 11,
 		height = 20,
-		font = Configuration:GetFont(2),
+		objectOverrideFont = Configuration:GetFont(2),
 		caption = "Filter out:",
 		parent = self.window
 	}
@@ -74,11 +74,11 @@ function BattleListWindow:init(parent)
 		boxalign = "left",
 		boxsize = 20,
 		caption = " Passworded",
-		checked = Configuration.battleFilterPassworded2 or false,
-		font = Configuration:GetFont(2),
+		checked = Configuration.battleFilterPassworded3 or false,
+		objectOverrideFont = Configuration:GetFont(2),
 		OnChange = {
 			function (obj, newState)
-				Configuration:SetConfigValue("battleFilterPassworded2", newState)
+				Configuration:SetConfigValue("battleFilterPassworded3", newState)
 				SoftUpdate()
 			end
 		},
@@ -93,7 +93,7 @@ function BattleListWindow:init(parent)
 		boxsize = 20,
 		caption = " Non-friend",
 		checked = Configuration.battleFilterNonFriend or false,
-		font = Configuration:GetFont(2),
+		objectOverrideFont = Configuration:GetFont(2),
 		OnChange = {
 			function (obj, newState)
 				Configuration:SetConfigValue("battleFilterNonFriend", newState)
@@ -111,7 +111,7 @@ function BattleListWindow:init(parent)
 		boxsize = 20,
 		caption = " Running",
 		checked = Configuration.battleFilterRunning or false,
-		font = Configuration:GetFont(2),
+		objectOverrideFont = Configuration:GetFont(2),
 		OnChange = {
 			function (obj, newState)
 				Configuration:SetConfigValue("battleFilterRunning", newState)
@@ -122,7 +122,7 @@ function BattleListWindow:init(parent)
 	}
 
 	local function UpdateCheckboxes()
-		checkPassworded:SetToggle(Configuration.battleFilterPassworded2)
+		checkPassworded:SetToggle(Configuration.battleFilterPassworded3)
 		checkNonFriend:SetToggle(Configuration.battleFilterNonFriend)
 		checkRunning:SetToggle(Configuration.battleFilterRunning)
 	end
@@ -195,7 +195,7 @@ function BattleListWindow:init(parent)
 	lobby:AddListener("OnBattleIngameUpdate", self.onBattleIngameUpdate)
 
 	local function onConfigurationChange(listener, key, value)
-		if key == "displayBadEngines2" then
+		if key == "displayBadEngines3" then
 			update()
 		end
 	end
@@ -272,22 +272,6 @@ function BattleListWindow:UpdateInfoPanel()
 end
 
 function BattleListWindow:MakeWatchBattle(battleID, battle)
-	local function RejoinBattleFunc()
-		if not VFS.HasArchive(battle.mapName) then
-			WG.Chobby.InformationPopup("Map download required. Wait for the download to complete and try again.")
-			WG.DownloadHandler.MaybeDownloadArchive(battle.mapName, "map", -1)
-			return
-		end
-
-		if not VFS.HasArchive(battle.gameName) then
-			WG.Chobby.InformationPopup("Game update required. Wait for the download to complete or restart the game.")
-			WG.DownloadHandler.MaybeDownloadArchive(battle.gameName, "game", -1)
-			return
-		end
-
-		lobby:RejoinBattle(battleID)
-	end
-
 	local height = self.itemHeight - 20
 	local parentButton = Button:New {
 		classname = "button_rounded",
@@ -298,9 +282,14 @@ function BattleListWindow:MakeWatchBattle(battleID, battle)
 		height = self.itemHeight,
 		caption = "",
 		OnClick = {
-			function()
+			function(obj, mx, my, mouseButton)
+				if mouseButton == 3 then
+					local items = {"Watch Battle"}
+					BattleListWindow:MakeJoinWatchOptionPopup(obj, battleID, battle, items, mx, my, mouseButton)
+					return
+				end
 				if Spring.GetGameName() == "" then
-					RejoinBattleFunc()
+					self:TryToWatchBattle(battleID, battle)
 				else
 					WG.Chobby.ConfirmationPopup(RejoinBattleFunc, "Are you sure you want to leave your current game to watch/rejoin this one?", nil, 315, 200)
 				end
@@ -316,7 +305,7 @@ function BattleListWindow:MakeWatchBattle(battleID, battle)
 		right = 0,
 		height = 20,
 		valign = 'center',
-		font = Configuration:GetFont(2),
+		objectOverrideFont = Configuration:GetFont(2),
 		caption = (battle.title or "") .. " - Click to watch",
 		parent = parentButton,
 		OnResize = {
@@ -368,7 +357,7 @@ function BattleListWindow:MakeWatchBattle(battleID, battle)
 		y = 20,
 		height = 15,
 		valign = 'center',
-		font = Configuration:GetFont(1),
+		objectOverrideFont = Configuration:GetFont(1),
 		caption = playerCount .. ((playerCount == 1 and " player on " ) or " players on ") .. battle.mapName:gsub("_", " "),
 		parent = parentButton,
 	}
@@ -390,7 +379,7 @@ function BattleListWindow:MakeWatchBattle(battleID, battle)
 		y = 36,
 		height = 15,
 		valign = 'center',
-		font = Configuration:GetFont(1),
+		objectOverrideFont = Configuration:GetFont(1),
 		caption = modeName,
 		parent = parentButton,
 	}
@@ -398,8 +387,85 @@ function BattleListWindow:MakeWatchBattle(battleID, battle)
 	return parentButton
 end
 
-function BattleListWindow:MakeJoinBattle(battleID, battle)
+function BattleListWindow:TryToWatchBattle(battleID, battle)
+	if not VFS.HasArchive(battle.mapName) then
+		WG.Chobby.InformationPopup("Map download required. Wait for the download to complete and try again.")
+		WG.DownloadHandler.MaybeDownloadArchive(battle.mapName, "map", -1)
+		return
+	end
 
+	if not VFS.HasArchive(battle.gameName) then
+		WG.Chobby.InformationPopup("Game update required. Wait for the download to complete or restart the game.")
+		WG.DownloadHandler.MaybeDownloadArchive(battle.gameName, "game", -1)
+		return
+	end
+
+	lobby:RejoinBattle(battleID)
+end
+
+function BattleListWindow:TryToJoinBattle(battleID, battle)
+	local myBattleID = lobby:GetMyBattleID()
+	if myBattleID then
+		if battleID == myBattleID then
+			-- Do not rejoin current battle
+			local battleTab = WG.Chobby.interfaceRoot.GetBattleStatusWindowHandler()
+			battleTab.OpenTabByName("myBattle")
+			return
+		end
+		if not Configuration.confirmation_battleFromBattle then
+			local myBattle = lobby:GetBattle(myBattleID)
+			if not WG.Chobby.Configuration.showMatchMakerBattles and myBattle and not myBattle.isMatchMaker then
+				local function Success()
+					self:JoinBattle(battle)
+				end
+				ConfirmationPopup(Success, "Are you sure you want to leave your current battle and join a new one?", "confirmation_battleFromBattle")
+				return
+			end
+		end
+	end
+	self:JoinBattle(battle)
+end
+
+function BattleListWindow:MakeJoinWatchOptionPopup(parentButton, battleID, battle, items, mx, my, mouseButton)
+	local optionMenu = ComboBox:New {
+		x = mx,
+		y = my - 20,
+		width = 150,
+		height = 20,
+		padding = {0, 0, 0, 0},
+		caption = "",
+		ignoreItemCaption = true,
+		selectByName = true,
+		objectOverrideFont = Configuration:GetFont(2),
+		itemHeight = 30,
+		selected = 0,
+		maxDropDownWidth = large and 220 or 150,
+		minDropDownHeight = 0,
+		maxDropDownHeight = 300,
+		parent = parentButton,
+		items = items,
+		OnSelectName = {
+			function (obj, selectedName)
+				if selectedName == "Join Room" then
+					self:TryToJoinBattle(battleID, battle)
+				elseif selectedName == "Watch Battle" then
+					self:TryToWatchBattle(battleID, battle)
+				end
+				obj:Dispose()
+			end
+		},
+		OnClose = {
+			function (obj)
+				obj:Dispose()
+			end
+		},
+	}
+	optionMenu:SetPos(mx, my - 20)
+	optionMenu:MouseDown(mx, my, mouseButton)
+	screen0:FocusControl(optionMenu)
+end
+
+function BattleListWindow:MakeJoinBattle(battleID, battle)
 	local height = self.itemHeight - 20
 	local parentButton = Button:New {
 		classname = "button_rounded",
@@ -410,27 +476,13 @@ function BattleListWindow:MakeJoinBattle(battleID, battle)
 		height = self.itemHeight,
 		caption = "",
 		OnClick = {
-			function()
-				local myBattleID = lobby:GetMyBattleID()
-				if myBattleID then
-					if battleID == myBattleID then
-						-- Do not rejoin current battle
-						local battleTab = WG.Chobby.interfaceRoot.GetBattleStatusWindowHandler()
-						battleTab.OpenTabByName("myBattle")
-						return
-					end
-					if not Configuration.confirmation_battleFromBattle then
-						local myBattle = lobby:GetBattle(myBattleID)
-						if not WG.Chobby.Configuration.showMatchMakerBattles and myBattle and not myBattle.isMatchMaker then
-							local function Success()
-								self:JoinBattle(battle)
-							end
-							ConfirmationPopup(Success, "Are you sure you want to leave your current battle and join a new one?", "confirmation_battleFromBattle")
-							return
-						end
-					end
+			function(obj, mx, my, mouseButton)
+				if mouseButton == 3 then
+					local items = (battle.isRunning and {"Join Room", "Watch Battle"}) or {"Join Room"}
+					BattleListWindow:MakeJoinWatchOptionPopup(obj, battleID, battle, items, mx, my, mouseButton)
+					return
 				end
-				self:JoinBattle(battle)
+				self:TryToJoinBattle(battleID, battle)
 			end
 		},
 		tooltip = "battle_tooltip_" .. battleID,
@@ -443,7 +495,7 @@ function BattleListWindow:MakeJoinBattle(battleID, battle)
 		right = 0,
 		height = 20,
 		valign = 'center',
-		font = Configuration:GetFont(2),
+		objectOverrideFont = Configuration:GetFont(2),
 		caption = battle.title,
 		parent = parentButton,
 		OnResize = {
@@ -494,7 +546,7 @@ function BattleListWindow:MakeJoinBattle(battleID, battle)
 		y = 18,
 		height = 22,
 		valign = 'bottom',
-		font = Configuration:GetFont(2),
+		objectOverrideFont = Configuration:GetFont(2),
 		caption = lobby:GetBattlePlayerCount(battleID) .. "/" .. battle.maxPlayers,
 		parent = parentButton,
 	}
@@ -534,7 +586,7 @@ function BattleListWindow:MakeJoinBattle(battleID, battle)
 		height = 15,
 		valign = 'center',
 		caption = self:_MakeGameCaption(battle),
-		font = Configuration:GetFont(1),
+		objectOverrideFont = Configuration:GetFont(1),
 		parent = parentButton,
 	}
 
@@ -556,7 +608,7 @@ function BattleListWindow:MakeJoinBattle(battleID, battle)
 		height = 15,
 		valign = 'center',
 		caption = battle.mapName:gsub("_", " "),
-		font = Configuration:GetFont(1),
+		objectOverrideFont = Configuration:GetFont(1),
 		parent = parentButton,
 	}
 
@@ -565,7 +617,7 @@ end
 
 function BattleListWindow:AddBattle(battleID, battle)
 	battle = battle or lobby:GetBattle(battleID)
-	if not (Configuration.displayBadEngines2 or Configuration:IsValidEngineVersion(battle.engineVersion)) then
+	if not (Configuration.displayBadEngines3 or Configuration:IsValidEngineVersion(battle.engineVersion)) then
 		return
 	end
 
@@ -593,7 +645,7 @@ function BattleListWindow:ItemInFilter(id)
 		end
 	end
 	if not lobby:GetBattleHasFriend(id) then
-		if Configuration.battleFilterPassworded2 and battle.passworded then
+		if Configuration.battleFilterPassworded3 and battle.passworded then
 			return false
 		end
 		if Configuration.battleFilterNonFriend then
@@ -612,8 +664,14 @@ function BattleListWindow:CompareItems(id1, id2)
 		if not (battle1 and battle2) then
 			return false
 		end
+		if battle1.passworded ~= battle2.passworded then
+			return battle2.passworded
+		end
 		if battle1.isMatchMaker ~= battle2.isMatchMaker then
 			return battle2.isMatchMaker
+		end
+		if (lobby:GetBattlePlayerCount(battle1.battleID) == 0) ~= (lobby:GetBattlePlayerCount(battle2.battleID) == 0) then
+			return (lobby:GetBattlePlayerCount(battle2.battleID) == 0)
 		end
 		if battle1.isRunning ~= battle2.isRunning then
 			return battle2.isRunning
@@ -640,7 +698,7 @@ end
 
 function BattleListWindow:UpdateSync(battleID)
 	local battle = lobby:GetBattle(battleID)
-	if not (Configuration.displayBadEngines2 or Configuration:IsValidEngineVersion(battle.engineVersion)) then
+	if not (Configuration.displayBadEngines3 or Configuration:IsValidEngineVersion(battle.engineVersion)) then
 		return
 	end
 
@@ -695,7 +753,7 @@ end
 
 function BattleListWindow:JoinedBattle(battleID)
 	local battle = lobby:GetBattle(battleID)
-	if not (Configuration.displayBadEngines2 or Configuration:IsValidEngineVersion(battle.engineVersion)) then
+	if not (Configuration.displayBadEngines3 or Configuration:IsValidEngineVersion(battle.engineVersion)) then
 		return
 	end
 
@@ -718,7 +776,7 @@ end
 
 function BattleListWindow:LeftBattle(battleID)
 	local battle = lobby:GetBattle(battleID)
-	if not (Configuration.displayBadEngines2 or Configuration:IsValidEngineVersion(battle.engineVersion)) then
+	if not (Configuration.displayBadEngines3 or Configuration:IsValidEngineVersion(battle.engineVersion)) then
 		return
 	end
 
@@ -741,7 +799,7 @@ end
 
 function BattleListWindow:OnUpdateBattleInfo(battleID)
 	local battle = lobby:GetBattle(battleID)
-	if not (Configuration.displayBadEngines2 or Configuration:IsValidEngineVersion(battle.engineVersion)) then
+	if not (Configuration.displayBadEngines3 or Configuration:IsValidEngineVersion(battle.engineVersion)) then
 		return
 	end
 
@@ -817,7 +875,7 @@ end
 
 function BattleListWindow:OnBattleIngameUpdate(battleID, isRunning)
 	local battle = lobby:GetBattle(battleID)
-	if not (Configuration.displayBadEngines2 or Configuration:IsValidEngineVersion(battle.engineVersion)) then
+	if not (Configuration.displayBadEngines3 or Configuration:IsValidEngineVersion(battle.engineVersion)) then
 		return
 	end
 
@@ -855,7 +913,7 @@ function BattleListWindow:OpenHostWindow()
 		y = 15,
 		height = 35,
 		caption = i18n("open_mp_game"),
-		font = Configuration:GetFont(4),
+		objectOverrideFont = Configuration:GetFont(4),
 		parent = hostBattleWindow,
 	}
 
@@ -866,7 +924,7 @@ function BattleListWindow:OpenHostWindow()
 		align = "right",
 		height = 35,
 		caption = i18n("game_name") .. ":",
-		font = Configuration:GetFont(3),
+		objectOverrideFont = Configuration:GetFont(3),
 		parent = hostBattleWindow,
 	}
 	local gameNameEdit = EditBox:New {
@@ -875,7 +933,8 @@ function BattleListWindow:OpenHostWindow()
 		y = 70,
 		height = 35,
 		text = (lobby:GetMyUserName() or "Player") .. "'s Battle",
-		font = Configuration:GetFont(3),
+		objectOverrideFont = Configuration:GetFont(3),
+		objectOverrideHintFont = Configuration:GetHintFont(3),
 		parent = hostBattleWindow,
 	}
 
@@ -886,7 +945,7 @@ function BattleListWindow:OpenHostWindow()
 		align = "right",
 		height = 35,
 		caption = i18n("password_optional") .. ":",
-		font = Configuration:GetFont(3),
+		objectOverrideFont = Configuration:GetFont(3),
 		parent = hostBattleWindow,
 	}
 	local passwordEdit = EditBox:New {
@@ -895,7 +954,9 @@ function BattleListWindow:OpenHostWindow()
 		y = 110,
 		height = 35,
 		text = "",
-		font = Configuration:GetFont(3),
+		hint = "Set for a private game",
+		objectOverrideFont = Configuration:GetFont(3),
+		objectOverrideHintFont = Configuration:GetHintFont(3),
 		useIME = false,
 		parent = hostBattleWindow,
 	}
@@ -907,7 +968,7 @@ function BattleListWindow:OpenHostWindow()
 		align = "right",
 		height = 35,
 		caption = i18n("game_type") .. ":",
-		font = Configuration:GetFont(3),
+		objectOverrideFont = Configuration:GetFont(3),
 		parent = hostBattleWindow,
 	}
 	
@@ -923,9 +984,8 @@ function BattleListWindow:OpenHostWindow()
 		height = 35,
 		itemHeight = 22,
 		text = "",
-		font = Configuration:GetFont(3),
+		objectOverrideFont = Configuration:GetFont(3),
 		items = modeList,
-		itemFontSize = Configuration:GetFont(3).size,
 		selected = 1,
 		parent = hostBattleWindow,
 	}
@@ -939,10 +999,16 @@ function BattleListWindow:OpenHostWindow()
 		local modeSelection = typeCombo.items[typeCombo.selected]
 		if customModeMap and customModeMap[modeSelection] then
 			local modeData = customModeMap[modeSelection]
+			if modeData.shortName then
+				-- This asks infra to redownload and apply the custom mode, hopefully solving version issues.
+				WG.ModoptionsPanel.UpdateCustomMode(modeData.shortName, true)
+			end
 			lobby:HostBattle(gameNameEdit.text, (string.len(passwordEdit.text) > 0) and passwordEdit.text, 
 				modeData.roomType or "Custom",
 				modeData.map,
 				modeData.game,
+				--modeData.game or (modeData.rapidTag and VFS.GetNameFromRapidTag and VFS.GetNameFromRapidTag(modeData.rapidTag)),
+				--VFS.GetNameFromRapidTag returns very old versions sometimes.
 				modeData.options
 			)
 		else
@@ -957,7 +1023,7 @@ function BattleListWindow:OpenHostWindow()
 		bottom = 1,
 		height = 70,
 		caption = i18n("host"),
-		font = Configuration:GetFont(3),
+		objectOverrideFont = Configuration:GetButtonFont(3),
 		parent = hostBattleWindow,
 		classname = "action_button",
 		OnClick = {
@@ -973,7 +1039,7 @@ function BattleListWindow:OpenHostWindow()
 		bottom = 1,
 		height = 70,
 		caption = i18n("cancel"),
-		font = Configuration:GetFont(3),
+		objectOverrideFont = Configuration:GetButtonFont(3),
 		parent = hostBattleWindow,
 		classname = "negative_button",
 		OnClick = {
@@ -1001,11 +1067,7 @@ function BattleListWindow:JoinBattle(battle)
 			y = 110,
 			height = 80,
 			caption = "",
-			font = {
-				color = { 1, 0, 0, 1 },
-				size = Configuration:GetFont(2).size,
-				shadow = Configuration:GetFont(2).shadow,
-			},
+			objectOverrideFont = Configuration:GetFont(2, "error_red", {color = { 1, 0, 0, 1 }}),
 			parent = passwordWindow,
 		}
 
@@ -1041,7 +1103,7 @@ function BattleListWindow:JoinBattle(battle)
 			right = 15,
 			y = 15,
 			height = 35,
-			font = Configuration:GetFont(3),
+			objectOverrideFont = Configuration:GetFont(3),
 			caption = i18n("enter_battle_password"),
 			parent = passwordWindow,
 		}
@@ -1053,7 +1115,8 @@ function BattleListWindow:JoinBattle(battle)
 			height = 35,
 			text = "",
 			hint = i18n("password"),
-			fontsize = Configuration:GetFont(3).size,
+			objectOverrideFont = Configuration:GetFont(3),
+			objectOverrideHintFont = Configuration:GetHintFont(3),
 			passwordInput = true,
 			useIME = false,
 			parent = passwordWindow,
@@ -1075,7 +1138,7 @@ function BattleListWindow:JoinBattle(battle)
 			bottom = 1,
 			height = 70,
 			caption = i18n("join"),
-			font = Configuration:GetFont(3),
+			objectOverrideFont = Configuration:GetButtonFont(3),
 			classname = "action_button",
 			OnClick = {
 				function()
@@ -1090,7 +1153,7 @@ function BattleListWindow:JoinBattle(battle)
 			bottom = 1,
 			height = 70,
 			caption = i18n("cancel"),
-			font = Configuration:GetFont(3),
+			objectOverrideFont = Configuration:GetButtonFont(3),
 			classname = "negative_button",
 			OnClick = {
 				function()

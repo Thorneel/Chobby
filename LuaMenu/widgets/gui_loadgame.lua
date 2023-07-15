@@ -247,11 +247,11 @@ local function AddSaveEntryButton(saveFile, saveList)
 	local actionButton = Button:New {
 		x = 3,
 		y = 3,
-		bottom = 3,
-		width = 65,
+		height = WG.BUTTON_HEIGHT,
+		width = 60,
 		caption = i18n("load"),
 		classname = "action_button",
-		font = WG.Chobby.Configuration:GetFont(2),
+		objectOverrideFont = WG.Chobby.Configuration:GetButtonFont(2),
 		OnClick = {
 			function()
 				if ingame then
@@ -265,72 +265,71 @@ local function AddSaveEntryButton(saveFile, saveList)
 	}
 
 	-- save name
-	local x = 80
+	local x = 72
 	local saveName = TextBox:New {
 		name = "saveName",
 		x = x,
 		y = 12,
-		right = 0,
+		width = 155,
 		height = 20,
 		valign = 'center',
-		fontsize = Configuration:GetFont(2).size,
+		objectOverrideFont = Configuration:GetFont(2),
 		text = saveFile.filename,
 		parent = container,
 	}
 
 	-- save's modgame name
-	x = x + 200
+	x = x + 155
 	local gameName = TextBox:New {
 		name = "gameName",
 		x = x,
 		y = 12,
-		right = 0,
+		width = 90,
 		height = 20,
 		valign = 'center',
-		fontsize = Configuration:GetFont(2).size,
+		objectOverrideFont = Configuration:GetFont(1),
 		text = saveFile.gameName .. "\n" .. saveFile.gameVersion,
 		parent = container,
 	}
 
 	-- save date
-	x = x + 140
+	x = x + 90
 	local saveDate = TextBox:New {
 		name = "saveDate",
 		x = x,
 		y = 12,
-		right = 0,
+		width = 90,
 		height = 20,
 		valign = 'center',
-		fontsize = Configuration:GetFont(2).size,
+		objectOverrideFont = Configuration:GetFont(1),
 		text = WriteDate(saveFile.date),
 		parent = container,
 	}
 
 	-- save details
-	x = x + 110
+	x = x + 90
 	local details = TextBox:New {
 		name = "saveDetails",
 		x = x,
 		y = 12,
-		right = 0,
+		right = 68,
 		height = 20,
 		valign = 'center',
-		fontsize = Configuration:GetFont(1).size,
+		objectOverrideFont = Configuration:GetFont(1),
 		text = GetSaveDescText(saveFile),
 		parent = container,
 	}
 
 	-- delete button
-	x = x + 180
 	local deleteButton = Button:New {
 		parent = container,
-		x = x,
-		width = 65,
 		y = 4,
-		bottom = 4,
+		right = 0,
+		width = 60,
+		height = WG.BUTTON_HEIGHT,
 		caption = i18n("delete"),
 		classname = "action_button",
-		font = WG.Chobby.Configuration:GetFont(2),
+		objectOverrideFont = WG.Chobby.Configuration:GetButtonFont(2),
 		OnClick = { function(self)
 				WG.Chobby.ConfirmationPopup(function(self) DeleteSave(saveFile.filename, saveList) end, i18n("delete_confirm"), nil, 360, 200)
 			end
@@ -361,10 +360,10 @@ local function InitializeControls(parent)
 	Label:New {
 		x = 20,
 		right = 5,
-		y = 17,
+		y = WG.TOP_LABEL_Y,
 		height = 20,
 		parent = parent,
-		font = Configuration:GetFont(3),
+		objectOverrideFont = Configuration:GetFont(3),
 		caption = i18n("load_saved_game"),
 	}
 
@@ -384,12 +383,12 @@ local function InitializeControls(parent)
 	}
 
 	local headings = {
-		{name = "Name", x = 82, width = 200},
-		{name = "Game", x = 82 + 200, width = 140},
-		{name = "Date", x = 82 + 200 + 138, width = 110},
+		{name = "Name", x = 74, width = 150},
+		{name = "Game", x = 74 + 155, width = 90},
+		{name = "Date", x = 74 + 155 + 90, width = 90},
 	}
 
-	local saveList = WG.Chobby.SortableList(listHolder, headings, 80, 3)
+	local saveList = WG.Chobby.SortableList(listHolder, headings, 80, 3, false)
 	PopulateSaveList(saveList)
 
 	local externalFunctions = {}

@@ -39,7 +39,7 @@ local function GetPlanet(planetUtilities, planetID)
 			},
 			{
 				image = "unitpics/cloakbomb.png",
-				text = [[Imp EMP bombs will stun any nearby units when they explode. They are mostly a defensive tool, and don't kill anything themselves, so make sure you have other units like Reavers to finish the job.]]
+				text = [[Imp EMP bombs stun nearby units when they explode. They are invisible while stationary so place them in areas the enemy is likely to pass through. They don't kill anything themselves, so make sure you have other units like Reavers to finish the job.]]
 			},
 			{
 				image = "unitpics/vehraid.png",
@@ -218,6 +218,12 @@ local function GetPlanet(planetUtilities, planetID)
 						name = "turretmissile",
 						x = 2375,
 						z = 900,
+						facing = 3,
+					},
+					{
+						name = "turretlaser",
+						x = 3122,
+						z = 870,
 						facing = 3,
 					},
 				}
@@ -470,10 +476,17 @@ local function GetPlanet(planetUtilities, planetID)
 					description = "Destroy the enemy Impaler",
 					experience = planetUtilities.BONUS_EXP,
 				},
-				[3] = {
-					victoryByTime = 360,
-					image = planetUtilities.ICON_OVERLAY.CLOCK,
-					description = "Win by 6:00",
+				[3] = { -- Build 4 Imps
+					satisfyOnce = true,
+					countRemovedUnits = true, -- count units that previously died.
+					comparisionType = planetUtilities.COMPARE.AT_LEAST,
+					targetNumber = 7, -- The player starts with three Imps
+					unitTypes = {
+						"cloakbomb",
+					},
+					image = planetUtilities.ICON_DIR .. "cloakbomb.png",
+					imageOverlay = planetUtilities.ICON_OVERLAY.REPAIR,
+					description = "Build 4 Imps",
 					experience = planetUtilities.BONUS_EXP,
 				},
 			},

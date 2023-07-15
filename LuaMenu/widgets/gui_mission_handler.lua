@@ -100,7 +100,7 @@ local function CreateMissionEntry(missionData)
 		height = 34,
 		caption = i18n("play"),
 		classname = "action_button",
-		font = WG.Chobby.Configuration:GetFont(2),
+		objectOverrideFont = WG.Chobby.Configuration:GetButtonFont(2),
 		OnClick = {
 			function()
 				local startScript = missionData.Script
@@ -144,7 +144,7 @@ local function CreateMissionEntry(missionData)
 	--	right = 0,
 	--	height = 20,
 	--	valign = 'center',
-	--	fontsize = Configuration:GetFont(3).size,
+	--	objectOverrideFont = Configuration:GetFont(3),
 	--	text = tostring(missionData.FeaturedOrder or ""),
 	--	parent = holder,
 	--}
@@ -161,7 +161,7 @@ local function CreateMissionEntry(missionData)
 		right = 0,
 		height = 20,
 		valign = 'center',
-		fontsize = Configuration:GetFont(3).size,
+		objectOverrideFont = Configuration:GetFont(3),
 		text = missionName,
 		parent = holder,
 	}
@@ -172,7 +172,7 @@ local function CreateMissionEntry(missionData)
 	--	right = 0,
 	--	height = 20,
 	--	valign = 'center',
-	--	fontsize = Configuration:GetFont(2).size,
+	--	objectOverrideFont = Configuration:GetFont(2),
 	--	text = string.format("Difficulty %.1f", missionData.Difficulty or 0),
 	--	parent = holder,
 	--}
@@ -183,7 +183,7 @@ local function CreateMissionEntry(missionData)
 	--	right = 0,
 	--	height = 20,
 	--	valign = 'center',
-	--	fontsize = Configuration:GetFont(2).size,
+	--	objectOverrideFont = Configuration:GetFont(2),
 	--	text = missionData.Map,
 	--	parent = holder,
 	--}
@@ -204,16 +204,16 @@ local function InitializeControls(parentControl)
 		width = 180,
 		height = 30,
 		parent = parentControl,
-		font = Configuration:GetFont(3),
+		objectOverrideFont = Configuration:GetFont(3),
 		caption = "Learn advanced techniques in these tutorials",
 	}
 
 	local btnLeaveScreen = Button:New {
 		right = 11,
-		y = 7,
+		y = WG.TOP_BUTTON_Y,
 		width = 80,
-		height = 45,
-		font =  WG.Chobby.Configuration:GetFont(3),
+		height = WG.BUTTON_HEIGHT,
+		objectOverrideFont =  WG.Chobby.Configuration:GetButtonFont(3),
 		caption = i18n("close"),
 		classname = "negative_button",
 		OnClick = {
@@ -244,7 +244,7 @@ local function InitializeControls(parentControl)
 			align = "center",
 			valign = "center",
 			parent = missingPanel,
-			font = Configuration:GetFont(3),
+			objectOverrideFont = Configuration:GetFont(3),
 			caption = "Error Loading Missions",
 		}
 		local missingLabel = Label:New {
@@ -255,7 +255,7 @@ local function InitializeControls(parentControl)
 			align = "center",
 			valign = "center",
 			parent = missingPanel,
-			font = Configuration:GetFont(3),
+			objectOverrideFont = Configuration:GetFont(3),
 			caption = "check that your install directory is writable.",
 		}
 		return

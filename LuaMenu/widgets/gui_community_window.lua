@@ -84,7 +84,7 @@ local function LeaveIntentionallyBlank(scroll, caption)
 		height = 20,
 		align = "left",
 		valign = "tp",
-		font = WG.Chobby.Configuration:GetFont(1),
+		objectOverrideFont = WG.Chobby.Configuration:GetFont(1),
 		caption = caption,
 		parent = scroll
 	}
@@ -101,7 +101,7 @@ local function AddLinkButton(scroll, name, tooltip, link, x, right, y, bottom)
 		classname = "option_button",
 		align = "left",
 		alignPadding = 0.12,
-		font = WG.Chobby.Configuration:GetFont(3),
+		objectOverrideFont = WG.Chobby.Configuration:GetButtonFont(3),
 		OnClick = {
 			function ()
 				WG.BrowserHandler.OpenUrl(link)
@@ -146,13 +146,13 @@ local function GetLadderHandler(parentControl)
 
 	local heading = TextBox:New{
 		x = 4,
-		y = 7,
+		y = WG.TOP_BUTTON_Y,
 		right = 4,
 		height = 24,
 		align = "left",
 		valign = "top",
 		text = "Ladder",
-		fontsize = WG.Chobby.Configuration:GetFont(3).size,
+		objectOverrideFont = WG.Chobby.Configuration:GetFont(3),
 		parent = holder,
 	}
 
@@ -186,7 +186,7 @@ local function GetLadderHandler(parentControl)
 					align = "right",
 					valign = "top",
 					caption = i .. ". ",
-					font = WG.Chobby.Configuration:GetFont(2),
+					objectOverrideFont = WG.Chobby.Configuration:GetFont(2),
 					parent = holder,
 				}
 			end
@@ -228,7 +228,7 @@ local function GetTutorialControl()
 		y = 15,
 		height = 35,
 		align = "center",
-		fontsize = Configuration:GetFont(5).size,
+		objectOverrideFont = Configuration:GetFont(5),
 		caption = "Welcome to Zero-K",
 		parent = holder,
 	}
@@ -238,18 +238,20 @@ local function GetTutorialControl()
 		right = 8,
 		y = 76,
 		height = 35,
-		fontsize = Configuration:GetFont(2).size,
-		text = [[Embark on a campaign to uncover the secrets of a seemingly empty galaxy, and learn Zero-K along the way. The campaign is under 'Singleplayer & Coop', but can also be started by clicking 'Play the Tutorial'. Alternately, battle a range of non-cheating AIs in the skirmish mode. Play either option with friends by inviting them with the Steam friends list.]],
+		lineSpacing = 1,
+		objectOverrideFont = Configuration:GetFont(2),
+		text = [[The campaign is a great place to begin as it starts with a tutorial that sets you up to conquer the entire galaxy.  Play co-op with friends by inviting them via the Steam friends list before launching a mission.]],
 		parent = holder,
 	}
 
 	TextBox:New {
 		x = 8,
 		right = 8,
-		y = 186,
+		y = 260,
 		height = 35,
-		fontsize = Configuration:GetFont(2).size,
-		text = [[Click 'Multiplayer' for private games, public games, and the matchmaker. Say 'hi' on Discord or the forum, or even get into modding and development. Zero-K runs on involvement as it is entirely community-made.]],
+		lineSpacing = 1,
+		objectOverrideFont = Configuration:GetFont(2),
+		text = [[Under 'Multiplayer' you'll find a list of game lobbies and matchmaker populated by our friendly community.  Join the Discord to say 'hi', or for help if you run into trouble.]],
 		parent = holder,
 	}
 
@@ -261,14 +263,14 @@ local function GetTutorialControl()
 		end
 	end
 
-	local offset = 262
+	local offset = 158
 	Button:New {
 		x = "18%",
 		y = offset,
 		right = "18%",
 		height = 70,
-		caption = "Play the Tutorial",
-		font = Configuration:GetFont(4),
+		caption = "Play the Campaign",
+		objectOverrideFont = Configuration:GetButtonFont(4),
 		classname = "action_button",
 		padding = {2,4,4,4},
 		OnClick = {
@@ -287,7 +289,7 @@ local function GetTutorialControl()
 	--	height = 42,
 	--	classname = "negative_button",
 	--	caption = i18n("close"),
-	--	font = Configuration:GetFont(3),
+	--	objectOverrideFont = Configuration:GetButtonFont(3),
 	--	OnClick = {
 	--		CancelFunc
 	--	},
@@ -328,7 +330,7 @@ local function GetDateTimeDisplay(parentControl, xPosition, yPosition, timeStrin
 		valign = "top",
 		text = localTimeString or utcTimeString, -- Fallback
 		tooltip = string.gsub(timeString, "T", " at ") .. " UTC",
-		fontsize = WG.Chobby.Configuration:GetFont(2).size,
+		objectOverrideFont = WG.Chobby.Configuration:GetFont(2),
 		parent = parentControl,
 	}
 
@@ -340,7 +342,7 @@ local function GetDateTimeDisplay(parentControl, xPosition, yPosition, timeStrin
 		align = "left",
 		valign = "top",
 		tooltip = utcTimeString,
-		fontsize = WG.Chobby.Configuration:GetFont(2).size,
+		objectOverrideFont = WG.Chobby.Configuration:GetFont(2),
 		parent = parentControl,
 	}
 
@@ -472,7 +474,7 @@ local function GetNewsEntry(parentHolder, index, headingSize, timeAsTooltip, sho
 					align = "left",
 					valign = "top",
 					text = entryData.heading,
-					fontsize = WG.Chobby.Configuration:GetFont(headingSize).size,
+					objectOverrideFont = WG.Chobby.Configuration:GetFont(headingSize),
 					parent = controls.linkButton,
 				}
 			else
@@ -510,7 +512,7 @@ local function GetNewsEntry(parentHolder, index, headingSize, timeAsTooltip, sho
 					align = "left",
 					valign = "top",
 					text = entryData.heading,
-					fontsize = WG.Chobby.Configuration:GetFont(4).size,
+					objectOverrideFont = WG.Chobby.Configuration:GetFont(4),
 					parent = holder,
 				}
 			else
@@ -569,8 +571,9 @@ local function GetNewsEntry(parentHolder, index, headingSize, timeAsTooltip, sho
 					height = 120,
 					align = "left",
 					valign = "top",
+					lineSpacing = 1,
 					text = entryData.text,
-					fontsize = WG.Chobby.Configuration:GetFont(2).size,
+					objectOverrideFont = WG.Chobby.Configuration:GetFont(2),
 					parent = holder,
 				}
 			else
@@ -659,13 +662,13 @@ local function GetNewsHandler(parentControl, headingSize, timeAsTooltip, topHead
 
 	local topHeadingLabel = topHeading and TextBox:New{
 		x = 4,
-		y = 7,
+		y = WG.TOP_BUTTON_Y,
 		right = 4,
 		height = headFormat.height,
 		align = "left",
 		valign = "top",
 		text = topHeading,
-		fontsize = WG.Chobby.Configuration:GetFont(3).size,
+		objectOverrideFont = WG.Chobby.Configuration:GetFont(3),
 		parent = holder,
 	}
 
@@ -755,7 +758,7 @@ local function InitializeControls(window)
 	--	width = 180,
 	--	height = 30,
 	--	parent = window,
-	--	font = WG.Chobby.Configuration:GetFont(3),
+	--	objectOverrideFont = WG.Chobby.Configuration:GetFont(3),
 	--	caption = "Community",
 
 	local lobby = WG.LibLobby.lobby

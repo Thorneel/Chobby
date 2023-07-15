@@ -123,6 +123,10 @@ function Lobby:SetBattleType(typeName)
 	self:SayBattle("!type " .. typeName)
 end
 
+function Lobby:GetCustomGameMode(modeName)
+	return self
+end
+
 -------------------------------------------------
 -- BEGIN Client commands
 -------------------------------------------------
@@ -262,12 +266,12 @@ end
 
 function Lobby:ConnectToBattle(useSpringRestart, battleIp, battlePort, clientPort, scriptPassword, myName, gameName, mapName, engineName, battleType, isSpectator)
 	if gameName and not VFS.HasArchive(gameName) then
-		WG.Chobby.InformationPopup("Cannont start game: missing game file '" .. gameName .. "'.")
+		WG.Chobby.InformationPopup("Cannot start game: missing game file '" .. gameName .. "'.")
 		return
 	end
 
 	if mapName and not VFS.HasArchive(mapName) then
-		WG.Chobby.InformationPopup("Cannont start game: missing map file '" .. mapName .. "'.")
+		WG.Chobby.InformationPopup("Cannot start game: missing map file '" .. mapName .. "'.")
 		return
 	end
 	local Config = WG.Chobby.Configuration
@@ -281,29 +285,33 @@ function Lobby:ConnectToBattle(useSpringRestart, battleIp, battlePort, clientPor
 			}
 			WG.WrapperLoopback.StartNewSpring(params)
 		else
-			WG.Chobby.InformationPopup("Cannont start game: wrong Spring engine version. The required version is '" .. engineName .. "', your version is '" .. Spring.Utilities.GetEngineVersion() .. "'.", {width = 420, height = 260})
+			WG.Chobby.InformationPopup("Cannot start game: wrong Spring engine version. The required version is '" .. engineName .. "', your version is '" .. Spring.Utilities.GetEngineVersion() .. "'.", {width = 420, height = 260})
 		end
 		return
 	end
 
 	self:_CallListeners("OnBattleAboutToStart", battleType, isSpectator)
 
-	Spring.Echo("Game starts!")
-	if useSpringRestart then
-		local springURL = "spring://" .. self:GetMyUserName() .. ":" .. scriptPassword .. "@" .. battleIp .. ":" .. battlePort
-		Spring.Echo(springURL)
-		Spring.Restart(springURL, "")
-	else
-		local scriptTxt = GenerateScriptTxt(battleIp, battlePort, clientPort, scriptPassword, myName)
+	local function DelayedStart()
+		Spring.Echo("Game starts!")
+		if useSpringRestart then
+			local springURL = "spring://" .. self:GetMyUserName() .. ":" .. scriptPassword .. "@" .. battleIp .. ":" .. battlePort
+			Spring.Echo(springURL)
+			Spring.Restart(springURL, "")
+		else
+			local scriptTxt = GenerateScriptTxt(battleIp, battlePort, clientPort, scriptPassword, myName)
 
-		Spring.Echo(scriptTxt)
-		--local scriptFileName = "scriptFile.txt"
-		--local scriptFile = io.open(scriptFileName, "w")
-		--scriptFile:write(scriptTxt)
-		--scriptFile:close()
+			Spring.Echo(scriptTxt)
+			--local scriptFileName = "scriptFile.txt"
+			--local scriptFile = io.open(scriptFileName, "w")
+			--scriptFile:write(scriptTxt)
+			--scriptFile:close()
 
-		Spring.Reload(scriptTxt)
+			Spring.Reload(scriptTxt)
+		end
 	end
+	
+	WG.Delay(DelayedStart, 0.5)
 end
 
 function Lobby:VoteYes()
@@ -466,8 +474,8 @@ function Lobby:_OnAccepted(newName)
 	self:_CallListeners("OnAccepted")
 end
 
-function Lobby:_OnDenied(reason)
-	self:_CallListeners("OnDenied", reason)
+function Lobby:_OnDenied(reason, extendedReason)
+	self:_CallListeners("OnDenied", reason, extendedReason)
 end
 
 -- TODO: rework, should be only one callin
@@ -808,6 +816,9 @@ function Lobby:_OnLeftBattle(battleID, userName)
 	end
 
 	self.users[userName].battleID = nil
+	if battleID and battleID == self.myBattleID then
+		self:UpdateMyBattlePlayerCount()
+	end
 	self:_CallListeners("OnUpdateUserStatus", userName, {battleID = false})
 
 	self:_CallListeners("OnLeftBattle", battleID, userName)
@@ -855,6 +866,25 @@ function Lobby:_OnUpdateBattleInfo(battleID, battleInfo)
 	self:_CallListeners("OnUpdateBattleInfo", battleID, battleInfo)
 end
 
+function Lobby:UpdateMyBattlePlayerCount()
+	local battle = self.myBattleID and self.battles[self.myBattleID]
+	if battle then
+		local realPlayers, realSpectators = 0, 0
+		for i = 1, #battle.users do
+			if not (self.userBattleStatus[battle.users[i]] or {}).isSpectator then
+				realPlayers = realPlayers + 1
+			else
+				realSpectators = realSpectators + 1
+			end
+		end
+		
+		self:_OnUpdateBattleInfo(self.myBattleID, {
+			playerCount = realPlayers,
+			spectatorCount = realSpectators,
+		})
+	end
+end
+
 -- Updates the specified status keys
 -- Status keys can be: isAway, isInGame, isModerator, rank, isBot, aiLib
 -- Bots have isBot=true, AIs have aiLib~=nil and humans are the remaining
@@ -883,6 +913,11 @@ function Lobby:_OnUpdateUserBattleStatus(userName, status)
 	userData.joinTime   = status.joinTime or userData.JoinTime
 	userData.queueOrder = status.queueOrder or userData.queueOrder
 
+	if changedSpectator or changedAllyTeam then
+		self:UpdateMyBattlePlayerCount()
+		self:_CallListeners("OnUpdateUserTeamStatus", userName, userData.allyNumber, userData.isSpectator)
+	end
+
 	status.allyNumber   = userData.allyNumber
 	status.teamNumber   = userData.teamNumber
 	status.isSpectator  = userData.isSpectator
@@ -895,10 +930,6 @@ function Lobby:_OnUpdateUserBattleStatus(userName, status)
 	status.queueOrder   = userData.queueOrder
 	self:_CallListeners("OnUpdateUserBattleStatus", userName, status)
 
-	if changedSpectator or changedAllyTeam then
-		--Spring.Echo("OnUpdateUserTeamStatus", changedAllyTeam, changedSpectator, "spectator", status.isSpectator, userData.isSpectator, "ally Team", status.allyNumber, userData.allyNumber)
-		self:_CallListeners("OnUpdateUserTeamStatus", userName, status.allyNumber, status.isSpectator)
-	end
 end
 
 -- Also calls the OnUpdateUserBattleStatus
@@ -1541,6 +1572,10 @@ end
 -- returns queues table (not necessarily an array)
 function Lobby:GetQueues()
 	return ShallowCopy(self.queues)
+end
+
+function Lobby:GetInQueue(queueName)
+	return self.joinedQueues and self.joinedQueues[queueName]
 end
 
 function Lobby:GetJoinedQueues()

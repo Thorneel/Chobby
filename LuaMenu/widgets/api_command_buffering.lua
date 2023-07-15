@@ -18,11 +18,19 @@ end
 -- Variables
 
 local bufferBypass = {
+	BattleDebriefing = true,
+	CustomGameModeResponse = true,
+	SetModOptions = true,
+	SetRectangle = true,
+	UserProfile = true,
+	RemoveBot = true,
+	UpdateBotStatus = true,
 	Welcome = true,
 	Ping = true,
 	AreYouReady = true,
 	AreYouReadyUpdate = true,
 	AreYouReadyResult = true,
+	MatchMakerSetup = true,
 	MatchMakerStatus = true,
 	MatchMakerQueueRequestFailed = true,
 	SiteToLobbyCommand = true,
@@ -32,6 +40,16 @@ local bufferBypass = {
 	BattleRemoved = true,
 	BattlePoll = true,
 	BattlePollOutcome = true,
+	UpdateUserBattleStatus = true,
+	User = true,
+	JoinedBattle = true,
+	JoinBattleSuccess = true,
+	RejoinOption = true,
+	LeftBattle = true,
+	LoginResponse = true,
+	RegisterResponse = true,
+	DefaultGameChanged = true,
+	DefaultEngineChanged = true,
 }
 
 local CMD_PER_UPDATE = 14
@@ -48,7 +66,8 @@ end
 
 function widget:Update()
 	local lobby = WG.LibLobby.lobby
-	local isLobbyVisible = WG.Chobby.interfaceRoot.GetLobbyInterfaceHolder().visible
+	local Configuration = WG.Chobby.Configuration
+	local isLobbyVisible = Configuration:IsLobbyVisible() and not Configuration.enableDebugBuffer
 	if not isLobbyVisible then
 		if not lobby.bufferCommandsEnabled then
 			lobby.bufferBypass = bufferBypass

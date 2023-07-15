@@ -43,7 +43,7 @@ local function GetPlanet(planetUtilities, planetID)
 			},
 			{
 				image = "unitpics/energysolar.png",
-				text = [[All construction requires equal amounts of metal and energy. Build Solar Collectors to gather energy.]]
+				text = [[All construction requires equal amounts of metal and energy. Build Solar Collectors to gather energy. Shift-drag to queue a line of structures.]]
 			},
 			{
 				image = "unitpics/cloakriot.png",
@@ -89,9 +89,35 @@ local function GetPlanet(planetUtilities, planetID)
 						difficultyAtMost = 3,
 					},
 					{
+						name = "turretriot",
+						x = 1140,
+						z = 3760,
+						facing = 1,
+					},
+					{
+						name = "turretriot",
+						x = 350,
+						z = 2110,
+						facing = 1,
+						difficultyAtMost = 3,
+					},
+					{
+						name = "turretriot",
+						x = 360,
+						z = 3230,
+						facing = 1,
+					},
+					{
+						name = "turretriot",
+						x = 930,
+						z = 3260,
+						facing = 1,
+						difficultyAtMost = 1,
+					},
+					{
 						name = "turretlaser",
-						x = 1050,
-						z = 3850,
+						x = 970,
+						z = 3900,
 						facing = 1,
 					},
 					{
@@ -166,12 +192,14 @@ local function GetPlanet(planetUtilities, planetID)
 							x = 3630,
 							z = 220,
 							facing = 2,
+							difficultyAtLeast = 2,
 						},
 						{
 							name = "staticmex",
 							x = 3880,
 							z = 200,
 							facing = 2,
+							difficultyAtLeast = 3,
 						},
 						{
 							name = "turretlaser",
@@ -199,6 +227,7 @@ local function GetPlanet(planetUtilities, planetID)
 							x = 3880,
 							z = 520,
 							facing = 2,
+							difficultyAtLeast = 4,
 						},
 						{
 							name = "energysolar",
@@ -225,6 +254,139 @@ local function GetPlanet(planetUtilities, planetID)
 						},
 					
 					}
+				},
+				{
+					startX = 4000,
+					startZ = 75,
+					aiLib = "Null AI",
+					humanName = "Loiterer",
+					bitDependant = false,
+					allyTeam = 1,
+					commander = false,
+					startUnits = {
+						{
+							name = "energywind",
+							x = 1240,
+							z = 1090,
+							facing = 2,
+						},
+						{
+							name = "energywind",
+							x = 1200,
+							z = 1150,
+							facing = 2,
+						},
+						{
+							name = "energywind",
+							x = 1190,
+							z = 1220,
+							facing = 2,
+						},
+						{
+							name = "energywind",
+							x = 2930,
+							z = 2567,
+							facing = 2,
+						},
+						{
+							name = "staticradar",
+							x = 1190,
+							z = 1298,
+							facing = 2,
+						},
+						{
+							name = "energywind",
+							x = 1755,
+							z = 1700,
+							facing = 2,
+						},
+						{
+							name = "energywind",
+							x = 1725,
+							z = 1822,
+							facing = 2,
+						},
+						{
+							name = "energywind",
+							x = 1770,
+							z = 1940,
+							facing = 2,
+						},
+						{
+							name = "energywind",
+							x = 1789,
+							z = 1763,
+							facing = 2,
+						},
+						{
+							name = "energywind",
+							x = 1920,
+							z = 1930,
+							facing = 2,
+						},
+						{
+							name = "energywind",
+							x = 2000,
+							z = 2020,
+							facing = 2,
+						},
+						{
+							name = "staticradar",
+							x = 2985,
+							z = 2345,
+							facing = 2,
+						},
+						{
+							name = "energywind",
+							x = 2975,
+							z = 2415,
+							facing = 2,
+						},
+						{
+							name = "energywind",
+							x = 2965,
+							z = 2485,
+							facing = 2,
+						},
+						{
+							name = "shieldassault",
+							x = 3486,
+							z = 2350,
+							facing = 4,
+						},
+						{
+							name = "shieldassault",
+							x = 2634,
+							z = 1947,
+							facing = 4,
+						},
+						{
+							name = "shieldassault",
+							x = 1732,
+							z = 1193,
+							facing = 3,
+						},
+						{
+							name = "shieldassault",
+							x = 1300,
+							z = 570,
+							facing = 4,
+						},
+					}
+				},
+			},
+			initialWrecks = {
+				{
+					name = "staticmex_dead",
+					x = 361,
+					z = 2006,
+					facing = 3,
+				},
+				{
+					name = "turretlaser_dead",
+					x = 1772,
+					z = 2094,
+					facing = 0,
 				},
 			},
 			defeatConditionConfig = {
@@ -257,8 +419,8 @@ local function GetPlanet(planetUtilities, planetID)
 			},
 			bonusObjectiveConfig = {
 				-- Indexed by bonusObjectiveID
-				[1] = { -- Have 3 mex by 1 minute.
-					satisfyByTime = 60,
+				[1] = { -- Have 3 mex
+                    satisfyOnce = true,
 					comparisionType = planetUtilities.COMPARE.AT_LEAST,
 					targetNumber = 3,
 					unitTypes = {
@@ -266,11 +428,11 @@ local function GetPlanet(planetUtilities, planetID)
 					},
 					image = planetUtilities.ICON_DIR .. "staticmex.png",
 					imageOverlay = planetUtilities.ICON_OVERLAY.REPAIR,
-					description = "Have 3 Metal Extractors by 1:00",
+					description = "Have 3 Metal Extractors",
 					experience = planetUtilities.BONUS_EXP,
 				},
-				[2] = { -- Have 3 solar by 2 minute.
-					satisfyByTime = 120,
+				[2] = { -- Have 3 solar
+                    satisfyOnce = true,
 					comparisionType = planetUtilities.COMPARE.AT_LEAST,
 					targetNumber = 3,
 					unitTypes = {
@@ -278,7 +440,7 @@ local function GetPlanet(planetUtilities, planetID)
 					},
 					image = planetUtilities.ICON_DIR .. "energysolar.png",
 					imageOverlay = planetUtilities.ICON_OVERLAY.REPAIR,
-					description = "Have 3 Solar Generators by 2:00",
+					description = "Have 3 Solar Generators",
 					experience = planetUtilities.BONUS_EXP,
 				},
 				[3] = { -- Build a radar
@@ -294,7 +456,20 @@ local function GetPlanet(planetUtilities, planetID)
 					description = "Build a Radar Tower",
 					experience = planetUtilities.BONUS_EXP,
 				},
-				[4] = { -- Build 3 Reavers
+                [4] = { -- Build 10 Glaives
+					satisfyOnce = true,
+					countRemovedUnits = true, -- count units that previously died.
+					comparisionType = planetUtilities.COMPARE.AT_LEAST,
+					targetNumber = 12,
+					unitTypes = {
+						"cloakraid",
+					},
+					image = planetUtilities.ICON_DIR .. "cloakraid.png",
+					imageOverlay = planetUtilities.ICON_OVERLAY.REPAIR,
+					description = "Build 10 more Glaives",
+					experience = planetUtilities.BONUS_EXP,
+				},
+				[5] = { -- Build 3 Reavers
 					satisfyOnce = true,
 					countRemovedUnits = true, -- count units that previously died.
 					comparisionType = planetUtilities.COMPARE.AT_LEAST,
@@ -307,35 +482,29 @@ local function GetPlanet(planetUtilities, planetID)
 					description = "Build 3 Reavers",
 					experience = planetUtilities.BONUS_EXP,
 				},
-				[5] = {
-					victoryByTime = 480,
-					image = planetUtilities.ICON_OVERLAY.CLOCK,
-					description = "Win by 8:00",
-					experience = planetUtilities.BONUS_EXP,
+			},
+			messagesOverTime = {
+				displayAfterVictory = false,
+				messages = {
+					[       2     *30    ] = "scanning for enemy activity...",
+					[       5     *30 +20] = "[very probable] enemy has no factory building capacity",
+					[       5     *30    ] = "estimated enemy forces: 1 Commander, 1 Factory",
+					[       7     *30    ] = "suggestion: use [Conjurer] constructor units to expand rapidly",
+					[       8     *30    ] = "suggestion: use [Glaive] raiders to attack enemy expansions and [Conjurer] constructor units, and protect from enemy raids",
+					[      12     *30    ] = "suggestion: use [Reaver] riot units to defeat large concentrations of enemy raiders",
+					[      13     *30    ] = "note: riot units are slow and cannot pursue fleeing raiders",
+					[      20     *30    ] = "note: [Conjurer] units can deploy a cloaking field at the cost of highly increased energy consumption",
+					[      28     *30    ] = "suggestion: [error: corrupted data]",
+					[      28     *30 + 4] = "attempting to restore data...",
+					[      32     *30    ] = "fatal error: dynamic hint module panicked",
+					[      32     *30 + 4] = "restarting dynamic hint module...",
+					[      34     *30    ] = "failed to restart dynamic hint module",
+					[      34     *30 + 4] = "dynamic hint module in unrecoverable state, please contact maintenance service for reinstall",
+					[      34     *30 + 8] = "uploading crashlog to test report database...",
+					[      35     *30    ] = "error: planetary network unavailable, saving crashlog for later upload",
+					[      35     *30 + 2] = "please reconnect to [Tempest] planetary network as soon as possible",
 				},
 			},
-      messagesOverTime = {
-        displayAfterVictory = false,
-        messages = {
-          [       2     *30    ] = "scanning for enemy activity...",
-          [       5     *30    ] = "estimated enemy forces: 1 Commander, 1 Factory",
-          [       5     *30 +20] = "[very probable] enemy has no factory building capacity",
-          [       7     *30    ] = "suggestion: use [Conjurer] constructor units to expand rapidly",
-          [       8     *30    ] = "suggestion: use [Glaive] raiders to attack enemy expansions and [Conjurer] constructor units, and protect from enemy raids",
-          [      12     *30    ] = "suggestion: use [Reaver] riot units to defeat large concentrations of enemy raiders",
-          [      13     *30    ] = "note: riot units are slow and cannot pursue fleeing raiders",
-          [      20     *30    ] = "note: [Conjurer] units can deploy a cloaking field at the cost of highly increased energy consumption",
-          [      28     *30    ] = "suggestion: [error: corrupted data]",
-          [      28     *30 + 4] = "attempting to restore data...",
-          [      32     *30    ] = "fatal error: dynamic hint module panicked",
-          [      32     *30 + 4] = "restarting dynamic hint module...",
-          [      34     *30    ] = "failed to restart dynamic hint module",
-          [      34     *30 + 4] = "dynamic hint module in unrecoverable state, please contact maintenance service for reinstall",
-          [      34     *30 + 8] = "uploading crashlog to test report database...",
-          [      35     *30    ] = "error: planetary network unavailable, saving crashlog for later upload",
-          [      35     *30 + 2] = "please reconnect to [Tempest] planetary network as soon as possible",
-        },
-      },
 		},
 		completionReward = {
 			experience = planetUtilities.MAIN_EXP,

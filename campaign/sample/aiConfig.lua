@@ -1,3 +1,6 @@
+
+local AiPrefixFunc = VFS.Include(LUA_DIRNAME .. "configs/gameConfig/zk/aiPrefixFunc.lua")
+
 local aiLibFunctions = {}
 
 local circuitDifficulties = {
@@ -9,17 +12,17 @@ local circuitDifficulties = {
 
 local circuitDifficultiesAlly = {
 	"CircuitAINormal",
-	"CircuitAINormal",
+	"CircuitAIHard",
 	"CircuitAIHard",
 	"CircuitAIBrutal",
 }
 
 function aiLibFunctions.Circuit_difficulty_autofill(difficultySetting)
-	return ((WG.Chobby.Configuration:GetIsDevEngine() and "Dev") or "") .. circuitDifficulties[difficultySetting]
+	return AiPrefixFunc() .. circuitDifficulties[difficultySetting]
 end
 
 function aiLibFunctions.Circuit_difficulty_autofill_ally(difficultySetting)
-	return ((WG.Chobby.Configuration:GetIsDevEngine() and "Dev") or "") .. circuitDifficultiesAlly[difficultySetting]
+	return AiPrefixFunc() .. circuitDifficultiesAlly[difficultySetting]
 end
 
 return {

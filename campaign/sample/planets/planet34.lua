@@ -44,6 +44,10 @@ local function GetPlanet(planetUtilities, planetID)
 				image = "unitpics/planefighter.png",
 				text = [[Swifts are good for intercepting enemy bombers or protecting your own. Use the manual fire (default hotkey D) to activate a speed boost.]]
 			},
+			{
+				image = "LuaUI/Images/ibeam.png",
+				text = [[Metal income from extractors is split evenly between teammates, with whoever builds an extractor temporarily recieving a slightly larger share as payment. Reclaim is private though, as is any metal in storage. Mouse over the metal icon at the top of the screen for a detailed breakdown.]]
+			},
 		},
 		gameConfig = {
 			mapName = "Valles_Marineris_v2",
