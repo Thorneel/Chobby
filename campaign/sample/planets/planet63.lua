@@ -1223,7 +1223,7 @@ local function GetPlanet(planetUtilities, planetID)
 							spawnRadius = 50,
 							delay = 15*30*60,
 							orbitalDrop = true,
-              warningText = planetUtilities.messages.enemyOrbitalDrop,
+							warningText = planetUtilities.messages.enemyOrbitalDrop,
 						},
 						{
 							name = "nebula",
@@ -1271,7 +1271,7 @@ local function GetPlanet(planetUtilities, planetID)
 							spawnRadius = 50,
 							delay = 19*30*60,
 							orbitalDrop = true,
-              warningText = planetUtilities.messages.enemyOrbitalDrop,
+							warningText = planetUtilities.messages.enemyOrbitalDrop,
 						},
 						{
 							name = "chicken_dragon",
@@ -1291,7 +1291,7 @@ local function GetPlanet(planetUtilities, planetID)
 							spawnRadius = 50,
 							delay = 22*30*60,
 							orbitalDrop = true,
-              warningText = planetUtilities.messages.enemyOrbitalDrop,
+							warningText = planetUtilities.messages.enemyOrbitalDrop,
 						},
 						{
 							name = "striderbantha",
@@ -1324,7 +1324,7 @@ local function GetPlanet(planetUtilities, planetID)
 							orbitalDrop = true,
 							difficultyAtLeast = 1,
 							difficultyAtMost = 1,
-              warningText = planetUtilities.messages.enemyOrbitalDrop,
+							warningText = planetUtilities.messages.enemyOrbitalDrop,
 						},
 						{
 							name = "chickenflyerqueen",
@@ -1347,7 +1347,7 @@ local function GetPlanet(planetUtilities, planetID)
 							orbitalDrop = true,
 							difficultyAtLeast = 2,
 							difficultyAtMost = 2,
-              warningText = planetUtilities.messages.enemyOrbitalDrop,
+							warningText = planetUtilities.messages.enemyOrbitalDrop,
 						},
 						{
 							name = "chickenflyerqueen",
@@ -1370,7 +1370,7 @@ local function GetPlanet(planetUtilities, planetID)
 							orbitalDrop = true,
 							difficultyAtLeast = 3,
 							difficultyAtMost = 3,
-              warningText = planetUtilities.messages.enemyOrbitalDrop,
+							warningText = planetUtilities.messages.enemyOrbitalDrop,
 						},
 						{
 							name = "chickenflyerqueen",
@@ -1393,7 +1393,7 @@ local function GetPlanet(planetUtilities, planetID)
 							orbitalDrop = true,
 							difficultyAtLeast = 4,
 							difficultyAtMost = 4,
-              warningText = planetUtilities.messages.enemyOrbitalDrop,
+							warningText = planetUtilities.messages.enemyOrbitalDrop,
 						},
 					},
 					startUnits = {

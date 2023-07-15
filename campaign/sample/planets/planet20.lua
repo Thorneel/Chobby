@@ -391,7 +391,7 @@ local function GetPlanet(planetUtilities, planetID)
 							spawnRadius = 50,
 							delay = 8*30*60,
 							orbitalDrop = true,
-              warningText = planetUtilities.messages.enemyOrbitalDrop,
+							warningText = planetUtilities.messages.enemyOrbitalDrop,
 						},
 						{
 							name = "tankriot",
@@ -451,7 +451,7 @@ local function GetPlanet(planetUtilities, planetID)
 							spawnRadius = 50,
 							delay = 11*30*60,
 							orbitalDrop = true,
-              warningText = planetUtilities.messages.enemyOrbitalDrop,
+							warningText = planetUtilities.messages.enemyOrbitalDrop,
 						},
 						{
 							name = "tankassault",
@@ -1087,10 +1087,10 @@ local function GetPlanet(planetUtilities, planetID)
 					experience = planetUtilities.BONUS_EXP,
 				},
 			},
-      messagesOverTime = {
-        displayAfterVictory = true,
-        messages = planetUtilities.messageGenerators.VictoryAfterTime("Tech Lab", 900),
-      },
+			messagesOverTime = {
+				displayAfterVictory = true,
+				messages = planetUtilities.messageGenerators.VictoryAfterTime("Tech Lab", 900),
+			},
 		},
 		completionReward = {
 			experience = planetUtilities.MAIN_EXP,

@@ -2281,7 +2281,7 @@ local function GetPlanet(planetUtilities, planetID)
 							spawnRadius = 150,
 							delay = 2*30*60,
 							orbitalDrop = true,
-              warningText = planetUtilities.messages.enemyOrbitalDrop,
+							warningText = planetUtilities.messages.enemyOrbitalDrop,
 						},
 						{
 							name = "striderscorpion",
@@ -2292,7 +2292,7 @@ local function GetPlanet(planetUtilities, planetID)
 							delay = 4*30*60,
 							orbitalDrop = true,
 							difficultyAtLeast = 4,
-              warningText = planetUtilities.messages.enemyOrbitalDrop,
+							warningText = planetUtilities.messages.enemyOrbitalDrop,
 						},
 						{
 							name = "striderscorpion",
@@ -2304,7 +2304,7 @@ local function GetPlanet(planetUtilities, planetID)
 							orbitalDrop = true,
 							difficultyAtLeast = 2,
 							difficultyAtMost = 3,
-              warningText = planetUtilities.messages.enemyOrbitalDrop,
+							warningText = planetUtilities.messages.enemyOrbitalDrop,
 						},
 						{
 							name = "striderbantha",
@@ -2315,7 +2315,7 @@ local function GetPlanet(planetUtilities, planetID)
 							delay = 6*30*60,
 							orbitalDrop = true,
 							difficultyAtLeast = 4,
-              warningText = planetUtilities.messages.enemyOrbitalDrop,
+							warningText = planetUtilities.messages.enemyOrbitalDrop,
 						},
 						{
 							name = "striderscorpion",
@@ -2325,7 +2325,7 @@ local function GetPlanet(planetUtilities, planetID)
 							spawnRadius = 150,
 							delay = 8*30*60,
 							orbitalDrop = true,
-              warningText = planetUtilities.messages.enemyOrbitalDrop,
+							warningText = planetUtilities.messages.enemyOrbitalDrop,
 						},
 						{
 							name = "striderscorpion",
@@ -2336,7 +2336,7 @@ local function GetPlanet(planetUtilities, planetID)
 							delay = 10*30*60,
 							orbitalDrop = true,
 							difficultyAtLeast = 3,
-              warningText = planetUtilities.messages.enemyOrbitalDrop,
+							warningText = planetUtilities.messages.enemyOrbitalDrop,
 						},
 					},
 					startUnits = {

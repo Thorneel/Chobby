@@ -2845,7 +2845,7 @@ local function GetPlanet(planetUtilities, planetID)
 							spawnRadius = 150,
 							delay = 4*30*60,
 							orbitalDrop = true,
-              warningText = planetUtilities.messages.enemyOrbitalDrop,
+							warningText = planetUtilities.messages.enemyOrbitalDrop,
 						},
 						{
 							name = "amphassault",

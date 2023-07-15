@@ -1708,7 +1708,7 @@ local function GetPlanet(planetUtilities, planetID)
 							commands = {
 								{cmdID = planetUtilities.COMMAND.FIGHT, pos = {3620, 1000}},
 							},
-              warningText = planetUtilities.messages.enemyOrbitalDrop,
+							warningText = planetUtilities.messages.enemyOrbitalDrop,
 						},
  						{
 							name = "vehassault",
@@ -1867,7 +1867,7 @@ local function GetPlanet(planetUtilities, planetID)
 							commands = {
 								{cmdID = planetUtilities.COMMAND.FIGHT, pos = {3620, 1000}},
 							},
-              warningText = planetUtilities.messages.enemyOrbitalDrop,
+							warningText = planetUtilities.messages.enemyOrbitalDrop,
 						},
  						{
 							name = "vehassault",
@@ -1922,7 +1922,7 @@ local function GetPlanet(planetUtilities, planetID)
 							commands = {
 								{cmdID = planetUtilities.COMMAND.FIGHT, pos = {3620, 1000}},
 							},
-              warningText = planetUtilities.messages.enemyOrbitalDrop,
+							warningText = planetUtilities.messages.enemyOrbitalDrop,
 						},
  						{
 							name = "veharty",
@@ -2053,7 +2053,7 @@ local function GetPlanet(planetUtilities, planetID)
 							commands = {
 								{cmdID = planetUtilities.COMMAND.FIGHT, pos = {3620, 1000}},
 							},
-              warningText = planetUtilities.messages.enemyOrbitalDrop,
+							warningText = planetUtilities.messages.enemyOrbitalDrop,
 						},
 					},
 					startUnits = {
@@ -2240,10 +2240,10 @@ local function GetPlanet(planetUtilities, planetID)
 					experience = planetUtilities.BONUS_EXP,
 				},
 			},
-      messagesOverTime = {
-        displayAfterVictory = true,
-        messages = planetUtilities.messageGenerators.VictoryAfterTime("Tech Lab", 30*60),
-      },
+			messagesOverTime = {
+				displayAfterVictory = true,
+				messages = planetUtilities.messageGenerators.VictoryAfterTime("Tech Lab", 30*60),
+			},
 		},
 		completionReward = {
 			experience = planetUtilities.MAIN_EXP,

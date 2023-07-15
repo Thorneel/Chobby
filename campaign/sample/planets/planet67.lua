@@ -1554,7 +1554,7 @@ local function GetPlanet(planetUtilities, planetID)
 							spawnRadius = 150,
 							delay = 1*30*60,
 							orbitalDrop = true,
-              warningText = planetUtilities.messages.enemyOrbitalDrop,
+							warningText = planetUtilities.messages.enemyOrbitalDrop,
 						},
 						{
 							name = "shipassault",
@@ -1666,7 +1666,7 @@ local function GetPlanet(planetUtilities, planetID)
 							spawnRadius = 150,
 							delay = 2*30*60,
 							orbitalDrop = true,
-              warningText = planetUtilities.messages.enemyOrbitalDrop,
+							warningText = planetUtilities.messages.enemyOrbitalDrop,
 						},
 						{
 							name = "shipaa",
